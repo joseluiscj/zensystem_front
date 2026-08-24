@@ -1,0 +1,126 @@
+<mat-dialog-content class="cl_model">
+    <div class="modal_div_cab_title">
+        <div class="card-title-text" style="font-weight: 500;">
+          Producto
+        </div> 
+        <div class="modal_close_tile" (click)="close()" >
+            <mat-icon>close</mat-icon>
+        </div> 
+    </div> 
+    <mat-divider></mat-divider>  
+    <div class="example-container mt-3">
+        <form [formGroup]="basicForm"> 
+            <div class="row wrap">  
+                <div class="col-md-12">                 
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row  ">  
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input">
+                                        <mat-label class="labeltext">Nombre</mat-label>
+                                        <input type="text" matInput required placeholder="" name="nombre" formControlName="nombre" autocomplete="off" >
+                                        <mat-hint *ngIf="basicForm.controls['nombre'].hasError('minlength') && basicForm.controls['nombre'].touched"
+                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['nombre'].errors?.["minlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['nombre'].hasError('maxlength') && basicForm.controls['nombre'].touched"
+                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['nombre'].errors?.["maxlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['nombre'].hasError('required') && basicForm.controls['nombre'].touched"
+                                            class="form-error-msg"> El campo es obligatorio.
+                                        </mat-hint>
+                                    </mat-form-field>
+                                </div> 
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input">
+                                        <mat-label class="labeltext">Saldo</mat-label>
+                                        <input type="number" inputmode="numeric" matInput required placeholder="" name="saldo" formControlName="saldo" autocomplete="off" class="example-right-align">
+                                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
+                                        <mat-hint *ngIf="basicForm.controls['saldo'].hasError('minlength') && basicForm.controls['saldo'].touched"
+                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['saldo'].errors?.["minlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['saldo'].hasError('maxlength') && basicForm.controls['saldo'].touched"
+                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['saldo'].errors?.["maxlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['saldo'].hasError('required') && basicForm.controls['saldo'].touched"
+                                            class="form-error-msg"> El campo es obligatorio.
+                                        </mat-hint>
+                                    </mat-form-field>
+                                </div>  
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Moneda</mat-label>
+                                        <mat-select   placeholder="Seleccione" formControlName="moneda" style="font-size: 15px;">
+                                            <mat-option  > f_nombre</mat-option> 
+                                            <mat-option  > f_nombre</mat-option> 
+                                        </mat-select>
+                                    </mat-form-field> 
+                                </div> 
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Medio de Pago</mat-label>
+                                        <mat-select   placeholder="Seleccione" formControlName="medioPago" style="font-size: 15px;">
+                                            <mat-option  > f_nombre</mat-option> 
+                                        </mat-select>
+                                    </mat-form-field> 
+                                </div> 
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Sucursal</mat-label>
+                                        <mat-select   placeholder="Seleccione" formControlName="sucursal" style="font-size: 15px;">
+                                            <mat-option  > sucursal</mat-option> 
+                                        </mat-select>
+                                    </mat-form-field> 
+                                </div> 
+                                <!-- <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input">
+                                        <mat-label class="labeltext">cajaTipo</mat-label>
+                                        <input type="number" inputmode="numeric" required matInput placeholder="" name="cajaTipo" formControlName="cajaTipo" autocomplete="off">
+                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('minlength') && basicForm.controls['cajaTipo'].touched"
+                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['cajaTipo'].errors?.["minlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('maxlength') && basicForm.controls['cajaTipo'].touched"
+                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['cajaTipo'].errors?.["maxlength"]?.requiredLength}} caracteres.
+                                        </mat-hint>
+                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('required') && basicForm.controls['cajaTipo'].touched"
+                                            class="form-error-msg"> El campo es obligatorio.
+                                        </mat-hint>
+                                    </mat-form-field>
+                                </div>  -->
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Tipo de Caja</mat-label>
+                                        <mat-select   placeholder="Seleccione" formControlName="sucursal" style="font-size: 15px;">
+                                            <mat-option  > sucursal</mat-option> 
+                                        </mat-select>
+                                    </mat-form-field> 
+                                </div> 
+                                <div class="col-md-12">
+                                    <section>
+                                        <mat-checkbox
+                                        style="border: 1px solid;border-radius: 8px;padding: 0px 30px;"
+                                            [checked]="check_pendiente"
+                                            (change)="onPendienteChange($event)"
+                                        >
+                                            Es caja principal
+                                        </mat-checkbox>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <hr>
+                <button type="button" mat-raised-button color="accent" (click)="close()" class="btn_secondary">
+                    <mat-icon>close</mat-icon> Cancelar
+                </button>
+                <button type="submit" mat-raised-button class="btn_primary" (click)="save()" [disabled]="isButtonDisabled" style="margin-left: 5px; background-color: #cc8431;" >
+                    <mat-icon>save</mat-icon><i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i> Guardar
+                </button>
+            </div>
+        </form>
+    </div>      
+</mat-dialog-content>
+
+

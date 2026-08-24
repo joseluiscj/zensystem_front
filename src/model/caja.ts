@@ -9,6 +9,12 @@ export class Caja{
 
 
     f_nombre:string;
-    
+    f_saldo:string;
+    f_moneda:string;
+    f_medioPago:string;
+    f_sucursal:string;
+    f_cajaTipo:string;
+    f_principal:string;
+
     
 }

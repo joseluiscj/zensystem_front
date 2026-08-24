@@ -71,7 +71,6 @@ export class RestauranteDialogDetalleComponent implements OnInit {
     private globalService: GlobalService,
     private productoService:ProductoService,
     private _snackbar: MatSnackBar,
-     
   ){}
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });

@@ -15,6 +15,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertMsjComponent } from '../alert-msj/alert-msj.component';
 import { CajaService } from '../../services/caja.service';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { CajaDialogComponent } from './caja-dialog/caja-dialog.component';
 
 @Component({
   selector: 'app-caja',
@@ -72,12 +73,12 @@ export class CajaComponent {
       nombres: new FormControl(''), 
     });
   }
-  openDialog(id?: number) {
-    // this._dialog.open(CategoriaDialogComponent, {
-    //   data: id,
-    //   disableClose: true,
-    //   panelClass: 'modal-dialog-right',
-    // })
+  openDialog(id?: number) { 
+    this._dialog.open(CajaDialogComponent, {
+      data: id,
+      disableClose: true,
+      panelClass: 'modal-dialog-right',
+    })
   }
   btnBuscar(): void {
     // const formValues = this.basicForm.value; 

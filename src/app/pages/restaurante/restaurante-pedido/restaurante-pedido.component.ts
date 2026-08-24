@@ -46,7 +46,7 @@ export class RestaurantePedidoComponent implements OnInit {
   error:boolean=false;
   listaDetalle:Producto[] = [];
   pedido:Pedido;
-
+  
   isButtonDisabled:boolean=false;
   selectePagoCon:number;
   selecteCaja:number;
