@@ -1,0 +1,145 @@
+.example-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.example-sidenav-container {
+    flex: 1;
+}
+
+.example-spacer {
+    flex: 1 1 auto;
+}
+
+.active {
+    background-color: #dcdcdc;
+}
+
+.myButton:focus{
+    box-shadow: 0 0 rgba(255, 255, 255, 1) !important;
+    transition:none !important;
+    background-color: rgba(255, 255, 255, 1) !important;
+    -webkit-tap-highlight-color:rgba(255, 255, 255, 1) !important;
+}
+
+.mat-elevation-z6 {
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+}
+
+.mod{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-left: 10px;
+    font-size: 28px;
+}
+
+.icon-text {
+    display: flex;
+    align-items: center;
+}
+  
+.icon-text img {
+    margin-right: 8px; /* Espacio entre la imagen y el texto, opcional */
+}
+
+@media (max-width: 550px){
+    .ocultar{
+        display: none;
+    }
+}
+.nav_top{
+    position: fixed;
+    width: -webkit-fill-available;
+    background: #144c85;
+    box-shadow: var(--mdc-elevated-card-container-elevation, var(--mat-app-level1));
+    border-bottom: 1px solid #144c85;
+}
+.mat-toolbar.mat-primary {
+    --mat-toolbar-container-background-color: none;
+    --mat-toolbar-container-text-color: none;
+}
+
+/* .active[_ngcontent-ng-c1724745955] {
+    background-color: #2F87E5 !important;
+    color: #ffff;
+} */
+
+/* Estilos para la opción activa */
+.active-link {
+    background-color: #02AFCC; /* Color de fondo para la opción activa */
+    color: white;            /* Color del texto para la opción activa */
+    box-shadow: 0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23)!important;
+}
+  
+.active-link mat-icon {
+    color: white;            /* Cambia el color del ícono en la opción activa */
+}
+  
+/* Si quieres animaciones al cambiar de opción */
+.active-link {
+    transition: background-color 0.3s ease, #02AFCC 0.3s ease;
+}
+
+.main-header {
+    z-index: 1000;
+}
+
+/* .cdk-overlay-pane{
+    margin-right: 10px !important;
+} */
+
+[class*=sidebar-dark-] .sidebar a {
+    color: #ffffffe0 !important;
+}
+::ng-deep .mat-expansion-indicator::after {
+	color: white !important; /* Cambia la flecha a blanco */
+  }
+
+.nav_icon{
+    color: #223580;
+    /* box-shadow: 0 0px 4px rgba(0, 0, 0, .16), 0 2px 4px rgba(0, 0, 0, .23) !important; */
+    box-shadow: 0px 0px 0px 0px !important;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+
+.sidenav-container {
+    height: 100vh;
+}
+  
+.sidenav {
+    width: 250px;
+    padding: 10px;
+}
+  
+mat-expansion-panel {
+    background: #113C68;
+}
+  
+mat-list-item a {
+    text-decoration: none;
+    color: #ffff;
+    padding: 5px 10px;
+    display: block;
+}
+
+.mat-expansion-panel:not([class*=mat-elevation-z]){
+    box-shadow: 0px 0px 0px 0px;
+}
+.btn_salir_menu{
+    color: #fff;
+    font-size: 13px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

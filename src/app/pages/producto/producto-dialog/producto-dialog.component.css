@@ -1,0 +1,168 @@
+.custom-input{
+    width: 100%;
+    margin-bottom: -8px;
+}
+
+.cl_model{
+    max-height: max-content;
+    margin-bottom: 69px;
+}
+
+/***********************/
+.expediente-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-top: 10px;
+    position: relative;
+    border-radius: 5px;
+}
+
+.expediente-form {
+  display: flex;
+  flex-direction: column;
+}
+
+button.btn-danger {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+/*  */
+.custom-input .mat-form-field-label,
+.custom-input .mat-input-element {
+    font-size: 13px; 
+}
+/* .labeltext {
+  font-size: 12px;  
+} */
+
+ 
+.textbtn{
+  width: -webkit-fill-available;
+  color: #17A2B8;
+  border-color: #17A2B8;
+  border-radius: 5px;
+}
+
+.form-error-msg{
+    margin-top: -14px;
+}
+
+.btn_delt{
+  padding: 1px 8px 2px 8px; 
+  top: 2px;
+  right: 2px; 
+  box-shadow: 0 0px 4px rgba(0, 0, 0, .16), 0 2px 4px rgba(0, 0, 0, .23) !important;
+}
+ 
+/*////////////////////////////////*/
+.custom-file-upload {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px;
+  background: #f9f9f9;
+}
+
+.file-label {
+  flex-grow: 1;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.upload-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.upload-btn:hover {
+  background: #e68900;
+}
+.style_btn_file{
+  background: #fff;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-radius: 5px 0px 0px 5px;
+  color: #485973;
+}
+/*////////////////////////////////*/
+/* PARA SUBIR ARCHIVOS */
+.custom-file-upload-form {
+  display: flex;
+  align-items: center;
+}
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+.custom-file-label {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  width: 200px; /* Ajusta el ancho según tus necesidades */
+  text-align: left;
+  margin-right: 10px; /* Espacio entre el label y el botón */
+  border-radius: 5px;
+  background: #fff;
+}
+.custom-file-button {
+  background-color: #ff9900;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.file_frm{
+  background: #E8E9ED;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+.wrap_files {
+  list-style: none;
+  padding: 5px !important;
+}
+.wrap_files .li_files {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #e4e1e1;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+.wrap_files .li_files .detail_evidence {
+  display: flex;
+  align-items: center;
+  padding-right: 5px;
+}
+.wrap_files .li_files .wrap_svg {
+  padding-right: 10px;
+}
+.wrap_files .li_files .detail_evidence .wrap_svg img {
+  width: 25px;
+  height: 25px;
+}
+.wrap_files .li_files .actions_files {
+  display: flex;
+  justify-content: center;
+}
+.wrap_files .li_files .actions_files a {
+  color: var(--info) !important;
+}
+.wrap_files .li_files .actions_files a {
+  color: #2ca8ff;
+  padding: 2px 4px;
+}
+/* FIN SUBIR ARCHIVO */
+.uppercase {
+  text-transform: uppercase;
+}
+

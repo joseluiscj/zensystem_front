@@ -1,0 +1,266 @@
+.mat-card {
+    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    position: relative;
+    padding: 16px;
+    border-radius: 4px;
+}
+
+.mat-card {
+margin: .5rem;
+overflow: hidden;
+}
+
+table {
+width: 100%;
+}
+
+/* Estilos para hacer que la tabla sea responsiva */
+.mat-table {
+width: 100%;
+overflow-x: auto;
+}
+
+.mat-header-cell, .mat-cell {
+padding: 8px 16px;
+}
+
+@media (max-width: 768px) {
+    .mat-header-cell, .mat-cell {
+        padding: 4px 8px;
+    }
+
+    .mat-table {
+        font-size: 12px;
+    }
+
+    .mat-paginator {
+        font-size: 12px;
+    }
+}
+
+.dat_inactivo {
+    font-weight: 500;
+    color: #fff;
+    background: #838383;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-radius: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 10px;
+}
+
+.dat_activo {
+    font-weight: 500;
+    color: #fff;
+    background: #FF7619;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-radius: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 10px;
+}
+
+.txt_e_act {
+    color: #FF7619 !important;
+    font-weight: bold !important;
+    font-size: 13px;
+}
+.txt_e_inact {
+    color: #838383 !important;
+    font-weight: bold !important;
+    font-size: 13px;
+}
+
+.small-button {
+    width: 33px;
+    height: 33px;
+    min-width: 33px;
+    min-height: 33px;
+    font-size: 9px;
+}
+
+.small-buttonc {
+    width: 24px; /* Ajusta el ancho del botón */
+    height: 26px; /* Ajusta la altura del botón */
+    /* border-color: #6F8D5F !important; */
+}
+  
+.small-buttonc .mat-icon {
+    font-size: 16px; /* Ajusta el tamaño del icono */
+    /* color: #6F8D5F !important; */
+}
+
+/*///////////////MOVIL//////////////////////*/
+.content_body_web{
+    display: block;
+}
+.content_body_movil{
+    display: none;
+}
+@media (max-width: 600px){
+    .content_body_web{
+        display: none;
+    }
+    .content_body_movil{
+        display: block;
+    }
+    .ocultar{
+        display: none;
+    }
+}
+ 
+.car_ulli{
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+}
+.car_lispan{
+    font-weight: 500;
+} 
+.car_mat-cad-act{
+    border-top: 4px solid #4758B8;
+    background: #4758B8; 
+    justify-content: center;
+}
+.car_mat-card_body{
+    /* border: 2px solid #4758B8;
+    margin: 4px; */
+    margin-bottom: 12px;
+    font-size: 13px;
+}  
+.car_cls-hr{
+    margin-bottom: 12px;
+    margin-top: 0px;
+} 
+.car_ul_cls{
+    padding-left: 4px;
+    margin-bottom: 6px !important;
+} 
+.car_icon_mat{
+    font-size: 16px;
+}
+.car_buton_span{
+    font-size: 12px;
+}
+.car_action_button{
+    height: 30px;
+}
+.car_color_footer{
+    color: #043B59;
+}
+
+.active > .page-link, .page-link.active {
+    z-index: 3;
+    color: var(--bs-pagination-active-color);
+    background-color: #4758B8;
+    border-color: #4758B8;
+}
+
+.car_mat-cad-descative{
+    border-top: 4px solid #838383;
+    background: #838383; 
+    justify-content: center;
+}
+.car_mat-card_body_desactive{
+    border: 2px solid #838383;
+    margin: 4px;
+    margin-bottom: 12px;
+}
+
+.btn_action{
+    /* border-color: #6F8D5F !important; */
+}
+.btn_delete{
+    color: #EB5757 !important;
+    border: 1px #EB5757 solid !important;
+}
+.car_footer{
+    justify-content: center;
+    background: #925B2E !important;
+}
+.car_footer_obs{
+    justify-content: center;
+    background: orange !important;
+}
+/*=========FIN=============*/
+/* styles.css */
+.custom-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Color y opacidad del fondo */
+    z-index: 1000; /* Asegúrate de que esté por encima del menú */
+}
+
+
+
+.content-below-button {
+    margin-top: 10px; /* Ajusta la distancia entre el botón y el contenido */
+    padding: 15px;
+    background-color: #f5f5f5; /* Fondo opcional para el contenido desplegable */
+    border: 1px solid #ddd;
+}
+
+
+.custom-input {
+    font-size: 14px;
+}
+
+.btn_boton_filter{
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 680px) {
+    .btn_boton_filter{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+
+.stable{
+    border-radius: 8px;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+/**/
+.small-font-table {
+    font-size: 12px; /* Ajusta el tamaño de la fuente según necesites */
+}
+
+/* También puedes especificar para `th` y `td` si deseas un control más preciso */
+.small-font-table th, .small-font-table td {
+    font-size: 12px;
+}
+
+ /* Estilo de zebra para filas de la tabla */
+ .fila-par {
+    background-color: #f2f2f2; /* Color para filas pares */
+}
+  
+.fila-impar {
+    background-color: #ffffff; /* Color para filas impares */
+}
+
+/* para la tabla */
+.mat-mdc-header-row{
+    border-radius: 10px !important;
+    color: #fff !important;
+    background: #144C85 !important;
+}
+.mat-sort-header-content {
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.mat-mdc-card-content{
+    padding: 4px !important;
+}
+/* Fin para la tabla */

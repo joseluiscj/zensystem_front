@@ -1,0 +1,81 @@
+<div class="contenido-central">
+    <ng-container *ngIf="mostrarFormulario">
+        <app-restaurante-pedido
+        [mesa_Id]="idMesaSeleccionada"
+        (cerrar)="cerrarFormulario()" 
+        ></app-restaurante-pedido>
+    </ng-container>
+
+    <div *ngIf="!mostrarFormulario">
+        <div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
+            <div class="m-section-title">
+                <h4 class="m-title mb-1">Restaurante</h4>
+                <div class="m-title-description">Desde aquí puedes gestionar tus Pedidos.</div>
+            </div>
+            <div class="m-section-buttons " align="center">
+                <!-- <button mat-raised-button color="primary" (click)="openDialog()" class="btn_p" >
+                    <mat-icon>add</mat-icon> Nueva Categoría
+                </button> --> 
+            </div>  
+        </div>     
+        
+        <div class="justify-content-center program-view-none-filters mb-0" style="display: flex;flex-wrap:wrap; margin-top: -30px;">
+            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
+                <div class="m-text-success number-state" style="color: #F6862A;" >{{mOcupadas}} </div>
+                <div class="num_info">Mesas Ocupadas</div>
+            </div>
+            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
+                <div class="m-text-info number-state" style="color: #1D95A8;">{{mTotal-mOcupadas}}</div>
+                <div class="num_info">Mesas Disponibles</div>
+            </div>
+            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
+                <div class="m-text-secondary number-state"  style="color: #223580;">{{mTotal}}</div>
+                <div class="num_info">Total Mesas</div>
+            </div> 
+        </div>
+        <hr>
+        <div class="row m-0 p-0 ">
+            <div style="text-align: center;font-weight: 500;" *ngIf="cardaData">
+                <div style="margin: 10px 28px;"  >
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                </div>
+                <!-- <i class="fas fa-spinner fa-spin"></i> Cargando datos... -->
+            </div>
+            <div class="col-md-3" *ngFor="let mesa of mesas; let i=index" >
+                <mat-card  class="example-card mb-3  card_st">
+                    <mat-card-header class="st_header {{mesa.disponible==0?'st_cart_hear_dis_no':'st_cart_hear_dis'}}" (click)="openDialog(mesa.id)" >
+                        <mat-icon style="color: #fff;">table_restaurant</mat-icon>
+                        <p class="mb-1" style="color: #fff;">
+                            <span style="font-weight: 500;">&nbsp;{{mesa.nombre}}</span>  
+                        </p>
+                    </mat-card-header>
+                    <mat-card-content (click)="openDialog(mesa.id)">
+                        <div class="mt-2" *ngIf="mesa.disponible==0">
+                            <div class="st_cart_hr">
+                                <div style="font-weight: 500;">Cliente:</div>
+                                <div>{{mesa.cliente}}</div>
+                            </div>
+                            <div class="st_cart_hr">
+                                <div style="font-weight: 500;">Monto:</div>
+                                <div>{{mesa.montoTotal}}</div>
+                            </div>
+                            <div class="st_cart_hr">
+                                <div style="font-weight: 500;">Estado:</div>
+                                <div><b class="{{mesa.state==1?'st_txt_ocupado':'st_txt_disponible'}}" >{{mesa.state==1?'ATENDIDO':'PENDIENTE'}}</b></div>
+                            </div>
+                            <!-- <div class="st_btn_card_pedido " >
+                                Liberar mesa
+                            </div>  -->
+                        </div>
+                        <div class="mt-2" *ngIf="mesa.disponible!=0">
+                            <div style="display: flex;justify-content: center;">   
+                                <mat-icon class="st_icon_disponible" >dining</mat-icon>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>  
+        </div>
+        <br><br>
+    </div>
+</div>

@@ -1,0 +1,185 @@
+<div>
+    <div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;"  >
+        <div class="m-section-title">
+        
+        </div>
+        <div class="m-section-buttons " align="center">
+            <button type="submit" mat-raised-button class="btn_tercero_delete mb-2" (click)="anularMesa()" *ngIf="accion=='actualizar'">
+                <mat-icon>delete</mat-icon> Anular Pedido
+            </button>&nbsp;
+            <button type="submit" mat-raised-button class="btn_primary  mb-2" (click)="liberarMesa()" *ngIf="accion=='actualizar'">
+                <mat-icon>bookmark_check</mat-icon> Liberar mesa
+            </button>&nbsp;
+            <button mat-raised-button color="accent" (click)="cerrarFormulario()" class="btn_secondary btn_action_panel_secondary  mb-2" >
+                <mat-icon>arrow_circle_left</mat-icon> Regresar
+            </button>
+        </div> 
+    </div>
+        <div style="text-align: center;margin-bottom: 5px; font-size: 11px;font-weight: 500;" *ngIf="!ocultarCarga">
+        <span>
+            <i class="fas fa-spinner fa-spin"></i> Cargando datos...
+        </span>
+    </div>
+
+    <div class="card_contest_div">
+        <form [formGroup]="basicForm"> 
+            <div class="row m-0 "> 
+                <div class="col-md-12 m_div">
+                    <div class="m_div_tex">
+                        {{nombreMesa}}
+                    </div>
+                </div>
+                <div class="col-md-3">      
+                    <div class="list_platos">
+                        --- Datos ---
+                    </div>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Nombre del cliente</mat-label>
+                        <input matInput placeholder="" name="nombreCliente" formControlName="nombreCliente" autocomplete="off"  class="uppercase">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Cajero</mat-label>
+                        <mat-select [(value)]="selecteCajero" placeholder="Seleccione" formControlName="cajero" style="font-size: 15px;">
+                            <mat-option *ngFor="let data of listCajero" [value]="data.id"> {{data.f_nombre}}</mat-option> 
+                        </mat-select> 
+                    </mat-form-field>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Medio de pago</mat-label>
+                        <mat-select   [(value)]="selectePagoCon" placeholder="Seleccione" formControlName="pagoCon" style="font-size: 15px;">
+                            <mat-option value="EF"> Efectivo</mat-option>
+                            <mat-option value="TA"> Tarjeta Cre/Deb</mat-option>
+                        </mat-select> 
+                    </mat-form-field>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Caja</mat-label>
+                        <mat-select [(value)]="selecteCaja" placeholder="Seleccione" formControlName="caja" style="font-size: 15px;">
+                            <mat-option *ngFor="let caja of listCaja" [value]="caja.id"> {{caja.f_nombre}}</mat-option> 
+                        </mat-select>
+                    </mat-form-field> 
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Monto total</mat-label>
+                        <input type="number" inputmode="numeric" matInput class="example-right-align" placeholder="0.00" name="montoTotal" readonly="true" formControlName="montoTotal" autocomplete="off">
+                        <!-- <span matTextPrefix>$&nbsp;</span> -->
+                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
+                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('minlength') && basicForm.controls['montoTotal'].touched"
+                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['montoTotal'].errors?.["minlength"]?.requiredLength}} caracteres.
+                        </mat-hint>
+                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('maxlength') && basicForm.controls['montoTotal'].touched"
+                            class="form-error-msg"> No puede contener más de {{basicForm.controls['montoTotal'].errors?.["maxlength"]?.requiredLength}} caracteres.
+                        </mat-hint>
+                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('required') && basicForm.controls['montoTotal'].touched"
+                            class="form-error-msg"> El campo es obligatorio.
+                        </mat-hint>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Monto efectivo</mat-label>
+                        <input type="number" inputmode="numeric" matInput class="example-right-align" 
+                        (change)="fnVuelto()" 
+                        (keydown.enter)="fnVuelto()"
+                        placeholder="0.00" name="montoEfectivo" formControlName="montoEfectivo" autocomplete="off">
+                        <!-- <span matTextPrefix>$&nbsp;</span> -->
+                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
+                    </mat-form-field>
+                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                        <mat-label class="labeltext">Vuelto</mat-label>
+                        <input type="number" inputmode="numeric" matInput class="example-right-align" placeholder="0.00" name="vuelto" readonly="true" formControlName="vuelto" autocomplete="off">
+                        <!-- <span matTextPrefix>$&nbsp;</span>  -->
+                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
+                    </mat-form-field>
+                    <div style="display: flex;justify-content: space-around;">
+                        <section>
+                            <mat-checkbox
+                                [checked]="check_pendiente"
+                                (change)="onPendienteChange($event)"
+                            >
+                                Pendiente
+                            </mat-checkbox>
+                        </section>
+                        <section>
+                            <mat-checkbox
+                                [checked]="check_atendido"
+                                (change)="onAtendidoChange($event)"
+                            >
+                                Atendido
+                            </mat-checkbox>
+                        </section>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="row m-0">
+                        <div class="col-md-12 list_platos" style="font-weight: 500;">
+                            Lista de Productos
+                        </div> 
+                        <div class="col-md-4 mt-2 card_product" *ngFor="let value of listaDetalle; let i = index ">
+                            <div class="row st_card_mesa_list" style="font-size: 14px;">
+                                <div class="col-md-3 st_car_img_platos">
+                                    <img src="{{value.f_download_link}}" alt="" style="width: stretch;height: stretch;">
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="col-md-12 st_label_booton" style="justify-content: center;font-weight: bold;" >
+                                        <div class="st_txt_label">{{value.f_txtCategoria}}</div>
+                                    </div>
+                                    <div class="col-md-12"  style="border-bottom: 1px solid #a5949461;">
+                                        <div class="st_txt_label"> </div>
+                                        <div>{{value.f_txtProducto}} </div>
+                                    </div>
+                                    <div class="col-md-12 st_label_booton" >
+                                        <div class="st_txt_label">Precio:</div>
+                                        <div>$/{{value.f_precio}}</div>
+                                    </div>
+                                    <div class="col-md-12 st_label_booton" >
+                                        <div class="st_txt_label">Cantidad:</div>
+                                        <div>{{value.f_cantidad}}</div>
+                                    </div>
+                                    <div class="col-md-12 st_label_booton" >
+                                        <div class="st_txt_label">Sub Total:</div>
+                                        <div style="font-weight: 500;"> $/{{(value.f_subTotal)}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-md-12" style="display: flex;justify-content: space-between;">
+                                        <div class="st_txt_label">Obs:</div>
+                                        <div>{{value.f_observacion}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <hr class="m-0">
+                                </div>
+                                <div class="st_btn_action">
+                                    <button type="button" mat-raised-button color="primary" (click)="eliminarProducto(i)" style="background: #EB5757; color: #fff;height: 26px;font-size: 12px;">
+                                        <mat-icon>delete</mat-icon>Eliminar
+                                    </button>&nbsp;&nbsp;
+                                    <button type="button" mat-raised-button color="primary" (click)="actualizarProducto(i)" style="background: #01A99A; color: #fff;height: 26px;font-size: 12px;">
+                                        <mat-icon>border_color</mat-icon>Modificar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div style="text-align: center;margin-top: 20px;">
+                        <button type="button" mat-raised-button color="primary" (click)="openDialogDetalle()" style="margin-left: 5px;background-color: #1D95A8;color: #fff;" >
+                            <mat-icon>add</mat-icon> Agregar Producto
+                        </button>
+                    </div> 
+                    <br>
+                </div> 
+                <div class="col-md-12">
+                    <div style="text-align: center;padding: 11px 0px;">
+                        <hr>
+                        <button type="button" mat-raised-button color="accent" (click)="cerrarFormulario()" class="btn_secondary">
+                            <mat-icon>close</mat-icon> Cerrar
+                        </button>
+                        <button type="button" mat-raised-button class="btn_primary" (click)="save()" [disabled]="isButtonDisabled" style="margin-left: 5px; background-color: #cc8431;" >
+                            <mat-icon>save</mat-icon><i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i> Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>        
+
+        </form>
+    </div>
+
+    <br> 
+    <br> 
+</div>

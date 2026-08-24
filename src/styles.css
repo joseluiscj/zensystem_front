@@ -1,0 +1,375 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { 
+    margin: 0; 
+    font-family: Roboto,; 
+    /* font-family: "Roboto", sans-serif !important; */
+    background-color: #F4F6F9;
+}
+/* .cdk-overlay-pane{
+    margin-right: 10px !important;
+} */
+
+.style_aside {
+    height: 100vh;
+    overflow-y: hidden;
+    z-index: 1038;
+    bottom: 0;
+    float: none;
+    left: 0;
+    position: fixed;
+    top: 0;
+}
+
+.section-body-contect-router{
+    padding-top: 2cm !important;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #6F8D5F ;
+    border-radius: 2px;
+}
+::-webkit-scrollbar-track {
+    background: #dddddd;
+}
+
+@media (max-width: 640px) {
+    .m-section-title {
+        text-align: center;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    .m-section-title {
+        text-align: center;
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+}
+
+
+/*Modal a la derecha*/
+.modal-dialog-right  {
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    height: 100% !important;
+    width: 408px !important; /* Puedes ajustar el ancho según tus necesidades */
+    max-width: none !important;
+}
+
+@media (max-width: 500px) {
+    .modal-dialog-right {
+        width: 100vw !important;  
+        height: 100vh !important; 
+        max-width: 100vw !important;
+    }
+}
+
+/**/
+.wrap-title-with-buttons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    margin-bottom: 20px !important;
+}
+
+.m-layout-section {
+    padding: 0 10px !important;
+}
+.wrap-title-with-buttons {
+    /* padding-top: 24px !important; */
+    /* padding-bottom: 24px !important; */
+    background-color: var(--background-color) !important;
+}
+
+.m-title {
+    /* font-family: "Montserrat", sans-serif !important; */
+    font-weight: bold !important;
+    font-size: 32px !important;
+    line-height: 39px !important;
+    color: #043B59 !important;
+}
+ 
+@media (max-width: 640px) {
+    .wrap-title-with-buttons {
+        justify-content: center !important;
+    }
+    .m-section-title {
+        text-align: center !important;
+        margin-top: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    .m-title {
+        font-size: 24px !important;
+        line-height: 29px !important;
+    }
+    .m-layout-section {
+        padding: 0 8px !important;
+    }
+    .m-section-buttons .btn {
+        margin-bottom: 8px !important;
+        width: 250px !important;
+    }
+}
+
+.button-container {
+    position: absolute;
+    bottom: 16px;
+    left: -8px;
+    width: 100%;
+    text-align: end;
+    padding-right: 8px;
+}
+
+.btn_secondary{
+    color: #113C68 !important;
+    background: #fff !important;
+    border: 1px solid #113C68 !important;
+}
+.btn_primary{
+    background: #113C68 !important;
+    color: #fff !important;
+}
+.btn_tercero_delete{
+    background: #d03d2a  !important;
+    color: #fff !important;
+}
+.modal_div_cab_title{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal_close_tile{
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.labeltext{
+    font-weight: 400 !important;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    /* background-color: var(--mdc-filled-text-field-container-color, var(--mat-app-surface-variant)); */
+    background-color: #fff !important;
+}
+
+label{
+    font-weight: 400 !important;
+}
+
+.mat-mdc-form-field-infix {
+    flex: auto;
+    min-width: 0;
+    width: 100px !important;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.mdc-notched-outline {
+    height: 80% !important;
+}
+
+/* .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    background-color: #F44336 !important;
+}
+.mat-mdc-snack-bar-container .mdc-snackbar__label{
+    color: #fff;
+}
+.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled){
+    color: #fff !important;  
+} */
+
+body:not(.layout-fixed) .main-sidebar {
+    position: none !important;
+}
+
+.main-sidebar {
+    z-index: 1000 !important;
+}
+
+/*/////*/
+.dat_activo_user {
+    color: #34A853;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_anulado_user {
+    color: #F6911D;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+/****/
+.dat_habilitado{
+    color: #6F8D5F;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_inabilitado{
+    color: orange;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+/****/
+
+.dat_pendiente {
+    color: #F6911D;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_observado {
+    color: orange;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_verificado {
+    color: #34A853;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_comunicado {
+    color: #223580;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_sentenciado {
+    color: #AF2210;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_traslado{
+    color: #fff;
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid #AF2210;
+    background: #AF2210;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+}
+.dat_liberado{
+    font-weight: 500;
+    font-size: 12px;
+    border: 1px solid #34A853;
+    padding: 2px 6px 2px 6px;
+    border-radius: 10px;
+    background: #34A853;
+    color: #fff;
+}
+/*/////*/
+
+.fila-observado{
+    color: orange !important;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.btn_action{ 
+    /* background: #17A2B8 !important;
+    color: #fff !important; */
+    border: 1px solid #17A2B8 !important;
+    background: #fff !important;
+    color: #17A2B8 !important;
+}
+
+
+/* .small-font-table {
+    font-size: 12px !important;  
+}
+
+.small-font-table th, .small-font-table td {
+    font-size: 12px !important;
+} */
+.fc-event-start{
+    background: #0073B7 !important;
+    color: #fff !important;
+    cursor: pointer;
+}
+
+.fc-event-title{
+    font-weight: 400 !important;
+}
+
+.fc-timeGridWeek-button, .fc-dayGridMonth-button, .fc-timeGridDay-button,
+.fc-prev-button, .fc-next-button, .fc-today-button{
+    background: #17A2B8 !important;
+    border-color: #17A2B8 !important;
+}
+.fc-button-active{
+    background: #0e889b !important;
+}
+.fc-toolbar-title{
+    color: #485973 !important;
+}
+
+.fc-col-header-cell{
+    color: #485973 !important;
+}
+.fc-col-header-cell-cushion{
+    color: #485973 !important;
+}
+.fc-daygrid-day-number{
+    color: #485973 !important;
+}
+
+.event-tras {
+    background-color: #AF2210 !important; /* Verde */
+    border-color: #AF2210 !important;
+}
+.event-lib {
+    background-color: #28a745 !important; /* Verde */
+    border-color: #28a745 !important;
+}
+
+.btn_p{
+    margin-left: 5px !important; 
+    background-color: #cc8431 !important;
+}
+
+.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    color: #fff !important;
+    border-radius: var(--mdc-snackbar-container-shape, var(--mat-app-corner-extra-small));
+    background-color: #ff9900 !important;
+}
+
+
+.mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed {
+    color:#000 !important;
+}
