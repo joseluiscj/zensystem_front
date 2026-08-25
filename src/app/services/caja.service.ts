@@ -36,4 +36,8 @@ export class CajaService extends GenericService<Caja> {
   close(id: number, monto_cierre: number){
     return this.http.post(`${this.url}/${id}/close`, { monto_cierre });
   }
+  listCbo(){
+    return this.http.post(`${this.url}/listCbo`,[]);
+  }
+
 }

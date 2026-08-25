@@ -6,6 +6,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Caja } from '../../../../model/caja';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { CajaService } from '../../../services/caja.service';
+import { CajaTipo } from '../../../../model/cajaTipo';
 
 @Component({
   selector: 'app-caja-dialog',
@@ -27,21 +29,28 @@ export class CajaDialogComponent implements OnInit {
   isButtonDisabled:boolean=false;
   caja:Caja;
   check_pendiente:boolean=false;
-
+  listTipoCaja:CajaTipo;
+  selecteTipoCaja:number
 
   constructor(
     @Inject(MAT_DIALOG_DATA) private _idProducto: number,
     private _dialogRef: MatDialogRef<CajaDialogComponent>,
-
+    private cajaService:CajaService,
 
     private _snackbar: MatSnackBar,
   ){}
 
   ngOnInit(): void {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    window.scrollTo({ top: 0, behavior: 'auto' }); 
     this.initialFrm();
-
-
+    // this.cajaService.getDataChange
+    this.cajaService.listCbo().subscribe((data)=>{
+      if(data['code'] == 200){
+        this.listTipoCaja=data['data']
+      }else{
+        this._snackbar.open(data['message'], "Error!",{duration:6000,panelClass: 'custom-snackbar'});
+      }
+    })
 
   }
   private initialFrm(){

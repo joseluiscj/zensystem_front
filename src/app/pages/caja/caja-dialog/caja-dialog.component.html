@@ -1,7 +1,7 @@
 <mat-dialog-content class="cl_model">
     <div class="modal_div_cab_title">
         <div class="card-title-text" style="font-weight: 500;">
-          Producto
+          Gestión de Caja
         </div> 
         <div class="modal_close_tile" (click)="close()" >
             <mat-icon>close</mat-icon>
@@ -17,7 +17,7 @@
                             <div class="row  ">  
                                 <div class="col-md-12">
                                     <mat-form-field appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">Nombre</mat-label>
+                                        <mat-label class="labeltext">Nombre Caja</mat-label>
                                         <input type="text" matInput required placeholder="" name="nombre" formControlName="nombre" autocomplete="off" >
                                         <mat-hint *ngIf="basicForm.controls['nombre'].hasError('minlength') && basicForm.controls['nombre'].touched"
                                             class="form-error-msg"> Se requiere al menos {{basicForm.controls['nombre'].errors?.["minlength"]?.requiredLength}} caracteres.
@@ -29,6 +29,14 @@
                                             class="form-error-msg"> El campo es obligatorio.
                                         </mat-hint>
                                     </mat-form-field>
+                                </div> 
+                                <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Tipo de Caja</mat-label>
+                                        <mat-select  [(value)]="selecteTipoCaja" placeholder="Seleccione" formControlName="cajaTipo" style="font-size: 15px;">
+                                            <mat-option *ngFor="let val of listTipoCaja" [value]="val.id"> {{val.nombre}}</mat-option> 
+                                        </mat-select> 
+                                    </mat-form-field> 
                                 </div> 
                                 <div class="col-md-12">
                                     <mat-form-field appearance="outline"  class="custom-input">
@@ -86,14 +94,6 @@
                                         </mat-hint>
                                     </mat-form-field>
                                 </div>  -->
-                                <div class="col-md-12">
-                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                                        <mat-label class="labeltext">Tipo de Caja</mat-label>
-                                        <mat-select   placeholder="Seleccione" formControlName="sucursal" style="font-size: 15px;">
-                                            <mat-option  > sucursal</mat-option> 
-                                        </mat-select>
-                                    </mat-form-field> 
-                                </div> 
                                 <div class="col-md-12">
                                     <section>
                                         <mat-checkbox
