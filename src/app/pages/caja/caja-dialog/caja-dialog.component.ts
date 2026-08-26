@@ -29,7 +29,7 @@ export class CajaDialogComponent implements OnInit {
   isButtonDisabled:boolean=false;
   caja:Caja;
   check_pendiente:boolean=false;
-  listTipoCaja:CajaTipo;
+  listTipoCaja:CajaTipo[];
   selecteTipoCaja:number
 
   constructor(
