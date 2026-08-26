@@ -31,4 +31,10 @@ export class GlobalService extends GenericService<any>  {
   getCategoria(){
     return this.http.get<any>(`${this.url}/getCategoria`);
   }
+  listSucursal(){
+    return this.http.get<any>(`${this.url}/listSucursal`);
+  }
+
+
+
 }
