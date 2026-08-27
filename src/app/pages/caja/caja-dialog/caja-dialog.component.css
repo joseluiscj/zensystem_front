@@ -35,7 +35,9 @@ button.btn-danger {
 /* .labeltext {
   font-size: 12px;  
 } */
-
+.uppercase {
+  text-transform: uppercase;
+}
  
 .textbtn{
   width: -webkit-fill-available;

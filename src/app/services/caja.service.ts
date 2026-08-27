@@ -5,16 +5,6 @@ import { environment } from '../../environments/environment.development';
 import { Subject } from 'rxjs';
 import { Caja } from '../../model/caja';
 
-// export interface Caja {
-//   id?: number;
-//   user_id?: number;
-//   estado?: string;
-//   monto_inicial?: number;
-//   monto_cierre?: number;
-//   opened_at?: string;
-//   closed_at?: string;
-// }
-
 @Injectable({
   providedIn: 'root'
 })

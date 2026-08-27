@@ -9,6 +9,11 @@
     </div> 
     <mat-divider></mat-divider>  
     <div class="example-container mt-3">
+        <div style="text-align: center;margin-bottom: 5px;font-size: 11px;" *ngIf="ocultar">
+            <span>
+                <b><i class="fas fa-spinner fa-spin" ></i> Cargando datos...</b>
+            </span>
+        </div>
         <form [formGroup]="basicForm"> 
             <div class="row wrap">  
                 <div class="col-md-12">                 
@@ -16,9 +21,17 @@
                         <div class="col-md-12">
                             <div class="row  ">  
                                 <div class="col-md-12">
+                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
+                                        <mat-label class="labeltext">Sucursal</mat-label>
+                                        <mat-select  [(value)]="selecteSucursal" placeholder="Seleccione" formControlName="sucursal" style="font-size: 15px;">
+                                            <mat-option *ngFor="let val of listSucursal" [value]="val.id"> {{val.nombre}}</mat-option> 
+                                        </mat-select> 
+                                    </mat-form-field> 
+                                </div> 
+                                <div class="col-md-12">
                                     <mat-form-field appearance="outline"  class="custom-input">
                                         <mat-label class="labeltext">Nombre Caja</mat-label>
-                                        <input type="text" matInput required placeholder="" name="nombre" formControlName="nombre" autocomplete="off" >
+                                        <input type="text" matInput required placeholder="" name="nombre" formControlName="nombre" autocomplete="off" class="uppercase" >
                                         <mat-hint *ngIf="basicForm.controls['nombre'].hasError('minlength') && basicForm.controls['nombre'].touched"
                                             class="form-error-msg"> Se requiere al menos {{basicForm.controls['nombre'].errors?.["minlength"]?.requiredLength}} caracteres.
                                         </mat-hint>
@@ -71,36 +84,13 @@
                                             <mat-option value="TAR" > TARJETA CRED/DEB</mat-option> 
                                         </mat-select>
                                     </mat-form-field> 
-                                </div> 
-                                <div class="col-md-12">
-                                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                                        <mat-label class="labeltext">Sucursal</mat-label>
-                                        <mat-select   placeholder="Seleccione" formControlName="sucursal" style="font-size: 15px;">
-                                            <mat-option  > sucursal</mat-option> 
-                                        </mat-select>
-                                    </mat-form-field> 
-                                </div> 
-                                <!-- <div class="col-md-12">
-                                    <mat-form-field appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">cajaTipo</mat-label>
-                                        <input type="number" inputmode="numeric" required matInput placeholder="" name="cajaTipo" formControlName="cajaTipo" autocomplete="off">
-                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('minlength') && basicForm.controls['cajaTipo'].touched"
-                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['cajaTipo'].errors?.["minlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('maxlength') && basicForm.controls['cajaTipo'].touched"
-                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['cajaTipo'].errors?.["maxlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['cajaTipo'].hasError('required') && basicForm.controls['cajaTipo'].touched"
-                                            class="form-error-msg"> El campo es obligatorio.
-                                        </mat-hint>
-                                    </mat-form-field>
-                                </div>  -->
+                                </div>  
                                 <div class="col-md-12">
                                     <section>
+                                        <!-- (change)="onPendienteChange($event)"  -->
                                         <mat-checkbox
                                         style="border: 1px solid;border-radius: 8px;padding: 0px 30px;"
-                                            [checked]="check_pendiente"
-                                            (change)="onPendienteChange($event)"
+                                            [checked]="check_principal"
                                         >
                                             Es caja principal
                                         </mat-checkbox>

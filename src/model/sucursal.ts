@@ -1,4 +1,4 @@
 export class Sucursal{
     id: number;
-    name: string
+    nombre: string
 }
