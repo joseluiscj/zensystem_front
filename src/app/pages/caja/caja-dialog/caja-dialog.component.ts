@@ -107,7 +107,9 @@ export class CajaDialogComponent implements OnInit {
       obj.f_saldo=this.basicForm.controls["saldo"].value;
       obj.f_moneda=this.basicForm.controls["moneda"].value;
       obj.f_medioPago=this.basicForm.controls["medioPago"].value;
-      obj.f_principal=this.basicForm.controls["principal"].value; 
+      // obj.f_principal=this.basicForm.controls["principal"].value; 
+      obj.f_principal=this.check_principal?1:0;
+
       if (this._idCaja!=0) {
         this.cajaService.save(obj).subscribe((data)=>{
           if(data['code'] == 200){
@@ -131,6 +133,7 @@ export class CajaDialogComponent implements OnInit {
   }
   validateFrm() :boolean{
     this.error = false;
+    console.log(this.basicForm.value)
     if(this.selecteSucursal==0){
       this._snackbar.open("Debe seleccionar Sucursal", "Aviso!",{duration:3000});
       this.error = true;
@@ -157,6 +160,7 @@ export class CajaDialogComponent implements OnInit {
     }
     return this.error;
   }
+
   // onPendienteChange(event: any): void {
   //   this.check_principal = event.checked;
   // }

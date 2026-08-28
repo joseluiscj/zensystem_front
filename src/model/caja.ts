@@ -14,7 +14,7 @@ export class Caja{
     f_medioPago:string;
     f_sucursal:string;
     f_cajaTipo:string;
-    f_principal:string;
+    f_principal:number;
 
     
 }
