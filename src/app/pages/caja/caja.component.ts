@@ -120,31 +120,27 @@ export class CajaComponent {
   onClear(){
     this.basicForm.reset();
   }
-  deletDialog(idCategoria?: number){
+  deletDialog(idCaja?: number){
     let dialogRef = this._dialog.open(AlertMsjComponent, {
       width: '300px',
       disableClose: true,
-      data: { mensaje: '¿Está seguro de eliminar la categoría?'}
+      data: { mensaje: '¿Está seguro de eliminar la caja?'}
     });
     dialogRef.afterClosed().subscribe(result => {
-      if (result === 'yes') {
-        const datax = {
-          id: idCategoria,
-          estado: '0',
-        }
-        // this.cajaService.deleteCategoria(datax).subscribe(data => {
-        //   if(data['code'] == 200){
-        //     this._snackbar.open('Categoría eliminada correctamente ', 'Correcto!', {
-        //       duration: 3000,
-        //       panelClass: 'custom-snackbar'
-        //     });
-        //     this.cajaService.findAllList().subscribe(data =>{
-        //       this.createTable(data);
-        //     }) 
-        //   }else{
-        //     this._snackbar.open(data['message'], "Error!",{duration:6000,panelClass: 'custom-snackbar'});
-        //   }
-        // }) 
+      if (result === 'yes' && idCaja) {
+        this.cajaService.deleteCaja(idCaja).subscribe(data => {
+          if(data['code'] == 200){
+            this._snackbar.open('Caja eliminada correctamente', 'Correcto!', {
+              duration: 3000,
+              panelClass: 'custom-snackbar'
+            });
+            this.cajaService.findAllList().subscribe(data =>{
+              this.createTable(data);
+            });
+          }else{
+            this._snackbar.open(data['message'] || 'Error al eliminar caja', "Error!", {duration:6000,panelClass: 'custom-snackbar'});
+          }
+        });
       } 
     });
   }

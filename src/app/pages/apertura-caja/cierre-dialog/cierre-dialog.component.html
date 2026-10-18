@@ -1,0 +1,117 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-title-group">
+      <mat-icon class="header-icon">lock_clock</mat-icon>
+      <h2 mat-dialog-title class="m-0">Cierre de Caja / Arqueo</h2>
+    </div>
+    <button mat-icon-button (click)="close()" class="btn-close-dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div *ngIf="cargandoResumen" class="loading-state">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="text-muted mt-2">Calculando resumen de movimientos del turno...</p>
+    </div>
+
+    <div *ngIf="!cargandoResumen && resumen">
+      <!-- Info del Turno -->
+      <div class="shift-info-card mb-3">
+        <div class="row g-2">
+          <div class="col-6">
+            <span class="info-label">Caja:</span>
+            <strong class="info-value">{{ resumen.detalle.cajaNombre }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="info-label">Cajero:</span>
+            <strong class="info-value">{{ resumen.detalle.usuarioNombre }}</strong>
+          </div>
+          <div class="col-6">
+            <span class="info-label">Apertura:</span>
+            <span class="info-value">{{ resumen.detalle.aFecha | date:'short' }}</span>
+          </div>
+          <div class="col-6">
+            <span class="info-label">Sucursal:</span>
+            <span class="info-value">{{ resumen.detalle.sucursalNombre }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen Financiero -->
+      <div class="financial-summary mb-3">
+        <div class="summary-row">
+          <span>Monto Inicial (Apertura):</span>
+          <strong>{{ resumen.aMonto | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Ventas en Efectivo (+):</span>
+          <span class="text-success">+{{ resumen.totalEfectivo | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Ventas con Tarjeta (Info):</span>
+          <span class="text-primary">{{ resumen.totalTarjeta | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="summary-row" *ngIf="resumen.totalEgresos > 0">
+          <span>Egresos / Gastos (-):</span>
+          <span class="text-danger">-{{ resumen.totalEgresos | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <hr class="my-2">
+        <div class="summary-row total-expected">
+          <span>Saldo Esperado en Efectivo:</span>
+          <span class="expected-amount">{{ resumen.saldoEsperadoEfectivo | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Formulario de Conteo Real -->
+      <form [formGroup]="basicForm">
+        <div class="row">
+          <div class="col-12 mb-2">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Efectivo Real en Caja (Arqueo)</mat-label>
+              <input matInput 
+                     type="number" 
+                     step="0.01" 
+                     min="0" 
+                     placeholder="0.00" 
+                     formControlName="cMonto" 
+                     (input)="calcularDiferencia()" 
+                     autocomplete="off">
+              <mat-icon matSuffix>payments</mat-icon>
+              <mat-hint>Total de efectivo contado físicamente en la gaveta.</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <!-- Indicador de Diferencia -->
+          <div class="col-12 mt-2">
+            <div class="difference-badge" 
+                 [ngClass]="{'diff-equal': diferencia === 0, 'diff-surplus': diferencia > 0, 'diff-deficit': diferencia < 0}">
+              <div class="diff-title">
+                <mat-icon *ngIf="diferencia === 0">check_circle</mat-icon>
+                <mat-icon *ngIf="diferencia > 0">trending_up</mat-icon>
+                <mat-icon *ngIf="diferencia < 0">warning</mat-icon>
+                <span>
+                  {{ diferencia === 0 ? 'Cuadre Perfecto' : (diferencia > 0 ? 'Sobrante en Caja' : 'Faltante en Caja') }}
+                </span>
+              </div>
+              <strong class="diff-val">
+                {{ diferencia | currency:'USD':'symbol':'1.2-2' }}
+              </strong>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="close()" class="btn-cancel">Cancelar</button>
+    <button mat-raised-button 
+            color="warn" 
+            (click)="save()" 
+            [disabled]="isButtonDisabled || cargandoResumen" 
+            class="btn-close-register">
+      <mat-icon>lock</mat-icon> Confirmar Cierre
+    </button>
+  </mat-dialog-actions>
+</div>

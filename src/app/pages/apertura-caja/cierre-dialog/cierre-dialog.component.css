@@ -1,0 +1,98 @@
+.dialog-container {
+  padding: 10px;
+  min-width: 420px;
+}
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+.dialog-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-icon {
+  color: #cc8431;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+.shift-info-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+}
+.info-label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+.info-value {
+  font-size: 13px;
+  color: #1e293b;
+}
+.financial-summary {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.total-expected {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  padding-top: 6px;
+}
+.expected-amount {
+  color: #1a635a;
+  font-size: 16px;
+  font-weight: bold;
+}
+.difference-badge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.diff-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.diff-equal {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+.diff-surplus {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+.diff-deficit {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+.btn-close-register {
+  background-color: #cc8431 !important;
+  color: #fff !important;
+  border-radius: 6px;
+}
+.btn-cancel {
+  color: #718096;
+}

@@ -48,7 +48,7 @@ export class RestaurantePedidoComponent implements OnInit {
   pedido:Pedido;
   
   isButtonDisabled:boolean=false;
-  selectePagoCon:number;
+  selectePagoCon:string = 'EF';
   selecteCaja:number;
   selecteCajero:number; 
 
@@ -87,19 +87,24 @@ export class RestaurantePedidoComponent implements OnInit {
           if(data['data']['f_disponible']==0){
             this.accion = 'actualizar';
           }
-          this.listCaja = data['caja'];
-          // if(this.listCaja.length>0){
-          //   this.selecteCaja = this.listCaja[0].id;
-          // }
-          this.listCajero = data['dataCajeros']
-          if(this.listCajero.length>0){
+          this.listCaja = data['caja'] || [];
+          this.listCajero = data['dataCajeros'] || [];
+
+          if (this.pedido?.f_caja) {
+            this.selecteCaja = Number(this.pedido.f_caja);
+          } else if (this.listCaja.length > 0) {
+            this.selecteCaja = this.listCaja[0].id;
+          }
+
+          if (this.pedido?.f_cajero) {
+            this.selecteCajero = Number(this.pedido.f_cajero);
+          } else if (this.listCajero.length > 0) {
             this.selecteCajero = this.listCajero[0].id;
           }
+
+          this.selectePagoCon = this.pedido?.f_pagoCon || 'EF';
+
           this.initialFrm();
-
-
-
-
         }else{
           this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
         }
@@ -117,16 +122,15 @@ export class RestaurantePedidoComponent implements OnInit {
     } 
   }
   private initialFrm(){
-    console.log(this.pedido)
     this.basicForm = new UntypedFormGroup({
       id: new UntypedFormControl(0),
-      nombreCliente: new UntypedFormControl(this.pedido?.f_nombreCliente),
-      pagoCon: new UntypedFormControl(this.pedido?.f_pagoCon),
-      caja: new UntypedFormControl(this.pedido?.f_caja),
-      cajero: new UntypedFormControl(this.pedido?.f_cajero),
-      montoTotal: new UntypedFormControl(this.pedido?.f_montoTotal),
-      montoEfectivo: new UntypedFormControl(this.pedido?.f_montoEfectivo),
-      vuelto: new UntypedFormControl(this.pedido?.f_vuelto),
+      nombreCliente: new UntypedFormControl(this.pedido?.f_nombreCliente || ''),
+      pagoCon: new UntypedFormControl(this.selectePagoCon),
+      caja: new UntypedFormControl(this.selecteCaja),
+      cajero: new UntypedFormControl(this.selecteCajero),
+      montoTotal: new UntypedFormControl(this.pedido?.f_montoTotal || '0.00'),
+      montoEfectivo: new UntypedFormControl(this.pedido?.f_montoEfectivo || ''),
+      vuelto: new UntypedFormControl(this.pedido?.f_vuelto || '0.00'),
     }); 
     if (this.pedido?.f_state==1) {
       this.check_atendido = true;
@@ -146,9 +150,9 @@ export class RestaurantePedidoComponent implements OnInit {
       objP.f_montoTotal = this.basicForm.controls["montoTotal"].value;
       objP.f_montoEfectivo = this.basicForm.controls["montoEfectivo"].value;
       objP.f_vuelto = this.basicForm.controls["vuelto"].value;
-      objP.f_pagoCon = this.selectePagoCon;
-      objP.f_caja = this.selecteCaja;
-      objP.f_cajero = this.selecteCajero;
+      objP.f_pagoCon = this.selectePagoCon || this.basicForm.controls["pagoCon"].value;
+      objP.f_caja = this.selecteCaja || this.basicForm.controls["caja"].value;
+      objP.f_cajero = this.selecteCajero || this.basicForm.controls["cajero"].value;
       objP.f_state = this.check_atendido?1:0;
 
       objP.f_detalle = this.listaDetalle
@@ -157,7 +161,6 @@ export class RestaurantePedidoComponent implements OnInit {
           this.isButtonDisabled=false;
           if(data['code'] == 200){
             this._snackbar.open("Pedido registrado correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
-            // this._dialogRef.close('yes');
             this.cerrar.emit();
           }else{
             this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
@@ -168,7 +171,6 @@ export class RestaurantePedidoComponent implements OnInit {
           this.isButtonDisabled=false;
           if(data['code'] == 200){
             this._snackbar.open("Pedido actualizado correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
-            // this._dialogRef.close('yes');
             this.cerrar.emit();
           }else{
             this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
@@ -226,21 +228,30 @@ export class RestaurantePedidoComponent implements OnInit {
     let total = 0;
     this.listaDetalle.forEach((item) => {
       total += item.f_subTotal;
-    })
-    this.basicForm.controls["montoTotal"].setValue((total).toFixed(2));
-    this.fnVuelto()
+    });
+    const totalStr = total.toFixed(2);
+    this.basicForm.controls["montoTotal"].setValue(totalStr);
+    
+    // Si no se ha ingresado monto efectivo, por defecto sugerir el total exacto
+    const efectivoActual = this.basicForm.controls["montoEfectivo"].value;
+    if (!efectivoActual || parseFloat(efectivoActual) === 0) {
+      this.basicForm.controls["montoEfectivo"].setValue(totalStr);
+    }
+    this.fnVuelto();
   }
   cerrarFormulario() {
     this.cerrar.emit();
   }
   fnVuelto(){
-    let vuelto = this.basicForm.controls["montoTotal"].value - this.basicForm.controls["montoEfectivo"].value
+    const total = parseFloat(this.basicForm.controls["montoTotal"].value || 0);
+    const efectivo = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
+    let vuelto = total - efectivo;
     if (vuelto > 0) {
-      vuelto = 0
-    }else{
-      vuelto=vuelto*-1
+      vuelto = 0;
+    } else {
+      vuelto = vuelto * -1;
     }
-    this.basicForm.controls["vuelto"].setValue(vuelto.toFixed(2))
+    this.basicForm.controls["vuelto"].setValue(vuelto.toFixed(2));
   }
 
 onPendienteChange(event: any): void {
@@ -256,27 +267,61 @@ onAtendidoChange(event: any): void {
   }
 }
 liberarMesa(){
+  const caja = this.selecteCaja || this.basicForm.controls["caja"].value;
+  const cajero = this.selecteCajero || this.basicForm.controls["cajero"].value;
+  const pagoCon = this.selectePagoCon || this.basicForm.controls["pagoCon"].value;
+  const montoTotal = parseFloat(this.basicForm.controls["montoTotal"].value || 0);
+  const montoEfectivo = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
+  const vuelto = parseFloat(this.basicForm.controls["vuelto"].value || 0);
+
+  if (!caja) {
+    this._snackbar.open("Debe seleccionar una Caja para el cobro", "Aviso!", {duration: 3500});
+    return;
+  }
+  if (!cajero) {
+    this._snackbar.open("Debe seleccionar un Cajero", "Aviso!", {duration: 3500});
+    return;
+  }
+  if (!pagoCon) {
+    this._snackbar.open("Debe seleccionar Medio de Pago", "Aviso!", {duration: 3500});
+    return;
+  }
+  if (montoTotal <= 0) {
+    this._snackbar.open("El total del pedido debe ser mayor a 0", "Aviso!", {duration: 3500});
+    return;
+  }
+  if (montoEfectivo < montoTotal) {
+    this._snackbar.open("El monto recibido debe ser igual o mayor al total del pedido", "Aviso!", {duration: 3500});
+    return;
+  }
+
   let dialogRef = this._dialog.open(AlertMsjComponent, {
-    width: '300px',
+    width: '320px',
     disableClose: true,
-    data: { mensaje: '¿Está seguro de liberar mesa?'}
+    data: { mensaje: `¿Confirmar cobro de $${montoTotal.toFixed(2)} y liberar mesa?` }
   });
   dialogRef.afterClosed().subscribe(result => {
     if (result === 'yes') {
       const datax = {
         id: this.mesa_Id,
-      }
+        f_pagoCon: pagoCon,
+        f_caja: caja,
+        f_cajero: cajero,
+        f_montoEfectivo: montoEfectivo,
+        f_vuelto: vuelto,
+        f_nombreCliente: this.basicForm.controls["nombreCliente"].value
+      };
       this.mesaService.liberar(datax).subscribe(data => {
         if(data['code'] == 200){
-          this._snackbar.open('Mesa liberada correctamente ', 'Correcto!', {
-            duration: 3000,
+          this._snackbar.open('¡Cobro registrado y mesa liberada correctamente!', 'Correcto!', {
+            duration: 3500,
             panelClass: 'custom-snackbar'
           });
           this.cerrar.emit();
         }else{
-          this._snackbar.open(data['message'], "Error!",{duration:6000,panelClass: 'custom-snackbar'});
+          this._snackbar.open(data['message'] || 'Error al liberar mesa', "Error!", {duration: 6000, panelClass: 'custom-snackbar'});
         }
-      }) 
+      });
     } 
   });
 }

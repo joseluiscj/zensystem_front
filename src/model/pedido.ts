@@ -6,7 +6,7 @@ export class Pedido{
 
     f_idMesa:number;
     f_nombreCliente:string;
-    f_pagoCon:number;
+    f_pagoCon:any;
     f_caja:number;
     f_cajero:number;
     f_montoTotal:number;
@@ -15,6 +15,6 @@ export class Pedido{
     f_detalle:Producto[];
     f_state:number;
     
-    f_txtCaja:number;
-    f_txtCajero:number;
+    f_txtCaja:string;
+    f_txtCajero:string;
 }

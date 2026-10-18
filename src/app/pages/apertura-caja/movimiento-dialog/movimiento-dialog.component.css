@@ -1,0 +1,104 @@
+.dialog-container {
+  padding: 10px;
+  min-width: 500px;
+  max-width: 650px;
+}
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+.dialog-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-icon {
+  color: #1a635a;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+.btn-sm-action {
+  background-color: #1a635a !important;
+  color: #fff !important;
+  font-size: 12px;
+  padding: 0 10px;
+  height: 32px;
+  border-radius: 6px;
+}
+.new-movement-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+}
+.movements-list {
+  max-height: 360px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.movement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.movement-item:hover {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+.movement-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.type-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.badge-ingreso {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+.badge-egreso {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+.type-icon-badge mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+.movement-desc {
+  font-size: 13px;
+  color: #1e293b;
+  display: block;
+}
+.movement-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.meta-tag {
+  background-color: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}

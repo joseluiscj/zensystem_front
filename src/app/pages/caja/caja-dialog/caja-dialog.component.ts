@@ -110,24 +110,21 @@ export class CajaDialogComponent implements OnInit {
       // obj.f_principal=this.basicForm.controls["principal"].value; 
       obj.f_principal=this.check_principal?1:0;
 
-      if (this._idCaja!=0) {
-        this.cajaService.save(obj).subscribe((data)=>{
-          if(data['code'] == 200){
-            this._snackbar.open("Datos registrados correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
-            this.cajaService.findAll().subscribe((data)=>{
-              this.cajaService.setDataChange(data);
-              this.close();
-            })
-          }else{
-            this.isButtonDisabled=false;
-            this._snackbar.open(data['message'], "Error!",{duration:6000,panelClass: 'custom-snackbar'});
-          }
-        })
-      }else{
-
-
-
-      }
+      this.cajaService.save(obj).subscribe((data: any) => {
+        if(data['code'] == 200){
+          this._snackbar.open("Datos registrados correctamente", "Correcto!", {duration:3000, panelClass: 'custom-snackbar'});
+          this.cajaService.findAllList().subscribe((listData: any) => {
+            this.cajaService.setDataChange(listData);
+            this.close();
+          });
+        } else {
+          this.isButtonDisabled = false;
+          this._snackbar.open(data['message'] || 'Error al guardar', "Error!", {duration:6000, panelClass: 'custom-snackbar'});
+        }
+      }, (error) => {
+        this.isButtonDisabled = false;
+        this._snackbar.open("Error de conexión al guardar", "Error!", {duration:6000, panelClass: 'custom-snackbar'});
+      });
 
     }
   }

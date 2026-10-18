@@ -1,0 +1,71 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-title-group">
+      <mat-icon class="header-icon">lock_open</mat-icon>
+      <h2 mat-dialog-title class="m-0">Aperturar Caja</h2>
+    </div>
+    <button mat-icon-button (click)="close()" class="btn-close-dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div *ngIf="cargandoCajas" class="loading-state">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="text-muted mt-2">Cargando cajas disponibles...</p>
+    </div>
+
+    <div *ngIf="!cargandoCajas && cajasDisponibles.length === 0" class="empty-state alert alert-warning">
+      <mat-icon>info</mat-icon>
+      <div>
+        <strong>No hay cajas disponibles para aperturar.</strong>
+        <p class="mb-0">Todas las cajas activas ya tienen un turno abierto o no hay cajas registradas.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="basicForm" *ngIf="!cargandoCajas && cajasDisponibles.length > 0">
+      <div class="row">
+        <div class="col-12 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Seleccionar Caja</mat-label>
+            <mat-select formControlName="idCaja" (valueChange)="onCajaSelected($event)">
+              <mat-option *ngFor="let c of cajasDisponibles" [value]="c.id">
+                {{ c.nombre }} - {{ c.sucursal }} ({{ c.tipoCaja }})
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>point_of_sale</mat-icon>
+            <mat-error *ngIf="basicForm.controls['idCaja'].hasError('required')">
+              Debe seleccionar una caja.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Monto Inicial de Apertura</mat-label>
+            <input matInput type="number" step="0.01" min="0" placeholder="0.00" formControlName="aMonto" autocomplete="off">
+            <mat-icon matSuffix>attach_money</mat-icon>
+            <mat-hint>Efectivo inicial en gaveta para dar vuelto.</mat-hint>
+            <mat-error *ngIf="basicForm.controls['aMonto'].hasError('required')">
+              El monto inicial es obligatorio.
+            </mat-error>
+            <mat-error *ngIf="basicForm.controls['aMonto'].hasError('min')">
+              El monto no puede ser negativo.
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="close()" class="btn-cancel">Cancelar</button>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="save()" 
+            [disabled]="isButtonDisabled || cargandoCajas || cajasDisponibles.length === 0" 
+            class="btn-confirm">
+      <mat-icon>check_circle</mat-icon> Aperturar Turno
+    </button>
+  </mat-dialog-actions>
+</div>

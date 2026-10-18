@@ -30,4 +30,8 @@ export class CajaService extends GenericService<Caja> {
     return this.http.post(`${this.url}/listCbo`,[]);
   }
 
+  deleteCaja(id: number){
+    return this.http.post<{code: number, message?: string}>(`${this.url}/deleteCaja`, { id });
+  }
+
 }

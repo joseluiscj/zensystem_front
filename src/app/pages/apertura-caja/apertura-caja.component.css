@@ -1,0 +1,72 @@
+.badge-abierta {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge-cerrada {
+  background-color: #f1f5f9;
+  color: #64748b;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge-monto {
+  font-weight: 600;
+  color: #1e293b;
+}
+.btn-close-shift {
+  background-color: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+  color: #b45309 !important;
+  font-size: 12px;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 8px;
+}
+.btn-view-movements {
+  background-color: #f0fdfa !important;
+  border: 1px solid #ccfbf1 !important;
+  color: #0f766e !important;
+  font-size: 12px;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 8px;
+}
+.mobile-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 13px;
+}
+.fila-par {
+  background-color: #ffffff;
+}
+.fila-impar {
+  background-color: #f8fafc;
+}
+@media (max-width: 768px) {
+  .content_body_web {
+    display: none;
+  }
+  .content_body_movil {
+    display: block;
+  }
+}
+@media (min-width: 769px) {
+  .content_body_web {
+    display: block;
+  }
+  .content_body_movil {
+    display: none;
+  }
+}

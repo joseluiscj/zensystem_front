@@ -1,1 +1,230 @@
-<p>apertura-caja works!</p>
+<div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
+  <div class="m-section-title">
+    <h4 class="m-title mb-1">Apertura y Cierre de Caja</h4>
+    <div class="m-title-description">Control de turnos, arqueos y movimientos de caja en tiempo real.</div>
+  </div>
+  <div class="m-section-buttons" align="center">
+    <button mat-raised-button (click)="openAperturarDialog()" class="btn_p btn_primary">
+      <mat-icon>lock_open</mat-icon> Aperturar Caja
+    </button>
+  </div>
+</div>
+
+<!-- Widgets de resumen -->
+<!-- <div class="justify-content-center program-view-none-filters mb-2" style="display: flex; flex-wrap: wrap; margin-top: -20px;">
+  <div class="mr-1 div-number-state" style="display: flex; align-items: center;">
+    <div class="m-text-success number-state" style="color: #10b981;">{{ cajasAbiertas }}</div>
+    <div class="num_info">Cajas Abiertas</div>
+  </div>
+  <div class="mr-1 div-number-state" style="display: flex; align-items: center;">
+    <div class="m-text-secondary number-state" style="color: #64748b;">{{ cajasCerradas }}</div>
+    <div class="num_info">Cajas Cerradas</div>
+  </div>
+  <div class="mr-1 div-number-state" style="display: flex; align-items: center;">
+    <div class="m-text-info number-state" style="color: #1d95a8;">{{ totalSesiones }}</div>
+    <div class="num_info">Total Turnos</div>
+  </div>
+</div> -->
+
+<!-- Filtros de búsqueda -->
+<mat-expansion-panel [(expanded)]="isPanelOpen" class="expansion-panel-below-button m-3" style="border-radius: 8px;">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <mat-icon>manage_search</mat-icon> &nbsp;
+      Filtrar turnos por:
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <form [formGroup]="basicForm" (ngSubmit)="btnBuscar()">
+    <div class="row align-items-center">
+      <div class="col-md-3">
+        <mat-form-field appearance="fill" class="custom-input w-100">
+          <mat-label class="labeltext">Caja:</mat-label>
+          <input matInput placeholder="Escribir nombre de caja..." formControlName="caja" autocomplete="off">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-2">
+        <mat-form-field appearance="fill" class="custom-input w-100">
+          <mat-label class="labeltext">Estado:</mat-label>
+          <mat-select formControlName="state">
+            <mat-option value="">Todos</mat-option>
+            <mat-option value="1">Abierta</mat-option>
+            <mat-option value="0">Cerrada</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-2">
+        <mat-form-field appearance="fill" class="custom-input w-100">
+          <mat-label class="labeltext">Fecha Desde:</mat-label>
+          <input matInput type="date" formControlName="fechaDesde">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-2">
+        <mat-form-field appearance="fill" class="custom-input w-100">
+          <mat-label class="labeltext">Fecha Hasta:</mat-label>
+          <input matInput type="date" formControlName="fechaHasta">
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-3 btn_boton_filter">
+        <div align="center" style="display: flex; align-items: center;">
+          <button mat-raised-button color="primary" type="submit" class="btn_primary" style="height: 36px;">
+            <mat-icon>search</mat-icon> Buscar
+          </button> &nbsp;
+          <button mat-raised-button type="button" (click)="onClear()" class="btn_secondary" style="height: 36px;">
+            <mat-icon>disabled_by_default</mat-icon> Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-expansion-panel>
+
+<div style="margin: 10px 28px;" *ngIf="cargaContenido">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<!-- Vista Web (Tabla) -->
+<div class="content_body_web">
+  <div class="row m-2 justify-content-center">
+    <div class="col-md-12">
+      <mat-card class="p-0 stable">
+        <mat-card-content>
+          <div class="table-container small-font-table" style="overflow-x: auto; border-radius: 10px;">
+            <table mat-table [dataSource]="dataSource" matSort>
+              <ng-container matColumnDef="#">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> # </th>
+                <td mat-cell *matCellDef="let row; let i = index"> {{ getRowNumber(i) }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cajaNombre">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Caja </th>
+                <td mat-cell *matCellDef="let row">
+                  <strong>{{ row.cajaNombre }}</strong>
+                  <div class="text-muted" style="font-size: 11px;">{{ row.sucursalNombre }}</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="usuarioNombre">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Cajero / Usuario </th>
+                <td mat-cell *matCellDef="let row"> {{ row.usuarioNombre || 'Sistema' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="aFecha">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Apertura </th>
+                <td mat-cell *matCellDef="let row"> {{ row.aFecha | date:'dd/MM/yyyy HH:mm' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="aMonto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Monto Inicial </th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="badge-monto">{{ row.aMonto | currency:'USD':'symbol':'1.2-2' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cFecha">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> F. Cierre </th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.cFecha ? (row.cFecha | date:'dd/MM/yyyy HH:mm') : '-' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cMonto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Monto Cierre </th>
+                <td mat-cell *matCellDef="let row">
+                  <span *ngIf="row.cMonto !== null && row.cMonto !== undefined" class="badge-monto text-success">
+                    {{ row.cMonto | currency:'USD':'symbol':'1.2-2' }}
+                  </span>
+                  <span *ngIf="row.cMonto === null || row.cMonto === undefined" class="text-muted">-</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="state">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Estado </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                  <span class="badge" [ngClass]="row.state === 1 ? 'badge-abierta' : 'badge-cerrada'">
+                    <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">
+                      {{ row.state === 1 ? 'lock_open' : 'lock' }}
+                    </mat-icon>
+                    {{ row.state === 1 ? 'ABIERTA' : 'CERRADA' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+                <td mat-cell *matCellDef="let row">
+                  <div style="display: flex; justify-content: center; gap: 8px;">
+                    <button *ngIf="row.state === 1" 
+                            mat-raised-button 
+                            (click)="openCerrarDialog(row)" 
+                            class="small-buttonc btn-close-shift" 
+                            matTooltip="Cerrar turno y arquear">
+                      <mat-icon style="color: #f59e0b !important;">lock_clock</mat-icon> Cerrar
+                    </button>
+
+                    <button mat-raised-button 
+                            (click)="openMovimientosDialog(row)" 
+                            class="small-buttonc btn-view-movements" 
+                            matTooltip="Ver movimientos del turno">
+                      <mat-icon style="color: #1d95a8 !important;">receipt_long</mat-icon> Movimientos
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;" [ngClass]="getRowClass(i)"></tr>
+            </table>
+          </div>
+          <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" aria-label="Seleccionar página"></mat-paginator>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+<!-- Vista Móvil -->
+<div class="content_body_movil">
+  <div style="margin: 9px;">
+    <div *ngFor="let item of paginatedItems" class="mb-3">
+      <mat-card class="example-card car_mat-card_body" style="border-radius: 8px;">
+        <mat-card-header class="d-flex justify-content-between align-items-center">
+          <mat-card-title style="font-size: 14px; font-weight: bold;">
+            {{ item.cajaNombre }}
+          </mat-card-title>
+          <span class="badge" [ngClass]="item.state === 1 ? 'badge-abierta' : 'badge-cerrada'">
+            {{ item.state === 1 ? 'ABIERTA' : 'CERRADA' }}
+          </span>
+        </mat-card-header>
+        <hr class="car_cls-hr">
+        <mat-card-content>
+          <div class="mobile-row">
+            <span class="text-muted">Cajero:</span>
+            <span>{{ item.usuarioNombre || 'Sistema' }}</span>
+          </div>
+          <div class="mobile-row">
+            <span class="text-muted">Apertura:</span>
+            <span>{{ item.aFecha | date:'dd/MM/yyyy HH:mm' }} ({{ item.aMonto | currency:'USD':'symbol':'1.2-2' }})</span>
+          </div>
+          <div class="mobile-row" *ngIf="item.cFecha">
+            <span class="text-muted">Cierre:</span>
+            <span>{{ item.cFecha | date:'dd/MM/yyyy HH:mm' }} ({{ item.cMonto | currency:'USD':'symbol':'1.2-2' }})</span>
+          </div>
+        </mat-card-content>
+        <mat-card-actions class="car_footer d-flex justify-content-end gap-2 p-2" style="border-radius: 0 0 8px 8px;">
+          <button *ngIf="item.state === 1" mat-raised-button color="warn" (click)="openCerrarDialog(item)" style="font-size: 12px;">
+            <mat-icon>lock_clock</mat-icon> Cerrar
+          </button>
+          <button mat-raised-button color="primary" (click)="openMovimientosDialog(item)" style="font-size: 12px;">
+            <mat-icon>receipt_long</mat-icon> Movimientos
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <mat-paginator [length]="dataMovil.length" [pageSizeOptions]="[10, 20, 50, 100]" (page)="onPageChange($event)"></mat-paginator>
+  </div>
+</div>

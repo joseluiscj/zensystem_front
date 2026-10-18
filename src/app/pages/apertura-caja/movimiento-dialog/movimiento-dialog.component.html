@@ -1,0 +1,113 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-title-group">
+      <mat-icon class="header-icon">receipt_long</mat-icon>
+      <div>
+        <h2 mat-dialog-title class="m-0">Movimientos de Caja</h2>
+        <span class="text-muted" style="font-size: 12px;">{{ data.cajaNombre }}</span>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button mat-raised-button 
+              color="primary" 
+              class="btn-sm-action" 
+              (click)="toggleNuevoMovimiento()" 
+              *ngIf="data.state === 1">
+        <mat-icon>{{ mostrarNuevoMovimiento ? 'close' : 'add' }}</mat-icon>
+        {{ mostrarNuevoMovimiento ? 'Cancelar' : 'Nuevo Movimiento' }}
+      </button>
+      <button mat-icon-button (click)="close()" class="btn-close-dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Formulario para agregar movimiento manual (Ingreso / Egreso) -->
+    <div class="new-movement-box mb-3" *ngIf="mostrarNuevoMovimiento">
+      <h6 class="mb-2" style="font-weight: 600; color: #1a635a;">Registrar Movimiento Manual</h6>
+      <form [formGroup]="movimientoForm">
+        <div class="row g-2">
+          <div class="col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Tipo</mat-label>
+              <mat-select formControlName="tipo">
+                <mat-option value="I">Ingreso (+)</mat-option>
+                <mat-option value="E">Egreso / Gasto (-)</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Monto</mat-label>
+              <input matInput type="number" step="0.01" min="0.01" placeholder="0.00" formControlName="monto">
+              <mat-icon matSuffix>attach_money</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-md-4">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Medio de Pago</mat-label>
+              <mat-select formControlName="metodoPago">
+                <mat-option value="EF">Efectivo</mat-option>
+                <mat-option value="TA">Tarjeta</mat-option>
+                <mat-option value="TR">Transferencia</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Descripción / Motivo</mat-label>
+              <input matInput placeholder="Ej. Retiro para compras, Ingreso adicional..." formControlName="descripcion">
+            </mat-form-field>
+          </div>
+          <div class="col-12 text-end">
+            <button mat-raised-button color="primary" (click)="guardarMovimiento()" [disabled]="isSaving">
+              <mat-icon>save</mat-icon> Guardar Movimiento
+            </button>
+          </div>
+        </div>
+      </form>
+      <hr>
+    </div>
+
+    <!-- Lista de Movimientos -->
+    <div *ngIf="cargando" class="loading-state">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="text-muted mt-2">Cargando movimientos...</p>
+    </div>
+
+    <div *ngIf="!cargando && movimientos.length === 0" class="empty-state text-center py-4">
+      <mat-icon style="font-size: 36px; height: 36px; width: 36px; color: #94a3b8;">receipt</mat-icon>
+      <p class="text-muted mt-2 mb-0">No se registran movimientos en este turno.</p>
+    </div>
+
+    <div class="movements-list" *ngIf="!cargando && movimientos.length > 0">
+      <div class="movement-item" *ngFor="let m of movimientos">
+        <div class="movement-left">
+          <div class="type-icon-badge" [ngClass]="{'badge-ingreso': m.tipo === 'I', 'badge-egreso': m.tipo === 'E'}">
+            <mat-icon>{{ m.tipo === 'I' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+          </div>
+          <div class="movement-details">
+            <strong class="movement-desc">{{ m.descripcion }}</strong>
+            <div class="movement-meta">
+              <span class="meta-tag">{{ m.metodoPago === 'EF' ? 'Efectivo' : (m.metodoPago === 'TA' ? 'Tarjeta' : 'Transf.') }}</span>
+              <span>&bull;</span>
+              <span>{{ m.created_at | date:'short' }}</span>
+              <span *ngIf="m.usuarioNombre">&bull;</span>
+              <span *ngIf="m.usuarioNombre">{{ m.usuarioNombre }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="movement-right">
+          <strong [ngClass]="{'text-success': m.tipo === 'I', 'text-danger': m.tipo === 'E'}">
+            {{ m.tipo === 'I' ? '+' : '-' }}{{ m.monto | currency:'USD':'symbol':'1.2-2' }}
+          </strong>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="close()">Cerrar</button>
+  </mat-dialog-actions>
+</div>
