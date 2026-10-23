@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig,LOCALE_ID, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -29,6 +29,10 @@ export const appConfig: ApplicationConfig = {
         },
       }),
     ),
+    {
+    provide: LOCALE_ID,
+      useValue: 'es-ES'
+    },
     provideHttpClient(withInterceptorsFromDi()), //para petición http forma cuando viaje al token jwt
     {
       provide: HTTP_INTERCEPTORS,

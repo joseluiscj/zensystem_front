@@ -6,6 +6,10 @@ import { InicioService } from '../../services/inicio.service';
 import { DashboardData } from '../../../model/dashboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import localeEs from '@angular/common/locales/es';
+import { registerLocaleData } from '@angular/common';
+
+registerLocaleData(localeEs);
 
 @Component({
   selector: 'app-inicio',
