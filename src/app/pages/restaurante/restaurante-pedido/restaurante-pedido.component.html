@@ -1,185 +1,380 @@
-<div>
-    <div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;"  >
-        <div class="m-section-title">
-        
+<div class="pos-wrapper">
+  <!-- Barra Superior / Header del POS -->
+  <header class="pos-topbar">
+    <div class="pos-topbar-left">
+      <button type="button" class="btn-topbar-back" (click)="cerrarFormulario()">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Volver al Salón</span>
+      </button>
+
+      <div class="pos-table-indicator">
+        <div class="table-icon-box">
+          <mat-icon>table_restaurant</mat-icon>
         </div>
-        <div class="m-section-buttons " align="center">
-            <button type="submit" mat-raised-button class="btn_tercero_delete mb-2" (click)="anularMesa()" *ngIf="accion=='actualizar'">
-                <mat-icon>delete</mat-icon> Anular Pedido
-            </button>&nbsp;
-            <button type="submit" mat-raised-button class="btn_primary  mb-2" (click)="liberarMesa()" *ngIf="accion=='actualizar'">
-                <mat-icon>bookmark_check</mat-icon> Liberar mesa
-            </button>&nbsp;
-            <button mat-raised-button color="accent" (click)="cerrarFormulario()" class="btn_secondary btn_action_panel_secondary  mb-2" >
-                <mat-icon>arrow_circle_left</mat-icon> Regresar
+        <div class="table-details">
+          <h2 class="table-title-text">{{ nombreMesa }}</h2>
+          <div class="table-badge-status" [ngClass]="accion === 'actualizar' ? 'badge-ocupada' : 'badge-nueva'">
+            <span class="status-indicator-dot"></span>
+            {{ accion === 'actualizar' ? 'Mesa en Consumo' : 'Nueva Comanda' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pos-topbar-actions">
+      <!-- Anular Pedido (Solo si ya existe pedido) -->
+      <button 
+        *ngIf="accion === 'actualizar'" 
+        type="button" 
+        class="btn-topbar-danger" 
+        (click)="anularMesa()"
+        matTooltip="Cancelar y eliminar comanda actual">
+        <mat-icon>delete_forever</mat-icon>
+        <span class="d-none d-sm-inline">Anular Pedido</span>
+      </button>
+
+      <!-- Guardar Pedido -->
+      <button 
+        type="button" 
+        class="btn-topbar-secondary" 
+        (click)="save()" 
+        [disabled]="isButtonDisabled"
+        matTooltip="Guardar cambios sin cerrar la cuenta">
+        <mat-icon>save</mat-icon>
+        <span>Guardar</span>
+      </button>
+
+      <!-- Cobrar y Liberar Mesa (Directo desde cabecera si está ocupada) -->
+      <button 
+        *ngIf="accion === 'actualizar'" 
+        type="button" 
+        class="btn-topbar-primary" 
+        (click)="liberarMesa()"
+        matTooltip="Efectuar cobro y desocupar mesa">
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Cobrar (${{ basicForm.controls['montoTotal'].value || '0.00' }})</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Indicador de Carga si aplica -->
+  <div *ngIf="!ocultarCarga" class="pos-loading-bar">
+    <i class="fas fa-spinner fa-spin"></i> Sincronizando comanda...
+  </div>
+
+  <!-- Contenedor Principal en 2 Columnas -->
+  <div class="pos-content-container">
+    <div class="row g-3">
+      <!-- COLUMNA IZQUIERDA: Detalle de Comanda / Lista de Platos (8 cols) -->
+      <div class="col-lg-7 col-xl-8">
+        <div class="pos-panel order-panel">
+          <!-- Cabecera de la Comanda -->
+          <div class="order-panel-header">
+            <div class="order-header-info">
+              <div class="order-header-icon">
+                <mat-icon>receipt_long</mat-icon>
+              </div>
+              <div>
+                <h3 class="order-header-title">Comanda de la Mesa</h3>
+                <span class="order-header-count">{{ listaDetalle.length }} {{ listaDetalle.length === 1 ? 'producto' : 'productos' }} agregados</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn-add-dish" (click)="openDialogDetalle()">
+              <mat-icon>add_circle</mat-icon>
+              <span>Agregar Producto</span>
             </button>
-        </div> 
-    </div>
-        <div style="text-align: center;margin-bottom: 5px; font-size: 11px;font-weight: 500;" *ngIf="!ocultarCarga">
-        <span>
-            <i class="fas fa-spinner fa-spin"></i> Cargando datos...
-        </span>
-    </div>
+          </div>
 
-    <div class="card_contest_div">
-        <form [formGroup]="basicForm"> 
-            <div class="row m-0 "> 
-                <div class="col-md-12 m_div">
-                    <div class="m_div_tex">
-                        {{nombreMesa}}
-                    </div>
-                </div>
-                <div class="col-md-3">      
-                    <div class="list_platos">
-                        --- Datos ---
-                    </div>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Nombre del cliente</mat-label>
-                        <input matInput placeholder="" name="nombreCliente" formControlName="nombreCliente" autocomplete="off"  class="uppercase">
-                    </mat-form-field>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Cajero</mat-label>
-                        <mat-select [(value)]="selecteCajero" placeholder="Seleccione" formControlName="cajero" style="font-size: 15px;">
-                            <mat-option *ngFor="let data of listCajero" [value]="data.id"> {{data.f_nombre}}</mat-option> 
-                        </mat-select>  
-                    </mat-form-field>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Medio de pago</mat-label>
-                        <mat-select   [(value)]="selectePagoCon" placeholder="Seleccione" formControlName="pagoCon" style="font-size: 15px;">
-                            <mat-option value="EF"> Efectivo</mat-option>
-                            <mat-option value="TA"> Tarjeta Cre/Deb</mat-option>
-                        </mat-select> 
-                    </mat-form-field>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Caja</mat-label>
-                        <mat-select [(value)]="selecteCaja" placeholder="Seleccione" formControlName="caja" style="font-size: 15px;">
-                            <mat-option *ngFor="let caja of listCaja" [value]="caja.id"> {{caja.f_nombre}}</mat-option> 
-                        </mat-select>
-                    </mat-form-field> 
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Monto total</mat-label>
-                        <input type="number" inputmode="numeric" matInput class="example-right-align" placeholder="0.00" name="montoTotal" readonly="true" formControlName="montoTotal" autocomplete="off">
-                        <!-- <span matTextPrefix>$&nbsp;</span> -->
-                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
-                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('minlength') && basicForm.controls['montoTotal'].touched"
-                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['montoTotal'].errors?.["minlength"]?.requiredLength}} caracteres.
-                        </mat-hint>
-                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('maxlength') && basicForm.controls['montoTotal'].touched"
-                            class="form-error-msg"> No puede contener más de {{basicForm.controls['montoTotal'].errors?.["maxlength"]?.requiredLength}} caracteres.
-                        </mat-hint>
-                        <mat-hint *ngIf="basicForm.controls['montoTotal'].hasError('required') && basicForm.controls['montoTotal'].touched"
-                            class="form-error-msg"> El campo es obligatorio.
-                        </mat-hint>
-                    </mat-form-field>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Monto efectivo</mat-label>
-                        <input type="number" inputmode="numeric" matInput class="example-right-align" 
-                        (change)="fnVuelto()" 
-                        (keydown.enter)="fnVuelto()"
-                        placeholder="0.00" name="montoEfectivo" formControlName="montoEfectivo" autocomplete="off">
-                        <!-- <span matTextPrefix>$&nbsp;</span> -->
-                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
-                    </mat-form-field>
-                    <mat-form-field appearance="outline"  class="custom-input st_boton_input">
-                        <mat-label class="labeltext">Vuelto</mat-label>
-                        <input type="number" inputmode="numeric" matInput class="example-right-align" placeholder="0.00" name="vuelto" readonly="true" formControlName="vuelto" autocomplete="off">
-                        <!-- <span matTextPrefix>$&nbsp;</span>  -->
-                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
-                    </mat-form-field>
-                    <div style="display: flex;justify-content: space-around;">
-                        <section>
-                            <mat-checkbox
-                                [checked]="check_pendiente"
-                                (change)="onPendienteChange($event)"
-                            >
-                                Pendiente
-                            </mat-checkbox>
-                        </section>
-                        <section>
-                            <mat-checkbox
-                                [checked]="check_atendido"
-                                (change)="onAtendidoChange($event)"
-                            >
-                                Atendido
-                            </mat-checkbox>
-                        </section>
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <div class="row m-0">
-                        <div class="col-md-12 list_platos" style="font-weight: 500;">
-                            Lista de Productos
-                        </div> 
-                        <div class="col-md-4 mt-2 card_product" *ngFor="let value of listaDetalle; let i = index ">
-                            <div class="row st_card_mesa_list" style="font-size: 14px;">
-                                <div class="col-md-3 st_car_img_platos">
-                                    <img src="{{value.f_download_link}}" alt="" style="width: stretch;height: stretch;">
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="col-md-12 st_label_booton" style="justify-content: center;font-weight: bold;" >
-                                        <div class="st_txt_label">{{value.f_txtCategoria}}</div>
-                                    </div>
-                                    <div class="col-md-12"  style="border-bottom: 1px solid #a5949461;">
-                                        <div class="st_txt_label"> </div>
-                                        <div>{{value.f_txtProducto}} </div>
-                                    </div>
-                                    <div class="col-md-12 st_label_booton" >
-                                        <div class="st_txt_label">Precio:</div>
-                                        <div>$/{{value.f_precio}}</div>
-                                    </div>
-                                    <div class="col-md-12 st_label_booton" >
-                                        <div class="st_txt_label">Cantidad:</div>
-                                        <div>{{value.f_cantidad}}</div>
-                                    </div>
-                                    <div class="col-md-12 st_label_booton" >
-                                        <div class="st_txt_label">Sub Total:</div>
-                                        <div style="font-weight: 500;"> $/{{(value.f_subTotal)}}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="col-md-12" style="display: flex;justify-content: space-between;">
-                                        <div class="st_txt_label">Obs:</div>
-                                        <div>{{value.f_observacion}}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <hr class="m-0">
-                                </div>
-                                <div class="st_btn_action">
-                                    <button type="button" mat-raised-button color="primary" (click)="eliminarProducto(i)" style="background: #EB5757; color: #fff;height: 26px;font-size: 12px;">
-                                        <mat-icon>delete</mat-icon>Eliminar
-                                    </button>&nbsp;&nbsp;
-                                    <button type="button" mat-raised-button color="primary" (click)="actualizarProducto(i)" style="background: #01A99A; color: #fff;height: 26px;font-size: 12px;">
-                                        <mat-icon>border_color</mat-icon>Modificar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div style="text-align: center;margin-top: 20px;">
-                        <button type="button" mat-raised-button color="primary" (click)="openDialogDetalle()" style="margin-left: 5px;background-color: #1D95A8;color: #fff;" >
-                            <mat-icon>add</mat-icon> Agregar Producto
-                        </button>
-                    </div> 
-                    <br>
-                </div> 
-                <div class="col-md-12">
-                    <div style="text-align: center;padding: 11px 0px;">
-                        <hr>
-                        <button type="button" mat-raised-button color="accent" (click)="cerrarFormulario()" class="btn_secondary">
-                            <mat-icon>close</mat-icon> Cerrar
-                        </button>
-                        <button type="button" mat-raised-button class="btn_primary" (click)="save()" [disabled]="isButtonDisabled" style="margin-left: 5px; background-color: #cc8431;" >
-                            <mat-icon>save</mat-icon><i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i> Guardar
-                        </button>
-                    </div>
-                </div>
-            </div>        
+          <!-- Estado Vacío cuando no hay platos agregados -->
+          <div *ngIf="listaDetalle.length === 0" class="empty-order-state">
+            <div class="empty-order-graphic">
+              <mat-icon>lunch_dining</mat-icon>
+            </div>
+            <h4>Comanda sin productos</h4>
+            <p>Agrega los platos o bebidas que los comensales han ordenado en esta mesa.</p>
+            <button type="button" class="btn-empty-action" (click)="openDialogDetalle()">
+              <mat-icon>add</mat-icon> Abrir Menú y Agregar Platos
+            </button>
+          </div>
 
+          <!-- Lista de Items en la Comanda -->
+          <div *ngIf="listaDetalle.length > 0" class="order-items-wrapper">
+            <div *ngFor="let item of listaDetalle; let i = index" class="order-item-card">
+              <!-- Miniatura / Avatar del Plato -->
+              <div class="item-visual-box">
+                <img *ngIf="item.f_download_link" [src]="item.f_download_link" [alt]="item.f_txtProducto" class="item-img" />
+                <div *ngIf="!item.f_download_link" class="item-placeholder-icon">
+                  <mat-icon>restaurant</mat-icon>
+                </div>
+              </div>
+
+              <!-- Información del Plato -->
+              <div class="item-main-info">
+                <span class="item-category-pill">{{ item.f_txtCategoria || 'Cocina' }}</span>
+                <h4 class="item-dish-name">{{ item.f_txtProducto }}</h4>
+                <div *ngIf="item.f_observacion" class="item-note-chip" [title]="item.f_observacion">
+                  <mat-icon class="note-icon">mode_comment</mat-icon>
+                  <span class="note-text">{{ item.f_observacion }}</span>
+                </div>
+              </div>
+
+              <!-- Precio Unitario -->
+              <div class="item-price-col">
+                <span class="col-label">Unitario</span>
+                <span class="col-val">${{ (item.f_precio || 0) | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Stepper de Cantidad (+ / -) -->
+              <div class="item-stepper-col">
+                <div class="pos-stepper">
+                  <button type="button" class="stepper-btn minus" (click)="decrementarCantidad(i)" matTooltip="Reducir">
+                    <mat-icon>remove</mat-icon>
+                  </button>
+                  <span class="stepper-count">{{ item.f_cantidad }}</span>
+                  <button type="button" class="stepper-btn plus" (click)="incrementarCantidad(i)" matTooltip="Aumentar">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Subtotal del Item -->
+              <div class="item-subtotal-col">
+                <span class="col-label">Subtotal</span>
+                <span class="col-subtotal-val">${{ (item.f_subTotal || 0) | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Botones de Acción -->
+              <div class="item-actions-col">
+                <button type="button" class="action-icon-btn edit-btn" (click)="actualizarProducto(i)" matTooltip="Editar notas o precio">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button type="button" class="action-icon-btn delete-btn" (click)="eliminarProducto(i)" matTooltip="Eliminar de la comanda">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón Rápido al final si la lista es extensa -->
+          <div *ngIf="listaDetalle.length >= 3" class="order-footer-add-more">
+            <button type="button" class="btn-add-more-items" (click)="openDialogDetalle()">
+              <mat-icon>add</mat-icon> Agregar otro producto a la cuenta
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: Liquidación, Pago & Configuración de Mesa (4-5 cols) -->
+      <div class="col-lg-5 col-xl-4">
+        <form [formGroup]="basicForm" class="checkout-sidebar-form">
+          <!-- TARJETA 1: Información de Mesa y Comensal -->
+          <div class="pos-panel info-panel">
+            <div class="panel-section-title">
+              <mat-icon class="section-title-icon">person_outline</mat-icon>
+              <span>Datos del Servicio</span>
+            </div>
+
+            <!-- Cliente -->
+            <div class="pos-field-group">
+              <label class="pos-field-label">Cliente / Razón Social</label>
+              <div class="pos-input-container">
+                <mat-icon class="input-icon">person</mat-icon>
+                <input 
+                  type="text" 
+                  formControlName="nombreCliente" 
+                  placeholder="Consumidor Final" 
+                  class="pos-control-input uppercase" />
+              </div>
+            </div>
+
+            <!-- Cajero y Caja -->
+            <div class="row g-2 mt-1">
+              <div class="col-6">
+                <div class="pos-field-group mb-0">
+                  <label class="pos-field-label">Cajero</label>
+                  <div class="pos-input-container">
+                    <mat-icon class="input-icon">badge</mat-icon>
+                    <select [(ngModel)]="selecteCajero" formControlName="cajero" class="pos-control-select">
+                      <option *ngFor="let data of listCajero" [value]="data.id">{{ data.f_nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="pos-field-group mb-0">
+                  <label class="pos-field-label">Caja Asignada</label>
+                  <div class="pos-input-container">
+                    <mat-icon class="input-icon">point_of_sale</mat-icon>
+                    <select [(ngModel)]="selecteCaja" formControlName="caja" class="pos-control-select">
+                      <option *ngFor="let caja of listCaja" [value]="caja.id">{{ caja.f_nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado de Cocina / Comanda (Segmented Pills) -->
+            <div class="pos-field-group mt-3 mb-0">
+              <label class="pos-field-label">Estado de la Orden</label>
+              <div class="segmented-status-pills">
+                <button 
+                  type="button" 
+                  class="status-pill-btn pill-pending" 
+                  [class.active-pending]="check_pendiente"
+                  (click)="seleccionarEstado('pendiente')">
+                  <mat-icon class="pill-icon">hourglass_empty</mat-icon>
+                  <span>Pendiente</span>
+                </button>
+
+                <button 
+                  type="button" 
+                  class="status-pill-btn pill-served" 
+                  [class.active-served]="check_atendido"
+                  (click)="seleccionarEstado('atendido')">
+                  <mat-icon class="pill-icon">check_circle</mat-icon>
+                  <span>Atendido</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TARJETA 2: Cobro, Arqueo & Liquidación -->
+          <div class="pos-panel checkout-panel mt-3">
+            <div class="panel-section-title">
+              <mat-icon class="section-title-icon">payments</mat-icon>
+              <span>Cobro en Caja</span>
+            </div>
+
+            <!-- Medio de Pago (Efectivo vs Tarjeta) -->
+            <div class="pos-field-group">
+              <label class="pos-field-label">Medio de Pago</label>
+              <div class="payment-tabs-grid">
+                <button 
+                  type="button" 
+                  class="payment-tab-btn" 
+                  [class.selected-tab]="selectePagoCon === 'EF'"
+                  (click)="seleccionarMedioPago('EF')">
+                  <mat-icon class="tab-icon">attach_money</mat-icon>
+                  <div class="tab-text">
+                    <span class="tab-name">Efectivo</span>
+                    <span class="tab-hint">Moneda física</span>
+                  </div>
+                </button>
+
+                <button 
+                  type="button" 
+                  class="payment-tab-btn" 
+                  [class.selected-tab]="selectePagoCon === 'TA'"
+                  (click)="seleccionarMedioPago('TA')">
+                  <mat-icon class="tab-icon">credit_card</mat-icon>
+                  <div class="tab-text">
+                    <span class="tab-name">Tarjeta</span>
+                    <span class="tab-hint">Datafast / POS</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Total de la Cuenta (Banner Prominente) -->
+            <div class="grand-total-banner">
+              <div class="total-meta">
+                <span class="total-caption">TOTAL A COBRAR</span>
+                <span class="total-currency">USD ($)</span>
+              </div>
+              <div class="total-number-display">
+                ${{ (basicForm.controls['montoTotal'].value || 0) | number:'1.2-2' }}
+              </div>
+            </div>
+
+            <!-- Sección de Efectivo / Billetes Rápidos / Cambio -->
+            <div *ngIf="selectePagoCon === 'EF'" class="cash-settlement-block">
+              <!-- Botones de Billetes Rápidos -->
+              <div class="pos-field-group mb-2">
+                <label class="pos-field-label">Pago Rápido</label>
+                <div class="quick-cash-grid">
+                  <button type="button" class="quick-pill pill-exact" (click)="establecerEfectivoRapido('exacto')">
+                    Exacto
+                  </button>
+                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(10)">$10</button>
+                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(20)">$20</button>
+                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(50)">$50</button>
+                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(100)">$100</button>
+                </div>
+              </div>
+
+              <!-- Input Monto Recibido -->
+              <div class="pos-field-group mb-2">
+                <label class="pos-field-label">Monto Entregado por Cliente</label>
+                <div class="pos-input-container large-tender-input">
+                  <span class="currency-symbol">$</span>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    formControlName="montoEfectivo" 
+                    (input)="fnVuelto()" 
+                    placeholder="0.00" 
+                    class="pos-control-input text-end fw-bold font-monospace" />
+                </div>
+              </div>
+
+              <!-- Caja de Cambio / Vuelto -->
+              <div class="change-calc-box" [class.positive-change]="(basicForm.controls['vuelto'].value || 0) > 0">
+                <div class="change-info-left">
+                  <mat-icon class="change-box-icon">currency_exchange</mat-icon>
+                  <div>
+                    <span class="change-box-title">Vuelto / Cambio</span>
+                    <span class="change-box-desc">A entregar al comensal</span>
+                  </div>
+                </div>
+                <div class="change-amount-display">
+                  ${{ (basicForm.controls['vuelto'].value || 0) | number:'1.2-2' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Mensaje Informativo si es Tarjeta -->
+            <div *ngIf="selectePagoCon === 'TA'" class="card-payment-notice">
+              <mat-icon class="notice-icon">contactless</mat-icon>
+              <div>
+                <strong>Pago Electrónico</strong>
+                <p>Procese el cobro en el terminal bancario antes de liberar la mesa.</p>
+              </div>
+            </div>
+
+            <!-- Botones Principales de Cierre -->
+            <div class="checkout-footer-actions">
+              <!-- Botón Cobrar y Liberar Mesa (siempre que la mesa esté ocupada) -->
+              <button 
+                *ngIf="accion === 'actualizar'" 
+                type="button" 
+                class="btn-checkout-primary"
+                (click)="liberarMesa()">
+                <div class="btn-checkout-content">
+                  <mat-icon class="main-btn-icon">verified</mat-icon>
+                  <div class="main-btn-text">
+                    <span class="btn-headline">Cobrar & Liberar Mesa</span>
+                    <span class="btn-subheadline">Ingresar venta a caja y desocupar</span>
+                  </div>
+                </div>
+                <mat-icon class="btn-arrow-icon">arrow_forward</mat-icon>
+              </button>
+
+              <!-- Botón Guardar Comanda -->
+              <button 
+                type="button" 
+                class="btn-checkout-save" 
+                [class.btn-checkout-full]="accion === 'nuevo'"
+                [disabled]="isButtonDisabled"
+                (click)="save()">
+                <mat-icon>save</mat-icon>
+                <span>{{ accion === 'nuevo' ? 'Abrir Mesa y Guardar Comanda' : 'Guardar Cambios de Comanda' }}</span>
+              </button>
+            </div>
+          </div>
         </form>
+      </div>
     </div>
-
-    <br> 
-    <br> 
+  </div>
 </div>

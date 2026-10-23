@@ -219,6 +219,35 @@ export class RestauranteDialogDetalleComponent implements OnInit {
       this._dialogRef.close(data);
     }
   }
+  sumarCantidad(): void {
+    const actual = Number(this.basicForm.controls["cantidad"].value || 1);
+    this.basicForm.controls["cantidad"].setValue(actual + 1);
+  }
+
+  restarCantidad(): void {
+    const actual = Number(this.basicForm.controls["cantidad"].value || 1);
+    if (actual > 1) {
+      this.basicForm.controls["cantidad"].setValue(actual - 1);
+    }
+  }
+
+  get subtotalPreview(): number {
+    const precio = parseFloat(this.basicForm.controls["precio"].value || 0);
+    const cantidad = parseFloat(this.basicForm.controls["cantidad"].value || 0);
+    return Math.round(precio * cantidad * 100) / 100;
+  }
+
+  agregarNotaRapida(nota: string): void {
+    const actual = (this.basicForm.controls['observacion'].value || '').trim();
+    if (actual) {
+      if (!actual.toLowerCase().includes(nota.toLowerCase())) {
+        this.basicForm.controls['observacion'].setValue(`${actual}, ${nota}`);
+      }
+    } else {
+      this.basicForm.controls['observacion'].setValue(nota);
+    }
+  }
+
   validateFrm() :boolean{
     this.error = false;
     if(!this.ValueCategoria.value){

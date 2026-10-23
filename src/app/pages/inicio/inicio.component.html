@@ -1,37 +1,553 @@
-<div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
-    <div class="m-section-title">
-        <h2 class="m-title">Bienvenido</h2>
-        <div class="m-title-description" style="font-size: 17px;font-weight: 500;">
-            <span> {{user_name}} </span> - <span style="color: #AF2210;">{{user_rol}}</span>
-        </div> 
+<div class="dashboard-wrapper">
+  <!-- BANNER DE BIENVENIDA Y CABECERA -->
+  <header class="dashboard-hero-banner">
+    <div class="hero-content-left">
+      <div class="hero-avatar-badge">
+        <mat-icon>dashboard_customize</mat-icon>
+      </div>
+      <div class="hero-text-block">
+        <div class="hero-greeting-row">
+          <h2 class="hero-greeting-title">{{ saludo }}, {{ dashboard?.usuario?.nombreCompleto || 'Administrador' }}</h2>
+          <span class="hero-role-pill">
+            <span class="role-dot"></span>
+            {{ dashboard?.usuario?.rol || 'Administrador' }}
+          </span>
+        </div>
+        <p class="hero-subtitle">
+          <mat-icon class="subtitle-icon">calendar_today</mat-icon>
+          <span>{{ fechaActual | date:'fullDate':'':'es-ES' | titlecase }}</span>
+          <span class="subtitle-divider">&bull;</span>
+          <mat-icon class="subtitle-icon">storefront</mat-icon>
+          <span>Panel de Control & Ventas ZenSystem</span>
+        </p>
+      </div>
     </div>
-    <div class="m-section-buttons " align="center">
-    </div>
-</div>
 
-<div class="row m-0 p-0 ">
-    <div class="col-md-4" >
-        <mat-card class="example-card mb-3">
-            <mat-card-header style="background: #B53437;border-radius: 5px 5px 0px 0px;">
-                <mat-icon style="color: #fff;">warning</mat-icon>
-                    <p class="mb-1" style="color: #fff;padding-top: 4px;">
-                        <span style="font-weight: 500;">&nbsp;card de ejemplo:</span> 10 días
-                    </p>
-                </mat-card-header>
-            <mat-card-content>
-                <div class="mt-2">
-                    <p class="mb-1"><span style="font-weight: 500;">-Fecha ingreso:</span>02-02-2024<span style="font-size: 10px;">40</span> </p>
+    <div class="hero-actions-right">
+      <button type="button" class="btn-hero-action btn-refresh" (click)="cargarDashboard()" matTooltip="Actualizar métricas">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span class="d-none d-sm-inline">Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-action btn-caja-shortcut" (click)="irAperturaCaja()">
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Turnos de Caja</span>
+      </button>
+
+      <button type="button" class="btn-hero-action btn-primary-restaurant" (click)="irRestaurante()">
+        <mat-icon>table_restaurant</mat-icon>
+        <span>Salón de Mesas</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- BARRA DE CARGA INDETERMINADA -->
+  <div *ngIf="cargando" class="dashboard-loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div class="loader-text">Sincronizando métricas del restaurante y caja...</div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL DEL DASHBOARD -->
+  <div *ngIf="!cargando && dashboard" class="dashboard-body">
+
+    <!-- FILA 1: 4 TARJETAS KPI DE ALTO IMPACTO -->
+    <div class="row g-3 mb-4">
+      <!-- KPI 1: Ventas Totales -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-metric-card kpi-sales" (click)="irRestaurante()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Ventas Totales</span>
+            <div class="kpi-icon-circle sales-circle">
+              <mat-icon>payments</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">${{ dashboard.kpis.ventasTotales | number:'1.2-2' }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-green">
+              <mat-icon>check_circle</mat-icon> {{ dashboard.kpis.pedidosAtendidos }} pedidos cobrados
+            </span>
+            <span class="kpi-hint">Recaudación acumulada</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Ocupación del Salón -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-metric-card kpi-tables" (click)="irRestaurante()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Ocupación del Salón</span>
+            <div class="kpi-icon-circle tables-circle">
+              <mat-icon>table_restaurant</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">
+            {{ dashboard.kpis.mesasOcupadas }} / {{ dashboard.kpis.mesasTotales }} Mesas
+            <span class="kpi-rate-tag">({{ dashboard.kpis.tasaOcupacion }}%)</span>
+          </div>
+          <div class="kpi-progress-wrap">
+            <div class="kpi-progress-bar" [style.width.%]="dashboard.kpis.tasaOcupacion"></div>
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-blue">
+              <mat-icon>event_seat</mat-icon> {{ dashboard.kpis.mesasDisponibles }} libres
+            </span>
+            <span class="kpi-hint">Capacidad en salón</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Estado de Cajas -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Turnos de Caja</span>
+            <div class="kpi-icon-circle register-circle">
+              <mat-icon>point_of_sale</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">
+            {{ dashboard.kpis.cajasAbiertas > 0 ? (dashboard.kpis.cajasAbiertas + ' Caja Abierta') : 'Sin Cajas Abiertas' }}
+          </div>
+          <div class="kpi-card-footer">
+            <span *ngIf="dashboard.kpis.cajaActiva" class="kpi-badge badge-emerald">
+              <span class="pulse-dot-green"></span> {{ dashboard.kpis.cajaActiva.caja_nombre }}: ${{ (dashboard.kpis.cajaActiva.saldo || 0) | number:'1.2-2' }}
+            </span>
+            <span *ngIf="!dashboard.kpis.cajaActiva" class="kpi-badge badge-amber">
+              <mat-icon>warning</mat-icon> Requiere apertura
+            </span>
+            <span class="kpi-hint">Saldo en gaveta</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 4: Comandas en Curso -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-metric-card kpi-orders" (click)="irRestaurante()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Comandas en Curso</span>
+            <div class="kpi-icon-circle orders-circle">
+              <mat-icon>restaurant_menu</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">
+            {{ dashboard.kpis.pedidosPendientes }} Pendientes
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-orange">
+              <mat-icon>hourglass_empty</mat-icon> En preparación
+            </span>
+            <span class="kpi-hint">{{ dashboard.kpis.pedidosTotales }} pedidos totales</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILA 2: DISTRIBUCIÓN EN 2 COLUMNAS (8 cols y 4 cols) -->
+    <div class="row g-3">
+      <!-- ====================================================
+           COLUMNA IZQUIERDA (8 COLUMNAS)
+           ==================================================== -->
+      <div class="col-lg-8">
+
+        <!-- BLOQUE A: MESAS OCUPADAS EN TIEMPO REAL -->
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-tables">
+                <mat-icon>deck</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Mesas Ocupadas en el Salón</h3>
+                <p class="dash-card-subtitle">Seguimiento en vivo de consumo y estado de pedidos</p>
+              </div>
+            </div>
+            <button type="button" class="dash-btn-link" (click)="irRestaurante()">
+              <span>Ir al Salón Completo</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+
+          <!-- Si hay mesas ocupadas -->
+          <div *ngIf="dashboard.mesasOcupadas && dashboard.mesasOcupadas.length > 0" class="live-tables-grid">
+            <div 
+              *ngFor="let m of dashboard.mesasOcupadas" 
+              class="live-table-card"
+              [class.state-served]="m.pedido_state === 1"
+              [class.state-kitchen]="m.pedido_state !== 1"
+              (click)="irRestaurante()">
+
+              <div class="live-table-top">
+                <div class="table-name-wrap">
+                  <mat-icon class="table-card-icon">table_restaurant</mat-icon>
+                  <span class="table-card-name">{{ m.nombre }}</span>
                 </div>
-            </mat-card-content>
-        </mat-card>
+                <span class="table-status-pill" [class.pill-ready]="m.pedido_state === 1" [class.pill-wait]="m.pedido_state !== 1">
+                  {{ m.pedido_state === 1 ? 'Atendido / Servido' : 'Pendiente' }}
+                </span>
+              </div>
+
+              <div class="live-table-info">
+                <div class="info-row">
+                  <mat-icon class="info-icon">person</mat-icon>
+                  <span class="info-client">{{ m.cliente || 'Consumidor Final' }}</span>
+                </div>
+                <div class="info-row">
+                  <mat-icon class="info-icon">shopping_bag</mat-icon>
+                  <span class="info-items">{{ m.items_count }} {{ m.items_count === 1 ? 'producto' : 'productos' }}</span>
+                </div>
+              </div>
+
+              <div class="live-table-bottom">
+                <div class="bill-total-wrap">
+                  <span class="bill-label">Cuenta acumulada</span>
+                  <span class="bill-amount">${{ (m.montoTotal || 0) | number:'1.2-2' }}</span>
+                </div>
+                <button type="button" class="btn-manage-table">
+                  <mat-icon>receipt</mat-icon> Ver Comanda
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Si NO hay mesas ocupadas -->
+          <div *ngIf="!dashboard.mesasOcupadas || dashboard.mesasOcupadas.length === 0" class="empty-state-card">
+            <div class="empty-icon-circle">
+              <mat-icon>dining</mat-icon>
+            </div>
+            <h4>Todas las mesas están disponibles</h4>
+            <p>El salón se encuentra libre en este momento para recibir nuevos clientes.</p>
+            <button type="button" class="btn-empty-action" (click)="irRestaurante()">
+              <mat-icon>add_circle_outline</mat-icon> Abrir Pedido en una Mesa
+            </button>
+          </div>
+        </div>
+
+        <!-- BLOQUE B: TOP PLATOS MÁS VENDIDOS -->
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-popular">
+                <mat-icon>military_tech</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Platos Más Vendidos</h3>
+                <p class="dash-card-subtitle">Platos y bebidas con mayor preferencia y facturación</p>
+              </div>
+            </div>
+            <button type="button" class="dash-btn-link" (click)="irProductos()">
+              <span>Ver Menú</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+
+          <div *ngIf="dashboard.topProductos && dashboard.topProductos.length > 0" class="top-products-list">
+            <div *ngFor="let p of dashboard.topProductos; let i = index" class="top-product-item">
+              <!-- Puesto / Medalla -->
+              <div class="rank-badge" [class.rank-gold]="i === 0" [class.rank-silver]="i === 1" [class.rank-bronze]="i === 2">
+                #{{ i + 1 }}
+              </div>
+
+              <!-- Miniatura -->
+              <div class="product-thumb-box">
+                <img *ngIf="p.imagen" [src]="p.imagen" [alt]="p.nombre" class="product-thumb-img" />
+                <div *ngIf="!p.imagen" class="product-thumb-placeholder">
+                  <mat-icon>restaurant</mat-icon>
+                </div>
+              </div>
+
+              <!-- Detalles del Plato -->
+              <div class="product-meta-col">
+                <span class="product-category-tag">{{ p.categoria }}</span>
+                <h4 class="product-name">{{ p.nombre }}</h4>
+                <div class="product-progress-track">
+                  <div class="product-progress-fill" [style.width.%]="calcularBarraTop(p.total_vendido)"></div>
+                </div>
+              </div>
+
+              <!-- Cantidad Vendida -->
+              <div class="product-qty-col">
+                <span class="qty-number">{{ p.total_vendido }}</span>
+                <span class="qty-label">vendidos</span>
+              </div>
+
+              <!-- Total Recaudado -->
+              <div class="product-revenue-col">
+                <span class="revenue-val">${{ (p.total_recaudado || 0) | number:'1.2-2' }}</span>
+                <span class="unit-price-label">${{ (p.precio || 0) | number:'1.2-2' }} c/u</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!dashboard.topProductos || dashboard.topProductos.length === 0" class="empty-state-card py-4">
+            <p class="text-muted">No se registran ventas de productos aún.</p>
+          </div>
+        </div>
+
+        <!-- BLOQUE C: ÚLTIMOS PEDIDOS REGISTRADOS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-recent">
+                <mat-icon>receipt_long</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Últimos Pedidos Registrados</h3>
+                <p class="dash-card-subtitle">Historial de comandas recientes en salón</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="dashboard.ultimosPedidos && dashboard.ultimosPedidos.length > 0" class="table-responsive">
+            <table class="dash-modern-table">
+              <thead>
+                <tr>
+                  <th>Orden</th>
+                  <th>Mesa</th>
+                  <th>Cliente</th>
+                  <th>Total</th>
+                  <th>Medio Pago</th>
+                  <th>Estado</th>
+                  <th>Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pedido of dashboard.ultimosPedidos">
+                  <td>
+                    <span class="order-id-tag">#{{ pedido.idPedido }}</span>
+                  </td>
+                  <td>
+                    <span class="table-cell-name">{{ pedido.mesa_nombre || 'Mesa' }}</span>
+                  </td>
+                  <td>
+                    <span class="client-cell-name">{{ pedido.cliente || 'Consumidor Final' }}</span>
+                  </td>
+                  <td>
+                    <strong class="amount-cell-text">${{ (pedido.montoTotal || 0) | number:'1.2-2' }}</strong>
+                  </td>
+                  <td>
+                    <span class="pay-method-badge" [class.badge-card]="pedido.pagoCon === 'TA'">
+                      {{ pedido.pagoCon === 'TA' ? '💳 Tarjeta' : '💵 Efectivo' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="order-state-badge" [class.state-atendido]="pedido.state === 1" [class.state-pendiente]="pedido.state !== 1">
+                      {{ pedido.state === 1 ? 'Atendido' : 'Pendiente' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="time-cell-text">{{ pedido.created_at | date:'shortTime':'':'es-ES' }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ====================================================
+           COLUMNA DERECHA (4 COLUMNAS)
+           ==================================================== -->
+      <div class="col-lg-4">
+
+        <!-- BLOQUE D: ESTADO DEL TURNO DE CAJA -->
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-caja">
+                <mat-icon>account_balance_wallet</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Caja en Turno</h3>
+                <p class="dash-card-subtitle">Control de efectivo y responsable</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="dashboard.kpis.cajaActiva" class="active-register-card">
+            <div class="register-header-banner">
+              <div class="register-status-indicator">
+                <span class="pulse-indicator-dot"></span>
+                <span class="register-status-text">Turno Abierto</span>
+              </div>
+              <h4 class="register-name">{{ dashboard.kpis.cajaActiva.caja_nombre }}</h4>
+            </div>
+
+            <div class="register-balance-display">
+              <span class="balance-title">Saldo Actual en Gaveta</span>
+              <span class="balance-big-amount">${{ (dashboard.kpis.cajaActiva.saldo || 0) | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="register-meta-list">
+              <div class="meta-item">
+                <mat-icon class="meta-icon">person</mat-icon>
+                <div class="meta-text">
+                  <span class="meta-label">Cajero a Cargo</span>
+                  <span class="meta-value">{{ dashboard.kpis.cajaActiva.cajero_nombre || dashboard.kpis.cajaActiva.cajero_user }}</span>
+                </div>
+              </div>
+
+              <div class="meta-item">
+                <mat-icon class="meta-icon">schedule</mat-icon>
+                <div class="meta-text">
+                  <span class="meta-label">Hora de Apertura</span>
+                  <span class="meta-value">{{ dashboard.kpis.cajaActiva.aFecha | date:'shortTime':'':'es-ES' }}</span>
+                </div>
+              </div>
+
+              <div class="meta-item">
+                <mat-icon class="meta-icon">attach_money</mat-icon>
+                <div class="meta-text">
+                  <span class="meta-label">Monto Base Inicial</span>
+                  <span class="meta-value">${{ (dashboard.kpis.cajaActiva.aMonto || 0) | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-register-action" (click)="irAperturaCaja()">
+              <mat-icon>point_of_sale</mat-icon>
+              <span>Gestionar Turno / Arqueo</span>
+            </button>
+          </div>
+
+          <div *ngIf="!dashboard.kpis.cajaActiva" class="empty-register-card text-center p-3">
+            <mat-icon class="empty-reg-icon">lock</mat-icon>
+            <h5>No hay turnos abiertos</h5>
+            <p class="text-muted small">Abre una caja para iniciar la facturación del día.</p>
+            <button type="button" class="btn-open-register" (click)="irAperturaCaja()">
+              <mat-icon>add_circle</mat-icon> Abrir Caja Ahora
+            </button>
+          </div>
+        </div>
+
+        <!-- BLOQUE E: DISTRIBUCIÓN POR MEDIO DE PAGO -->
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-payment">
+                <mat-icon>pie_chart</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Medios de Pago</h3>
+                <p class="dash-card-subtitle">Cobros registrados por modalidad</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="payment-methods-breakdown">
+            <div *ngFor="let m of dashboard.metodosPago" class="payment-method-row">
+              <div class="method-header-row">
+                <div class="method-name-wrap">
+                  <span class="method-symbol">{{ m.pagoCon === 'TA' ? '💳' : '💵' }}</span>
+                  <span class="method-label">{{ m.pagoCon === 'TA' ? 'Tarjeta Débito/Crédito' : 'Efectivo en Caja' }}</span>
+                </div>
+                <div class="method-amounts">
+                  <span class="method-total">${{ (m.total || 0) | number:'1.2-2' }}</span>
+                  <span class="method-pct">({{ calcularPorcentajeMetodo(m.total) }}%)</span>
+                </div>
+              </div>
+              <div class="method-progress-track">
+                <div 
+                  class="method-progress-bar" 
+                  [class.bar-card]="m.pagoCon === 'TA'"
+                  [class.bar-cash]="m.pagoCon !== 'TA'"
+                  [style.width.%]="calcularPorcentajeMetodo(m.total)"></div>
+              </div>
+            </div>
+
+            <div *ngIf="!dashboard.metodosPago || dashboard.metodosPago.length === 0" class="text-center py-3 text-muted small">
+              Sin cobros registrados aún.
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOQUE F: ÚLTIMOS MOVIMIENTOS EN CAJA -->
+        <div class="dash-card mb-4">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-mov">
+                <mat-icon>history</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Movimientos en Caja</h3>
+                <p class="dash-card-subtitle">Flujo de cobros y retiros en vivo</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="dashboard.ultimosMovimientos && dashboard.ultimosMovimientos.length > 0" class="mov-feed-list">
+            <div *ngFor="let mov of dashboard.ultimosMovimientos" class="mov-feed-item">
+              <div class="mov-type-badge" [class.type-in]="mov.tipo === 'I'" [class.type-out]="mov.tipo === 'E'">
+                <mat-icon>{{ mov.tipo === 'I' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+              </div>
+              <div class="mov-content-col">
+                <span class="mov-desc" [title]="mov.descripcion">{{ mov.descripcion }}</span>
+                <div class="mov-meta-row">
+                  <span class="mov-caja-tag">{{ mov.caja_nombre }}</span>
+                  <span class="mov-time">{{ mov.created_at | date:'shortTime':'':'es-ES' }}</span>
+                </div>
+              </div>
+              <div class="mov-amount-col" [class.amount-in]="mov.tipo === 'I'" [class.amount-out]="mov.tipo === 'E'">
+                {{ mov.tipo === 'I' ? '+' : '-' }}${{ (mov.monto || 0) | number:'1.2-2' }}
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!dashboard.ultimosMovimientos || dashboard.ultimosMovimientos.length === 0" class="text-center py-3 text-muted small">
+            Sin movimientos registrados.
+          </div>
+        </div>
+
+        <!-- BLOQUE G: ACCESOS RÁPIDOS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-header-left">
+              <div class="dash-card-icon-badge badge-shortcuts">
+                <mat-icon>apps</mat-icon>
+              </div>
+              <div>
+                <h3 class="dash-card-title">Accesos Rápidos</h3>
+                <p class="dash-card-subtitle">Navegación directa a módulos clave</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="shortcuts-grid">
+            <div class="shortcut-tile" (click)="irRestaurante()">
+              <div class="shortcut-icon-box shortcut-resto">
+                <mat-icon>table_restaurant</mat-icon>
+              </div>
+              <span class="shortcut-title">Salón Mesas</span>
+              <span class="shortcut-desc">Gestión POS</span>
+            </div>
+
+            <div class="shortcut-tile" (click)="irAperturaCaja()">
+              <div class="shortcut-icon-box shortcut-apertura">
+                <mat-icon>point_of_sale</mat-icon>
+              </div>
+              <span class="shortcut-title">Apertura Caja</span>
+              <span class="shortcut-desc">Turnos & Arqueo</span>
+            </div>
+
+            <div class="shortcut-tile" (click)="irProductos()">
+              <div class="shortcut-icon-box shortcut-prod">
+                <mat-icon>lunch_dining</mat-icon>
+              </div>
+              <span class="shortcut-title">Productos</span>
+              <span class="shortcut-desc">Platos & Menú</span>
+            </div>
+
+            <div class="shortcut-tile" (click)="irCategorias()">
+              <div class="shortcut-icon-box shortcut-cat">
+                <mat-icon>category</mat-icon>
+              </div>
+              <span class="shortcut-title">Categorías</span>
+              <span class="shortcut-desc">Organización</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
+  </div>
 </div>
-
-
-
-
- 
-  
-
-
-

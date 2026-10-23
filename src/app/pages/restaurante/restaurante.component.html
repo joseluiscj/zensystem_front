@@ -1,81 +1,208 @@
 <div class="contenido-central">
-    <ng-container *ngIf="mostrarFormulario">
-        <app-restaurante-pedido
-        [mesa_Id]="idMesaSeleccionada"
-        (cerrar)="cerrarFormulario()" 
-        ></app-restaurante-pedido>
-    </ng-container>
+  <!-- Vista del formulario de pedido y cobro -->
+  <ng-container *ngIf="mostrarFormulario">
+    <app-restaurante-pedido
+      [mesa_Id]="idMesaSeleccionada"
+      (cerrar)="cerrarFormulario()">
+    </app-restaurante-pedido>
+  </ng-container>
 
-    <div *ngIf="!mostrarFormulario">
-        <div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
-            <div class="m-section-title">
-                <h4 class="m-title mb-1">Restaurante</h4>
-                <div class="m-title-description">Desde aquí puedes gestionar tus Pedidos.</div>
-            </div>
-            <div class="m-section-buttons " align="center">
-                <!-- <button mat-raised-button color="primary" (click)="openDialog()" class="btn_p" >
-                    <mat-icon>add</mat-icon> Nueva Categoría
-                </button> --> 
-            </div>  
-        </div>     
-        
-        <div class="justify-content-center program-view-none-filters mb-0" style="display: flex;flex-wrap:wrap; margin-top: -30px;">
-            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
-                <div class="m-text-success number-state" style="color: #F6862A;" >{{mOcupadas}} </div>
-                <div class="num_info">Mesas Ocupadas</div>
-            </div>
-            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
-                <div class="m-text-info number-state" style="color: #1D95A8;">{{mTotal-mOcupadas}}</div>
-                <div class="num_info">Mesas Disponibles</div>
-            </div>
-            <div class="mr-1 div-number-state" style="display: flex;align-items: center;">
-                <div class="m-text-secondary number-state"  style="color: #223580;">{{mTotal}}</div>
-                <div class="num_info">Total Mesas</div>
-            </div> 
+  <!-- Vista Principal del Salón de Mesas -->
+  <div *ngIf="!mostrarFormulario" class="salon-container">
+    <!-- Encabezado Principal -->
+    <div class="salon-header">
+      <div class="header-info">
+        <div class="header-icon-box">
+          <mat-icon>table_restaurant</mat-icon>
         </div>
-        <hr>
-        <div class="row m-0 p-0 ">
-            <div style="text-align: center;font-weight: 500;" *ngIf="cardaData">
-                <div style="margin: 10px 28px;"  >
-                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-                </div>
-                <!-- <i class="fas fa-spinner fa-spin"></i> Cargando datos... -->
-            </div>
-            <div class="col-md-3" *ngFor="let mesa of mesas; let i=index" >
-                <mat-card  class="example-card mb-3  card_st">
-                    <mat-card-header class="st_header {{mesa.disponible==0?'st_cart_hear_dis_no':'st_cart_hear_dis'}}" (click)="openDialog(mesa.id)" >
-                        <mat-icon style="color: #fff;">table_restaurant</mat-icon>
-                        <p class="mb-1" style="color: #fff;">
-                            <span style="font-weight: 500;">&nbsp;{{mesa.nombre}}</span>  
-                        </p>
-                    </mat-card-header>
-                    <mat-card-content (click)="openDialog(mesa.id)">
-                        <div class="mt-2" *ngIf="mesa.disponible==0">
-                            <div class="st_cart_hr">
-                                <div style="font-weight: 500;">Cliente:</div>
-                                <div>{{mesa.cliente}}</div>
-                            </div>
-                            <div class="st_cart_hr">
-                                <div style="font-weight: 500;">Monto:</div>
-                                <div>{{mesa.montoTotal}}</div>
-                            </div>
-                            <div class="st_cart_hr">
-                                <div style="font-weight: 500;">Estado:</div>
-                                <div><b class="{{mesa.state==1?'st_txt_ocupado':'st_txt_disponible'}}" >{{mesa.state==1?'ATENDIDO':'PENDIENTE'}}</b></div>
-                            </div>
-                            <!-- <div class="st_btn_card_pedido " >
-                                Liberar mesa
-                            </div>  -->
-                        </div>
-                        <div class="mt-2" *ngIf="mesa.disponible!=0">
-                            <div style="display: flex;justify-content: center;">   
-                                <mat-icon class="st_icon_disponible" >dining</mat-icon>
-                            </div>
-                        </div>
-                    </mat-card-content>
-                </mat-card>
-            </div>  
+        <div>
+          <h3 class="header-title">Salón de Mesas & Restaurante</h3>
+          <p class="header-subtitle">Gestión en tiempo real de comandas, mesas y cobros en caja.</p>
         </div>
-        <br><br>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button class="btn-refresh" (click)="listData()" matTooltip="Actualizar estado de mesas">
+          <mat-icon>refresh</mat-icon> Actualizar
+        </button>
+        <button mat-raised-button class="btn-caja" (click)="irAperturaCaja()" matTooltip="Gestionar turnos de caja">
+          <mat-icon>point_of_sale</mat-icon> Turnos de Caja
+        </button>
+      </div>
     </div>
+
+    <!-- Tarjetas de Métricas / KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-ocupadas" (click)="setFiltro('ocupadas')">
+        <div class="kpi-content">
+          <span class="kpi-label">Mesas Ocupadas</span>
+          <span class="kpi-value">{{ mOcupadas }}</span>
+          <span class="kpi-hint">{{ mPendientes }} pendientes &bull; {{ mAtendidas }} atendidas</span>
+        </div>
+        <div class="kpi-icon-circle">
+          <mat-icon>restaurant_menu</mat-icon>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-disponibles" (click)="setFiltro('disponibles')">
+        <div class="kpi-content">
+          <span class="kpi-label">Mesas Disponibles</span>
+          <span class="kpi-value">{{ mDisponible }}</span>
+          <span class="kpi-hint">Listas para nuevos clientes</span>
+        </div>
+        <div class="kpi-icon-circle">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-total" (click)="setFiltro('todas')">
+        <div class="kpi-content">
+          <span class="kpi-label">Capacidad Total</span>
+          <span class="kpi-value">{{ mTotal }}</span>
+          <span class="kpi-hint">Mesas activas en salón</span>
+        </div>
+        <div class="kpi-icon-circle">
+          <mat-icon>deck</mat-icon>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-tasa">
+        <div class="kpi-content">
+          <span class="kpi-label">Ocupación del Salón</span>
+          <span class="kpi-value">{{ tasaOcupacion }}%</span>
+          <div class="tasa-progress-bar">
+            <div class="tasa-progress-fill" [style.width.%]="tasaOcupacion"></div>
+          </div>
+        </div>
+        <div class="kpi-icon-circle">
+          <mat-icon>pie_chart</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros y Búsqueda -->
+    <div class="toolbar-filter-box">
+      <div class="filter-tabs">
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'todas'" (click)="setFiltro('todas')">
+          Todas <span class="tab-badge">{{ mTotal }}</span>
+        </button>
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'disponibles'" (click)="setFiltro('disponibles')">
+          <span class="dot dot-green"></span> Disponibles <span class="tab-badge">{{ mDisponible }}</span>
+        </button>
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'ocupadas'" (click)="setFiltro('ocupadas')">
+          <span class="dot dot-orange"></span> Ocupadas <span class="tab-badge">{{ mOcupadas }}</span>
+        </button>
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'pendientes'" (click)="setFiltro('pendientes')">
+          <span class="dot dot-amber"></span> Pendientes <span class="tab-badge">{{ mPendientes }}</span>
+        </button>
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'atendidas'" (click)="setFiltro('atendidas')">
+          <span class="dot dot-blue"></span> Atendidas <span class="tab-badge">{{ mAtendidas }}</span>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input 
+          type="text" 
+          [(ngModel)]="textoBusqueda" 
+          (input)="onBuscarChange()" 
+          placeholder="Buscar mesa o cliente..." 
+          class="search-input" />
+        <button *ngIf="textoBusqueda" mat-icon-button class="btn-clear-search" (click)="limpiarBusqueda()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="cardaData" class="py-4 text-center">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="text-muted mt-2">Cargando estado del salón...</p>
+    </div>
+
+    <!-- Estado Vacío cuando el filtro no coincide -->
+    <div *ngIf="!cardaData && mesasFiltradas.length === 0" class="empty-state-card text-center py-5">
+      <mat-icon class="empty-icon">search_off</mat-icon>
+      <h5>No se encontraron mesas</h5>
+      <p class="text-muted">Intenta cambiar los filtros o el texto de búsqueda.</p>
+      <button mat-stroked-button color="primary" (click)="setFiltro('todas'); limpiarBusqueda()">
+        Ver todas las mesas
+      </button>
+    </div>
+
+    <!-- Cuadrícula / Grid de Mesas -->
+    <div *ngIf="!cardaData && mesasFiltradas.length > 0" class="mesas-grid">
+      <div 
+        *ngFor="let mesa of mesasFiltradas" 
+        class="mesa-tile" 
+        [ngClass]="{
+          'tile-disponible': mesa.disponible === 1,
+          'tile-pendiente': mesa.disponible === 0 && mesa.state !== 1,
+          'tile-atendido': mesa.disponible === 0 && mesa.state === 1
+        }"
+        (click)="openDialog(mesa.id)">
+
+        <!-- Cabecera de la Mesa -->
+        <div class="tile-header">
+          <div class="mesa-title-wrap">
+            <mat-icon class="mesa-icon">table_restaurant</mat-icon>
+            <span class="mesa-number">{{ mesa.nombre }}</span>
+          </div>
+
+          <div class="tile-status-badge">
+            <span *ngIf="mesa.disponible === 1" class="badge-status badge-free">
+              <span class="pulse-dot green-dot"></span> Libre
+            </span>
+            <span *ngIf="mesa.disponible === 0 && mesa.state !== 1" class="badge-status badge-pending">
+              <span class="pulse-dot orange-dot"></span> Pendiente
+            </span>
+            <span *ngIf="mesa.disponible === 0 && mesa.state === 1" class="badge-status badge-served">
+              <span class="pulse-dot blue-dot"></span> Atendido
+            </span>
+          </div>
+        </div>
+
+        <!-- Contenido Central de la Mesa -->
+        <div class="tile-body">
+          <!-- Si la mesa está ocupada -->
+          <ng-container *ngIf="mesa.disponible === 0">
+            <div class="occupied-details">
+              <div class="client-row">
+                <mat-icon class="small-icon">person</mat-icon>
+                <span class="client-name" [title]="mesa.cliente || 'Cliente General'">
+                  {{ mesa.cliente ? mesa.cliente : 'Cliente General' }}
+                </span>
+              </div>
+
+              <div class="amount-row">
+                <span class="amount-label">Cuenta:</span>
+                <span class="amount-value">${{ (mesa.montoTotal || 0) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Si la mesa está disponible -->
+          <ng-container *ngIf="mesa.disponible === 1">
+            <div class="available-details">
+              <div class="available-graphic">
+                <mat-icon class="large-cutlery-icon">dining</mat-icon>
+              </div>
+              <span class="free-text">Mesa Disponible</span>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Pie de la Mesa / Botón de Acción -->
+        <div class="tile-footer">
+          <button 
+            type="button" 
+            class="tile-action-btn"
+            [class.btn-open]="mesa.disponible === 1"
+            [class.btn-manage]="mesa.disponible === 0">
+            <mat-icon class="btn-icon">{{ mesa.disponible === 1 ? 'add_circle' : 'receipt_long' }}</mat-icon>
+            <span>{{ mesa.disponible === 1 ? 'Tomar Pedido' : 'Gestionar / Cobrar' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

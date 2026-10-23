@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { FormControl, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,6 +24,7 @@ import { AlertMsjComponent } from '../../alert-msj/alert-msj.component';
     MaterialModule,
     MatExpansionModule, 
     ReactiveFormsModule, 
+    FormsModule,
     MatPaginatorModule,
     CommonModule,
     NgIf,
@@ -193,7 +194,8 @@ export class RestaurantePedidoComponent implements OnInit {
   }
   openDialogDetalle() {  
     let dialogRef = this._dialog.open(RestauranteDialogDetalleComponent, {
-      width: '300px',
+      width: '430px',
+      maxWidth: '95vw',
       disableClose: true,
       panelClass: 'modal-dialog-right', 
     });
@@ -202,15 +204,18 @@ export class RestaurantePedidoComponent implements OnInit {
         this.listaDetalle.push(result);
         this.fnTotal();
       } 
-    })
+    });
   }
+
   eliminarProducto(index:number){
     this.listaDetalle.splice(index, 1);
     this.fnTotal();
   }
+
   actualizarProducto(index:number){
     let dialogRef = this._dialog.open(RestauranteDialogDetalleComponent, {
-      width: '300px',
+      width: '430px',
+      maxWidth: '95vw',
       disableClose: true,
       panelClass: 'modal-dialog-right',
       data: { 
@@ -222,26 +227,81 @@ export class RestaurantePedidoComponent implements OnInit {
         this.listaDetalle[index] = result;
         this.fnTotal();
       }
-    })
+    });
   }
+
+  incrementarCantidad(index: number): void {
+    if (this.listaDetalle[index]) {
+      const cant = Number(this.listaDetalle[index].f_cantidad || 0) + 1;
+      this.listaDetalle[index].f_cantidad = cant;
+      this.listaDetalle[index].f_subTotal = Math.round(cant * Number(this.listaDetalle[index].f_precio || 0) * 100) / 100;
+      this.fnTotal();
+    }
+  }
+
+  decrementarCantidad(index: number): void {
+    if (this.listaDetalle[index]) {
+      const cant = Number(this.listaDetalle[index].f_cantidad || 0);
+      if (cant > 1) {
+        this.listaDetalle[index].f_cantidad = cant - 1;
+        this.listaDetalle[index].f_subTotal = Math.round((cant - 1) * Number(this.listaDetalle[index].f_precio || 0) * 100) / 100;
+        this.fnTotal();
+      } else {
+        this.eliminarProducto(index);
+      }
+    }
+  }
+
+  seleccionarEstado(estado: 'pendiente' | 'atendido'): void {
+    if (estado === 'pendiente') {
+      this.check_pendiente = true;
+      this.check_atendido = false;
+    } else {
+      this.check_pendiente = false;
+      this.check_atendido = true;
+    }
+  }
+
+  seleccionarMedioPago(metodo: string): void {
+    this.selectePagoCon = metodo;
+    this.basicForm.controls['pagoCon'].setValue(metodo);
+    if (metodo === 'TA') {
+      const total = this.basicForm.controls['montoTotal'].value;
+      this.basicForm.controls['montoEfectivo'].setValue(total);
+      this.fnVuelto();
+    }
+  }
+
+  establecerEfectivoRapido(monto: number | 'exacto'): void {
+    const total = parseFloat(this.basicForm.controls['montoTotal'].value || 0);
+    if (monto === 'exacto') {
+      this.basicForm.controls['montoEfectivo'].setValue(total.toFixed(2));
+    } else {
+      this.basicForm.controls['montoEfectivo'].setValue(Number(monto).toFixed(2));
+    }
+    this.fnVuelto();
+  }
+
   fnTotal(){
     let total = 0;
     this.listaDetalle.forEach((item) => {
-      total += item.f_subTotal;
+      total += Number(item.f_subTotal || 0);
     });
     const totalStr = total.toFixed(2);
     this.basicForm.controls["montoTotal"].setValue(totalStr);
     
-    // Si no se ha ingresado monto efectivo, por defecto sugerir el total exacto
-    const efectivoActual = this.basicForm.controls["montoEfectivo"].value;
-    if (!efectivoActual || parseFloat(efectivoActual) === 0) {
+    // Si no se ha ingresado monto efectivo, o es tarjeta, sugerir el total exacto
+    const efectivoActual = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
+    if (!efectivoActual || efectivoActual === 0 || this.selectePagoCon === 'TA') {
       this.basicForm.controls["montoEfectivo"].setValue(totalStr);
     }
     this.fnVuelto();
   }
+
   cerrarFormulario() {
     this.cerrar.emit();
   }
+
   fnVuelto(){
     const total = parseFloat(this.basicForm.controls["montoTotal"].value || 0);
     const efectivo = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
@@ -254,18 +314,19 @@ export class RestaurantePedidoComponent implements OnInit {
     this.basicForm.controls["vuelto"].setValue(vuelto.toFixed(2));
   }
 
-onPendienteChange(event: any): void {
-  this.check_pendiente = event.checked;
-  if (event.checked) {
-    this.check_atendido = false;
+  onPendienteChange(event: any): void {
+    this.check_pendiente = event.checked;
+    if (event.checked) {
+      this.check_atendido = false;
+    }
   }
-}
-onAtendidoChange(event: any): void {
-  this.check_atendido = event.checked;
-  if (event.checked) {
-    this.check_pendiente = false;
+
+  onAtendidoChange(event: any): void {
+    this.check_atendido = event.checked;
+    if (event.checked) {
+      this.check_pendiente = false;
+    }
   }
-}
 liberarMesa(){
   const caja = this.selecteCaja || this.basicForm.controls["caja"].value;
   const cajero = this.selecteCajero || this.basicForm.controls["cajero"].value;

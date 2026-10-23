@@ -1,109 +1,161 @@
-<mat-dialog-content class="cl_model">
-    <div class="modal_div_cab_title">
-        <div class="card-title-text" style="font-weight: 500;">
-          Producto
-        </div> 
-        <div class="modal_close_tile" (click)="close()" >
-            <mat-icon>close</mat-icon>
-        </div> 
-    </div> 
-    <mat-divider></mat-divider>  
-    <div class="example-container mt-3">
-        <form [formGroup]="basicForm"> 
-            <div class="row wrap">  
-                <div class="col-md-12">                 
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="row  "> 
-                                <div class="col-md-12">
-                                    <mat-form-field  appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">Categoría</mat-label>
-                                        <mat-select required placeholder="Seleccione una opción" [formControl]="ValueCategoria"  >
-                                        <mat-option>
-                                            <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar"></ngx-mat-select-search>
-                                        </mat-option>
-                                        <mat-option *ngFor="let option of filteredCategoria | async" [value]="option.id">
-                                            {{ option.nombre }}
-                                        </mat-option>
-                                        </mat-select>
-                                        <mat-hint *ngIf="filterCategoria.hasError('required')"
-                                            class="form-error-msg"> El campo es obligatorio.
-                                        </mat-hint>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-12">
-                                    <mat-form-field  appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">Producto</mat-label>
-                                        <mat-select required placeholder="Seleccione una opción" [formControl]="ValueProducto">
-                                            <mat-option>
-                                                <ngx-mat-select-search [formControl]="filterProducto" placeholderLabel="Buscar"></ngx-mat-select-search>
-                                            </mat-option>
-                                            <mat-option *ngFor="let option of filteredProducto | async" [value]="option.id">
-                                                {{ option.nombre }}
-                                            </mat-option>
-                                        </mat-select> 
-                                        <mat-hint *ngIf="filterProducto.hasError('required')"
-                                            class="form-error-msg"> El campo es obligatorio.
-                                        </mat-hint>
-                                    </mat-form-field> 
-                                </div>
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">Precio</mat-label>
-                                        <input type="number" inputmode="numeric" matInput required placeholder="" name="precio" formControlName="precio" autocomplete="off" class="example-right-align">
-                                        <mat-icon matSuffix style="color: #1A635A;">payments</mat-icon> 
-                                        <mat-hint *ngIf="basicForm.controls['precio'].hasError('minlength') && basicForm.controls['precio'].touched"
-                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['precio'].errors?.["minlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['precio'].hasError('maxlength') && basicForm.controls['precio'].touched"
-                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['precio'].errors?.["maxlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['precio'].hasError('required') && basicForm.controls['precio'].touched"
-                                            class="form-error-msg"> El campo es obligatorio.
-                                        </mat-hint>
-                                    </mat-form-field>
-                                </div> 
-                                <div class="col-md-6">
-                                    <mat-form-field appearance="outline"  class="custom-input">
-                                        <mat-label class="labeltext">Cantidad</mat-label>
-                                        <input type="number" inputmode="numeric" required matInput placeholder="" name="cantidad" formControlName="cantidad" autocomplete="off">
-                                        <mat-hint *ngIf="basicForm.controls['cantidad'].hasError('minlength') && basicForm.controls['cantidad'].touched"
-                                            class="form-error-msg"> Se requiere al menos {{basicForm.controls['cantidad'].errors?.["minlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['cantidad'].hasError('maxlength') && basicForm.controls['cantidad'].touched"
-                                            class="form-error-msg"> No puede contener más de {{basicForm.controls['cantidad'].errors?.["maxlength"]?.requiredLength}} caracteres.
-                                        </mat-hint>
-                                        <mat-hint *ngIf="basicForm.controls['cantidad'].hasError('required') && basicForm.controls['cantidad'].touched"
-                                            class="form-error-msg"> El campo es obligatorio.
-                                        </mat-hint>
-                                    </mat-form-field>
-                                </div>
-                                <mat-form-field appearance="outline"  class="custom-input">
-                                    <mat-label class="labeltext">Observación</mat-label>
-                                    <textarea matInput name="observacion" formControlName="observacion" placeholder="Escribir..."></textarea>
-                                </mat-form-field>
-                                <div class="col-md-12 st_car_img" >
-                                    <img src="{{ft_download_link}}" alt="" style="width: 250px;margin-top: -15px;">
-                                </div>
-                                <div class="col-md-12" style="font-size: 12px;" *ngIf="ft_descripcion">
-                                    <label style="font-weight: 500 !important;">Descripción:</label> {{ft_descripcion}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="button-container">
-                <hr>
-                <button type="button" mat-raised-button color="accent" (click)="close()" class="btn_secondary">
-                    <mat-icon>close</mat-icon> Cancelar
-                </button>
-                <button type="submit" mat-raised-button class="btn_primary" (click)="save()" [disabled]="isButtonDisabled" style="margin-left: 5px; background-color: #cc8431;" >
-                    <mat-icon>save</mat-icon><i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i> Guardar
-                </button>
-            </div>
-        </form>
-    </div>      
-</mat-dialog-content>
+<div class="dialog-detalle-container">
+  <!-- Cabecera del Diálogo -->
+  <div class="dialog-header">
+    <div class="dialog-header-info">
+      <div class="dialog-icon-badge">
+        <mat-icon>{{ productox ? 'edit_note' : 'add_circle' }}</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">{{ productox ? 'Modificar Producto' : 'Agregar a la Comanda' }}</h3>
+        <p class="dialog-subtitle">Selecciona el plato, cantidad y notas de cocina</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="close()" matTooltip="Cerrar ventana">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
+  <mat-divider></mat-divider>
 
+  <!-- Contenido con Scroll -->
+  <div class="dialog-body">
+    <form [formGroup]="basicForm">
+      <!-- Selector de Categoría -->
+      <div class="form-section">
+        <label class="section-field-label">Categoría del Menú</label>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-field">
+          <mat-label>Seleccione una categoría</mat-label>
+          <mat-select required placeholder="Buscar categoría..." [formControl]="ValueCategoria">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar categoría..."></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let option of filteredCategoria | async" [value]="option.id">
+              {{ option.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix class="field-icon">category</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Selector de Producto -->
+      <div class="form-section">
+        <label class="section-field-label">Plato o Bebida</label>
+        <mat-form-field appearance="outline" class="w-100 custom-mat-field">
+          <mat-label>Seleccione el producto</mat-label>
+          <mat-select required placeholder="Buscar producto..." [formControl]="ValueProducto">
+            <mat-option>
+              <ngx-mat-select-search [formControl]="filterProducto" placeholderLabel="Buscar plato..."></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let option of filteredProducto | async" [value]="option.id">
+              {{ option.nombre }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix class="field-icon">restaurant_menu</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Preview del Producto Seleccionado -->
+      <div *ngIf="ft_txtProducto" class="selected-product-card">
+        <div class="product-preview-thumb">
+          <img *ngIf="ft_download_link" [src]="ft_download_link" [alt]="ft_txtProducto" />
+          <div *ngIf="!ft_download_link" class="thumb-placeholder">
+            <mat-icon>fastfood</mat-icon>
+          </div>
+        </div>
+        <div class="product-preview-info">
+          <span class="preview-category">{{ ft_txtCategoria }}</span>
+          <h4 class="preview-title">{{ ft_txtProducto }}</h4>
+          <p *ngIf="ft_descripcion" class="preview-desc">{{ ft_descripcion }}</p>
+        </div>
+      </div>
+
+      <!-- Cantidad y Precio -->
+      <div class="row g-2 mt-2">
+        <!-- Control de Cantidad con Stepper -->
+        <div class="col-7">
+          <label class="section-field-label">Cantidad</label>
+          <div class="stepper-widget">
+            <button type="button" class="btn-stepper-qty minus" (click)="restarCantidad()">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input 
+              type="number" 
+              formControlName="cantidad" 
+              class="stepper-input" 
+              min="1" />
+            <button type="button" class="btn-stepper-qty plus" (click)="sumarCantidad()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Precio Unitario -->
+        <div class="col-5">
+          <label class="section-field-label">Precio Unit. ($)</label>
+          <mat-form-field appearance="outline" class="w-100 custom-mat-field price-field">
+            <input 
+              type="number" 
+              step="0.01" 
+              matInput 
+              required 
+              placeholder="0.00" 
+              formControlName="precio" 
+              class="text-end fw-bold" />
+            <span matPrefix class="text-muted fw-bold me-1">$</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Subtotal Live Banner -->
+      <div class="subtotal-banner">
+        <div class="subtotal-label-wrap">
+          <mat-icon class="subtotal-icon">calculate</mat-icon>
+          <span>Subtotal del Item:</span>
+        </div>
+        <div class="subtotal-value">${{ subtotalPreview | number:'1.2-2' }}</div>
+      </div>
+
+      <!-- Observaciones / Notas de Cocina -->
+      <div class="form-section mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="section-field-label mb-0">Indicaciones para Cocina</label>
+          <span class="text-muted small">Opcional</span>
+        </div>
+
+        <!-- Chips de Notas Rápidas -->
+        <div class="quick-notes-row">
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Sin cebolla')">Sin cebolla</button>
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Para llevar')">Para llevar</button>
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Poco picante')">Poco picante</button>
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Bien cocido')">Bien cocido</button>
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Término medio')">Término medio</button>
+          <button type="button" class="quick-note-chip" (click)="agregarNotaRapida('Extra salsa')">Extra salsa</button>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-100 custom-mat-field mt-1">
+          <textarea 
+            matInput 
+            rows="2" 
+            formControlName="observacion" 
+            placeholder="Ej: Término medio, sin ensalada, salsa aparte..."></textarea>
+          <mat-icon matPrefix class="field-icon">notes</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <!-- Pie / Acciones del Diálogo -->
+  <div class="dialog-footer">
+    <button type="button" class="btn-cancel" (click)="close()">
+      <mat-icon>close</mat-icon> Cancelar
+    </button>
+    <button 
+      type="button" 
+      class="btn-save" 
+      [disabled]="isButtonDisabled"
+      (click)="save()">
+      <mat-icon>{{ productox ? 'save' : 'add_shopping_cart' }}</mat-icon>
+      <span>{{ productox ? 'Guardar Cambios' : 'Agregar al Pedido' }}</span>
+    </button>
+  </div>
+</div>
