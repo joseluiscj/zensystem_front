@@ -1,0 +1,140 @@
+<div class="gestion-dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box">
+        <mat-icon>domain</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">Gestión de Almacenes & Puntos de Stock</h3>
+        <p class="dialog-subtitle">Administración de sucursales, almacenes centrales y sub-almacenes operativos</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+
+  <div class="dialog-body">
+
+    <!-- BOTON CREAR / FORMULARIO -->
+    <div class="top-bar-action mb-3" *ngIf="!mostrarFormulario">
+      <button type="button" class="btn-add-alm" (click)="nuevoAlmacen()">
+        <mat-icon>add_circle</mat-icon>
+        <span>+ Crear Nuevo Almacén</span>
+      </button>
+    </div>
+
+    <!-- FORMULARIO DE ALMACEN -->
+    <div class="alm-form-card mb-4" *ngIf="mostrarFormulario">
+      <div class="form-title-row">
+        <h5>{{ editandoId ? 'Editar Almacén' : 'Registrar Nuevo Almacén' }}</h5>
+        <button type="button" class="btn-close-form" (click)="cancelarFormulario()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="almacenForm" (ngSubmit)="guardar()">
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label-custom">Código Almacén: *</label>
+            <mat-form-field appearance="outline" class="w-100 custom-field">
+              <input matInput formControlName="codigo" placeholder="Ej: ALM-03" class="uppercase">
+            </mat-form-field>
+          </div>
+
+          <div class="col-12 col-md-8">
+            <label class="form-label-custom">Nombre del Almacén: *</label>
+            <mat-form-field appearance="outline" class="w-100 custom-field">
+              <input matInput formControlName="nombre" placeholder="Ej: Almacén de Bebidas / Barra 2">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label-custom">Responsable / Encargado:</label>
+            <mat-form-field appearance="outline" class="w-100 custom-field">
+              <input matInput formControlName="responsable" placeholder="Ej: Administrador / Bartender">
+              <mat-icon matPrefix class="prefix-icon">person</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="form-label-custom">Ubicación Física:</label>
+            <mat-form-field appearance="outline" class="w-100 custom-field">
+              <input matInput formControlName="ubicacion" placeholder="Ej: Segundo piso / Barra central">
+              <mat-icon matPrefix class="prefix-icon">place</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label-custom">Descripción / Propósito:</label>
+          <mat-form-field appearance="outline" class="w-100 custom-field">
+            <input matInput formControlName="descripcion" placeholder="Ej: Stock de despacho rápido para fines de semana...">
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions-right">
+          <button type="button" class="btn-cancel" (click)="cancelarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="almacenForm.invalid || cargando">
+            <mat-icon>save</mat-icon>
+            <span>Guardar Almacén</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- LISTADO DE ALMACENES ACTIVOS -->
+    <div class="almacenes-grid">
+      <div *ngFor="let alm of almacenes" class="alm-card">
+        <div class="alm-card-header">
+          <div class="alm-code-badge">{{ alm.codigo }}</div>
+          <button type="button" class="btn-edit-alm" (click)="editarAlmacen(alm)" matTooltip="Editar almacén">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+
+        <h4 class="alm-name">{{ alm.nombre }}</h4>
+        <p class="alm-desc" *ngIf="alm.descripcion">{{ alm.descripcion }}</p>
+
+        <div class="alm-meta-list">
+          <div class="meta-item" *ngIf="alm.responsable">
+            <mat-icon>person</mat-icon>
+            <span>{{ alm.responsable }}</span>
+          </div>
+          <div class="meta-item" *ngIf="alm.ubicacion">
+            <mat-icon>place</mat-icon>
+            <span>{{ alm.ubicacion }}</span>
+          </div>
+        </div>
+
+        <div class="alm-stats-footer">
+          <div class="stat-box">
+            <span class="stat-label">Productos con Stock</span>
+            <span class="stat-num">{{ alm.productosConStock }}</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Unidades Totales</span>
+            <span class="stat-num">{{ alm.unidadesTotales | number:'1.0-0' }}</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Valorización ($)</span>
+            <span class="stat-num stat-valor">${{ alm.valorTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dialog-footer">
+    <button type="button" class="btn-close-action" (click)="cerrar()">
+      Cerrar
+    </button>
+  </div>
+</div>

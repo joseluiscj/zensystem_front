@@ -9,7 +9,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GlobalService } from '../../../services/global.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductoService } from '../../../services/producto.service';
-import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-producto-dialog',
@@ -25,148 +24,155 @@ import { MatSelectChange } from '@angular/material/select';
   templateUrl: './producto-dialog.component.html',
   styleUrl: './producto-dialog.component.css'
 })
-export class ProductoDialogComponent  implements OnInit{
-  basicForm: UntypedFormGroup;
-  isButtonDisabled:boolean=false;
-  producto: Producto; 
-  ocultar: string = 'd-none'
+export class ProductoDialogComponent implements OnInit {
+  basicForm!: UntypedFormGroup;
+  isButtonDisabled: boolean = false;
+  producto!: Producto; 
+  ocultar: string = 'd-none';
   selectedFile: File | null = null;
   error: boolean = false;
-  textFile:string = 'Seleccionar adjunto';
-  file_txt:string = "";
-  download_link:string = "";
-  ocultar_carga = "d-none"
+  textFile: string = 'Seleccionar adjunto';
+  file_txt: string = "";
+  download_link: string = "";
+  ocultar_carga = "d-none";
 
-  //tipo
-  // ValueTipo = new FormControl();
-  // filterTipo = new FormControl();
-  // filteredTipo: Observable<any[]>;
-  // lst_tipo: Tipo[];
-  //
-  
-  //categoria
+  unidadesMedida: string[] = [
+    'UNIDAD',
+    'KG',
+    'GRAMO',
+    'LITRO',
+    'MILILITRO',
+    'BOTELLA',
+    'LATA',
+    'CAJA',
+    'PAQUETE',
+    'PORCION'
+  ];
+
+  // Categoria
   ValueCategoria = new FormControl();
   filterCategoria = new FormControl();
-  filteredCategoria: Observable<any[]>;
-  lst_categoria: Categoria[];
-  //
+  filteredCategoria!: Observable<any[]>;
+  lst_categoria: Categoria[] = [];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) private idProductoSelected:number,
+    @Inject(MAT_DIALOG_DATA) private idProductoSelected: number,
     private _dialogRef: MatDialogRef<ProductoDialogComponent>,
     private globalService: GlobalService,
     private _snackbar: MatSnackBar,
-    private productoService:ProductoService
-    // private platoService:PlatoService
-  ){}
+    private productoService: ProductoService
+  ) {}
 
   ngOnInit(): void {
-    this.initialFrm()  
+    this.initialFrm();
     this.fnCargaCboCategoria();
-    if(this.idProductoSelected){
+    if (this.idProductoSelected) {
       this.ocultar = "";
       this.productoService.findById(this.idProductoSelected).subscribe(data => {
-        if(data['code'] == 200){
-          this.producto = data['data']
-          // this.ValueTipo.setValue(this.plato.f_tipo); 
-          // this.fnCargaCboCategoria(this.plato.f_tipo);
+        if (data['code'] == 200) {
+          this.producto = data['data'];
           this.ValueCategoria.setValue(this.producto.f_categoria); 
-          this.initialFrm()  
+          this.initialFrm();
           this.ocultar = "d-none";
-        }else{
-          this._snackbar.open(data['message'], "Error!",{duration:3000,panelClass: 'custom-snackbar'});
+        } else {
+          this._snackbar.open(data['message'], "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
         }
-      })
+      });
     } 
   }
+
   private _filterCategoria(value: string): any[] {
-    const filterValue = value.toLowerCase();
+    const filterValue = (value || '').toLowerCase();
     return this.lst_categoria.filter(option => option.nombre.toLowerCase().includes(filterValue));
   }
-  // private _filterTipo(value: string): any[] {
-  //   const filterValue = value.toLowerCase();
-  //   return this.lst_tipo.filter(option => option.nombre.toLowerCase().includes(filterValue));
-  // }
-  private initialFrm(){
+
+  private initialFrm() {
     this.basicForm = new UntypedFormGroup({
       id: new UntypedFormControl(this.producto?.id),
-      // tipo: new UntypedFormControl(this.plato?.f_tipo,[Validators.required]),
-      categoria: new UntypedFormControl(this.producto?.f_categoria,[Validators.required]),
+      codigo: new UntypedFormControl(this.producto?.f_codigo || ''),
+      categoria: new UntypedFormControl(this.producto?.f_categoria, [Validators.required]),
       nombre: new UntypedFormControl(this.producto?.f_nombre, [Validators.required]),
-      precio: new UntypedFormControl(this.producto?.f_precio),
-      descripcion: new UntypedFormControl(this.producto?.f_descripcion),
+      precio: new UntypedFormControl(this.producto?.f_precio || 0, [Validators.required, Validators.min(0)]),
+      costo: new UntypedFormControl(this.producto?.f_costo || 0, [Validators.min(0)]),
+      stockMinimo: new UntypedFormControl(this.producto?.f_stockMinimo !== undefined ? this.producto?.f_stockMinimo : 5, [Validators.min(0)]),
+      unidadMedida: new UntypedFormControl(this.producto?.f_unidadMedida || 'UNIDAD', [Validators.required]),
+      descripcion: new UntypedFormControl(this.producto?.f_descripcion || ''),
     });
-    if(this.producto?.f_img != "" && this.producto?.f_img != null){
+
+    if (this.producto?.f_img != "" && this.producto?.f_img != null) {
       this.download_link = this.producto.f_imgId;
       this.file_txt = this.producto.f_img;
     } 
   }
-  // onTipoChange(event :MatSelectChange){
-  //   this.fnCargaCboCategoria(event.value);
-  // }
-  fnCargaCboCategoria(){
+
+  fnCargaCboCategoria() {
     this.globalService.getCategoria().subscribe((data) => {
       this.lst_categoria = data;
       this.filteredCategoria = this.filterCategoria.valueChanges.pipe(
         startWith(''),
         map(value => this._filterCategoria(value))
       );
-    })
+    });
   }
-  close(){
+
+  close() {
     this._dialogRef.close();
   }
+
   save() {
-    if(!this.validateFrm()){
+    if (!this.validateFrm()) {
       const ObjP = new Producto();
       ObjP.id = this.idProductoSelected;
       ObjP.f_categoria = this.ValueCategoria.value;
+      ObjP.f_codigo = this.basicForm.controls["codigo"].value;
       ObjP.f_nombre = this.basicForm.controls["nombre"].value;
-      ObjP.f_precio = this.basicForm.controls["precio"].value;
+      ObjP.f_precio = parseFloat(this.basicForm.controls["precio"].value || 0);
+      ObjP.f_costo = parseFloat(this.basicForm.controls["costo"].value || 0);
+      ObjP.f_stockMinimo = parseFloat(this.basicForm.controls["stockMinimo"].value || 5);
+      ObjP.f_unidadMedida = this.basicForm.controls["unidadMedida"].value;
       ObjP.f_descripcion = this.basicForm.controls["descripcion"].value;
       ObjP.f_img = this.file_txt;
       ObjP.f_imgId = this.download_link;
-      if(!ObjP.id){ //create
+
+      if (!ObjP.id) { // create
         this.productoService.save(ObjP).subscribe((data) => {
-          if(data['code'] == 200){
-            this._snackbar.open("Datos registrados correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
-            this.productoService.findAll().subscribe((data)=>{
+          if (data['code'] == 200) {
+            this._snackbar.open("Producto registrado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
+            this.productoService.findAll().subscribe((data) => {
               this.productoService.setDataChange(data);
               this.close();
-            })
-          }else{
-            this._snackbar.open(data['message'], "Error!",{duration:3000,panelClass: 'custom-snackbar'});
+            });
+          } else {
+            this._snackbar.open(data['message'] || 'Error al guardar', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           }
-        })
-      }else{ //update
+        });
+      } else { // update
         this.productoService.update(ObjP.id, ObjP).subscribe(data => {
-          if(data['code'] == 200){
-            this._snackbar.open("Datos actualizados correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
-            this.productoService.findAll().subscribe((data)=>{
+          if (data['code'] == 200) {
+            this._snackbar.open("Producto actualizado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
+            this.productoService.findAll().subscribe((data) => {
               this.productoService.setDataChange(data);
               this.close();
-            })
-          }else{
-            this._snackbar.open(data['message'], "Error!",{duration:3000,panelClass: 'custom-snackbar'});
+            });
+          } else {
+            this._snackbar.open(data['message'] || 'Error al actualizar', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           }
-        })
+        });
       }
     } 
   }
 
-  validateFrm():boolean{
+  validateFrm(): boolean {
     this.error = false;
-    if((this.basicForm.controls["nombre"].value)?.trim() == "" || (this.basicForm.controls["nombre"].value) == null){
-      this._snackbar.open("Debe ingresar Nombre", "Aviso!",{duration:3000});
+    if ((this.basicForm.controls["nombre"].value)?.trim() == "" || (this.basicForm.controls["nombre"].value) == null) {
+      this._snackbar.open("Debe ingresar Nombre del producto", "Aviso!", { duration: 3000 });
       this.error = true;
+      return true;
     }
-    // if(!this.ValueTipo.value){
-    //   this._snackbar.open("Debe seleccionar Tipo", "Aviso!",{duration:3000});
-    //   this.error = true;
-    // }
-    if(!this.ValueCategoria.value){
-      this._snackbar.open("Debe seleccionar Categoría", "Aviso!",{duration:3000});
+    if (!this.ValueCategoria.value) {
+      this._snackbar.open("Debe seleccionar Categoría", "Aviso!", { duration: 3000 });
       this.error = true;
+      return true;
     }
     return this.error;
   }
@@ -178,9 +184,9 @@ export class ProductoDialogComponent  implements OnInit{
       this.selectedFile = target.files[0];
       this.textFile = this.selectedFile.name;
       const formData = new FormData();
-      formData.append('file', this.selectedFile, this.selectedFile.name); // Se asegura de enviar bien el archivo
+      formData.append('file', this.selectedFile, this.selectedFile.name);
       this.productoService.saveFile(formData).subscribe((data) => {
-        if(data.code == 200){
+        if (data.code == 200) {
           this.ocultar_carga = 'd-none';
           this.download_link = data.download_link;
           this.file_txt = data.file_name;
@@ -188,15 +194,16 @@ export class ProductoDialogComponent  implements OnInit{
       });
     }
   }
+
   triggerFileInput() {
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     if (fileInput) {
-      fileInput.click();  // Simula el click en el input file
+      fileInput.click();
     }
   }
-  delteFile(){
+
+  delteFile() {
     this.download_link = "";
     this.file_txt = "";
   }
-
 }

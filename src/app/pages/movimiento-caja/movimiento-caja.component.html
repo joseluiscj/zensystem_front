@@ -1,0 +1,361 @@
+<div class="caja-mov-wrapper">
+
+  <!-- CABECERA PRINCIPAL (HERO BANNER) -->
+  <header class="caja-hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>currency_exchange</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Movimientos de Caja: Gastos & Ingresos</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">account_balance</mat-icon>
+          <span>Registro y control financiero de gastos operativos, pagos a proveedores e ingresos directos</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="cargarMovimientos()" matTooltip="Refrescar lista">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span>Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-ingreso" (click)="abrirNuevoMovimiento('I')" matTooltip="Registrar un ingreso extraordinario">
+        <mat-icon>add_circle</mat-icon>
+        <span>+ Ingreso Extra</span>
+      </button>
+
+      <button type="button" class="btn-hero-gasto" (click)="abrirNuevoMovimiento('E')" matTooltip="Registrar un gasto o egreso de caja">
+        <mat-icon>remove_circle</mat-icon>
+        <span>+ Registrar Gasto</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TARJETAS DE KPIS FINANCIEROS -->
+  <div class="row g-3 mb-4">
+    <!-- Total Gastos / Egresos -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-gasto" (click)="filtrarPorTipo('E')" [class.kpi-active]="filtros.tipo === 'E'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Gastos / Egresos</span>
+          <div class="kpi-icon-circle gasto-circle">
+            <mat-icon>trending_down</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-danger">-${{ kpis.totalEgresos | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-rose">
+            <mat-icon>arrow_downward</mat-icon> Salidas registradas
+          </span>
+          <span class="kpi-hint">{{ esFiltroHoy ? 'Hoy' : 'En filtro' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Ingresos -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-ingreso" (click)="filtrarPorTipo('I')" [class.kpi-active]="filtros.tipo === 'I'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Total Ingresos</span>
+          <div class="kpi-icon-circle ingreso-circle">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-success">+${{ kpis.totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-emerald">
+            <mat-icon>arrow_upward</mat-icon> Cobros y aportes
+          </span>
+          <span class="kpi-hint">{{ esFiltroHoy ? 'Hoy' : 'En filtro' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balance Neto del Período -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-balance">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Balance Neto Período</span>
+          <div class="kpi-icon-circle balance-circle">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value" [ngClass]="kpis.balanceNeto >= 0 ? 'text-primary' : 'text-danger'">
+          ${{ kpis.balanceNeto | number:'1.2-2' }}
+        </div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-blue">
+            <mat-icon>balance</mat-icon> Ingresos - Egresos
+          </span>
+          <span class="kpi-hint">{{ kpis.totalMovimientos }} registros</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saldo Actual Total en Cajas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-saldo" (click)="filtrarPorTipo('todos')" [class.kpi-active]="filtros.tipo === 'todos'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Saldo en Cajas Físicas</span>
+          <div class="kpi-icon-circle saldo-circle">
+            <mat-icon>savings</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-slate">${{ kpis.saldoTotalCajas | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-slate">
+            <mat-icon>point_of_sale</mat-icon> Fondos disponibles
+          </span>
+          <span class="kpi-hint">{{ cajas.length }} cajas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS -->
+  <div class="caja-filters-card mb-4">
+    <div class="filters-grid">
+      <!-- Búsqueda rápida -->
+      <div class="filter-item filter-search">
+        <label class="filter-label">Buscar Concepto / Beneficiario / Doc:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput [(ngModel)]="filtros.search" (keyup.enter)="cargarMovimientos()" placeholder="Ej: Luz, Agua, Factura, Carlos...">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <button *ngIf="filtros.search" matSuffix mat-icon-button (click)="filtros.search = ''; cargarMovimientos()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <!-- Tipo de Movimiento -->
+      <div class="filter-item">
+        <label class="filter-label">Tipo Movimiento:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.tipo" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">Todos (Ingresos & Egresos)</mat-option>
+            <mat-option value="E">Solo Gastos / Egresos (-)</mat-option>
+            <mat-option value="I">Solo Ingresos (+)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Caja -->
+      <div class="filter-item">
+        <label class="filter-label">Caja:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idCaja" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">-- Todas las cajas --</mat-option>
+            <mat-option *ngFor="let c of cajas" [value]="c.id">
+              {{ c.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Medio de Pago -->
+      <div class="filter-item">
+        <label class="filter-label">Medio de Pago:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.metodoPago" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">Todos los medios</mat-option>
+            <mat-option value="EF">Efectivo</mat-option>
+            <mat-option value="TJ">Tarjeta</mat-option>
+            <mat-option value="TR">Transferencia</mat-option>
+            <mat-option value="YP">Yape</mat-option>
+            <mat-option value="PL">Plin</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Desde -->
+      <div class="filter-item">
+        <label class="filter-label">Desde:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="esFiltroHoy = false; cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Hasta -->
+      <div class="filter-item">
+        <label class="filter-label">Hasta:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="esFiltroHoy = false; cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Botones de Acción Filtros -->
+      <div class="filter-actions-inline">
+        <button type="button" class="btn-filter-today" [class.btn-today-active]="esFiltroHoy" (click)="aplicarFiltroHoy()" matTooltip="Filtrar movimientos de hoy">
+          <mat-icon>today</mat-icon>
+          <span>Hoy</span>
+        </button>
+
+        <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
+          <mat-icon>tune</mat-icon>
+          <span>Filtrar</span>
+        </button>
+
+        <button type="button" class="btn-action-reset" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE MOVIMIENTOS -->
+  <div class="caja-table-card">
+    <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="table-loader"></mat-progress-bar>
+
+    <div class="table-responsive">
+      <table class="caja-table">
+        <thead>
+          <tr>
+            <th>Fecha & Hora</th>
+            <th>Tipo</th>
+            <th>Caja</th>
+            <th>Concepto / Categoría</th>
+            <th>Descripción / Glosa</th>
+            <th>Beneficiario / Proveedor</th>
+            <th>Comprobante</th>
+            <th>Medio Pago</th>
+            <th class="text-end">Monto ($)</th>
+            <th>Usuario</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of movimientosPaginados" class="mov-row" [ngClass]="{
+            'row-gasto': m.tipo === 'E',
+            'row-ingreso': m.tipo === 'I'
+          }">
+            <!-- Fecha -->
+            <td class="cell-date">
+              <span class="date-main">{{ m.fecha | date:'dd/MM/yyyy' }}</span>
+              <span class="date-hour">{{ m.fecha | date:'HH:mm' }}</span>
+            </td>
+
+            <!-- Tipo Badge -->
+            <td>
+              <span *ngIf="m.tipo === 'E'" class="badge-tipo badge-gasto">
+                <mat-icon>trending_down</mat-icon> GASTO
+              </span>
+              <span *ngIf="m.tipo === 'I'" class="badge-tipo badge-ingreso">
+                <mat-icon>trending_up</mat-icon> INGRESO
+              </span>
+            </td>
+
+            <!-- Caja -->
+            <td>
+              <div class="caja-cell">
+                <mat-icon>point_of_sale</mat-icon>
+                <span>{{ m.caja_nombre }}</span>
+              </div>
+            </td>
+
+            <!-- Categoría -->
+            <td>
+              <span class="cat-pill">{{ m.categoria }}</span>
+            </td>
+
+            <!-- Descripción -->
+            <td>
+              <div class="desc-cell" [title]="m.descripcion">
+                {{ m.descripcion }}
+              </div>
+            </td>
+
+            <!-- Beneficiario -->
+            <td>
+              <div class="beneficiario-cell" *ngIf="m.beneficiario">
+                <mat-icon>person</mat-icon>
+                <span>{{ m.beneficiario }}</span>
+              </div>
+              <span *ngIf="!m.beneficiario" class="text-muted small">-</span>
+            </td>
+
+            <!-- Comprobante -->
+            <td>
+              <div class="doc-cell" *ngIf="m.tipoComprobante && m.tipoComprobante !== 'Sin Comprobante'">
+                <span class="doc-type">{{ m.tipoComprobante }}</span>
+                <span class="doc-nro" *ngIf="m.nroComprobante">{{ m.nroComprobante }}</span>
+              </div>
+              <span *ngIf="!m.tipoComprobante || m.tipoComprobante === 'Sin Comprobante'" class="text-muted small">Sin comprobante</span>
+            </td>
+
+            <!-- Medio Pago -->
+            <td>
+              <span class="pago-pill" [ngClass]="'pago-' + m.metodoPago.toLowerCase()">
+                <mat-icon *ngIf="m.metodoPago === 'EF'">payments</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'TJ' || m.metodoPago === 'TA'">credit_card</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'TR'">account_balance</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'YP' || m.metodoPago === 'PL'">phone_android</mat-icon>
+                <span>{{ obtenerNombreMedioPago(m.metodoPago) }}</span>
+              </span>
+            </td>
+
+            <!-- Monto -->
+            <td class="text-end font-mono">
+              <span class="monto-val" [ngClass]="m.tipo === 'I' ? 'monto-ingreso' : 'monto-gasto'">
+                {{ m.tipo === 'I' ? '+' : '-' }}${{ m.monto | number:'1.2-2' }}
+              </span>
+            </td>
+
+            <!-- Usuario -->
+            <td>
+              <span class="user-pill">
+                {{ m.usuario_nombre }}
+              </span>
+            </td>
+
+            <!-- Acciones -->
+            <td class="text-center">
+              <button type="button" class="btn-action-anular" 
+                matTooltip="Anular movimiento y revertir saldo"
+                (click)="anularMovimiento(m)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Vacío -->
+          <tr *ngIf="movimientos.length === 0 && !cargando">
+            <td colspan="11" class="text-center py-5">
+              <div class="empty-state">
+                <mat-icon class="empty-icon">account_balance_wallet</mat-icon>
+                <h4 class="empty-title">No hay movimientos registrados</h4>
+                <p class="empty-desc">No se encontraron transacciones para el filtro de fecha o criterio seleccionado.</p>
+                <button type="button" class="btn-clear-empty" (click)="limpiarFiltros()">
+                  Limpiar Filtros
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PIE DE PAGINACIÓN -->
+    <div class="caja-footer" *ngIf="movimientos.length > 0">
+      <div class="footer-left">
+        <span class="footer-info">
+          Mostrando {{ (paginaActual - 1) * registrosPorPagina + 1 }} - 
+          {{ (paginaActual * registrosPorPagina > movimientos.length ? movimientos.length : paginaActual * registrosPorPagina) }} 
+          de {{ movimientos.length }} transacciones
+        </span>
+      </div>
+
+      <div class="footer-right">
+        <button type="button" class="btn-page" (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-indicator">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn-page" (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

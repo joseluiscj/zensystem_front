@@ -23,6 +23,10 @@ export class ProductoService extends GenericService<Producto> {
     return this.dataChange.asObservable();
   }
 
+  list(data?: any) {
+    return this.findAllList(data);
+  }
+
   saveFile(obj :FormData){
     return this.http.post<any>(`${this.url}/saveFile`, obj );
   }

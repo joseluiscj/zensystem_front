@@ -1,1 +1,576 @@
-<p>venta works!</p>
+<div class="ventas-wrapper">
+
+  <!-- ============================================================
+       MODO 1: LISTADO GENERAL DE VENTAS Y FILTROS
+       ============================================================ -->
+  <ng-container *ngIf="modo === 'lista'">
+
+    <!-- CABECERA PRINCIPAL -->
+    <header class="ventas-hero-banner">
+      <div class="hero-left">
+        <div class="hero-icon-box">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div>
+          <h2 class="hero-title">Gestión de Ventas & Comandas</h2>
+          <p class="hero-subtitle">
+            <mat-icon class="sub-icon">storefront</mat-icon>
+            <span>Control histórico de pedidos registrados desde el Salón de Mesas</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button type="button" class="btn-hero-secondary" (click)="cargarVentas()" matTooltip="Refrescar lista">
+          <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+          <span>Actualizar</span>
+        </button>
+        <button type="button" class="btn-hero-primary" (click)="irRestaurante()" matTooltip="Ir al salón de mesas">
+          <mat-icon>table_restaurant</mat-icon>
+          <span>Salón Restaurante</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- TARJETAS DE MÉTRICAS / KPIS DEL CONJUNTO FILTRADO -->
+    <div class="row g-3 mb-4">
+      <!-- Total Recaudado -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-sales">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Total Recaudado</span>
+            <div class="kpi-icon-circle sales-circle">
+              <mat-icon>payments</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">${{ resumen.totalVentas | number:'1.2-2' }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-green">
+              <mat-icon>paid</mat-icon> Cobros registrados
+            </span>
+            <span class="kpi-hint">{{ esFiltroHoy ? 'Hoy' : 'En filtro' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total de Pedidos -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-orders">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Total de Comandas</span>
+            <div class="kpi-icon-circle orders-circle">
+              <mat-icon>receipt</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">{{ resumen.totalPedidos }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-blue">
+              <mat-icon>list_alt</mat-icon> Registros totales
+            </span>
+            <span class="kpi-hint">Comandas generadas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Atendidos / Cobrados -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-atendidos">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Atendidos / Cobrados</span>
+            <div class="kpi-icon-circle atendidos-circle">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">{{ resumen.totalAtendidos }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-emerald">
+              <mat-icon>task_alt</mat-icon> Cerrados
+            </span>
+            <span class="kpi-hint">Servidos y pagados</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pendientes -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-pendientes">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Pendientes en Salón</span>
+            <div class="kpi-icon-circle pendientes-circle">
+              <mat-icon>hourglass_empty</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">{{ resumen.totalPendientes }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-amber">
+              <mat-icon>pending</mat-icon> En preparación / mesa
+            </span>
+            <span class="kpi-hint">Por cobrar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL DE FILTROS AVANZADOS -->
+    <section class="ventas-filter-card mb-4">
+      <div class="filter-card-header">
+        <div class="filter-header-left">
+          <mat-icon class="filter-icon">tune</mat-icon>
+          <span class="filter-header-title">Filtros de Búsqueda</span>
+        </div>
+        <div class="filter-header-right">
+          <button type="button" class="btn-today-quick" [class.btn-today-active]="esFiltroHoy" (click)="filtrarHoy()">
+            <mat-icon>today</mat-icon>
+            <span>Ver Solo Hoy</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-grid-layout">
+        <!-- Fecha Inicio -->
+        <div class="filter-field">
+          <label class="field-label">
+            <mat-icon>calendar_today</mat-icon> Desde
+          </label>
+          <input type="date" class="form-input" [(ngModel)]="filtros.fechaInicio" (change)="aplicarFiltros()" />
+        </div>
+
+        <!-- Fecha Fin -->
+        <div class="filter-field">
+          <label class="field-label">
+            <mat-icon>event</mat-icon> Hasta
+          </label>
+          <input type="date" class="form-input" [(ngModel)]="filtros.fechaFin" (change)="aplicarFiltros()" />
+        </div>
+
+        <!-- Estado -->
+        <div class="filter-field">
+          <label class="field-label">
+            <mat-icon>toggle_on</mat-icon> Estado
+          </label>
+          <select class="form-select" [(ngModel)]="filtros.state" (change)="aplicarFiltros()">
+            <option value="todos">Todos los Estados</option>
+            <option value="1">Atendido / Cobrado</option>
+            <option value="0">Pendiente en Mesa</option>
+          </select>
+        </div>
+
+        <!-- Medio de Pago -->
+        <div class="filter-field">
+          <label class="field-label">
+            <mat-icon>payment</mat-icon> Medio de Pago
+          </label>
+          <select class="form-select" [(ngModel)]="filtros.pagoCon" (change)="aplicarFiltros()">
+            <option value="todos">Todos los Medios</option>
+            <option value="EF">💵 Efectivo en Caja</option>
+            <option value="TA">💳 Tarjeta Débito/Crédito</option>
+          </select>
+        </div>
+
+        <!-- Mesa -->
+        <div class="filter-field">
+          <label class="field-label">
+            <mat-icon>table_restaurant</mat-icon> Mesa
+          </label>
+          <select class="form-select" [(ngModel)]="filtros.idMesa" (change)="aplicarFiltros()">
+            <option value="todos">Todas las Mesas</option>
+            <option *ngFor="let m of mesasCatalogo" [value]="m.id || m.idMesa">{{ m.nombre || m.f_nombre }}</option>
+          </select>
+        </div>
+
+        <!-- Búsqueda por texto -->
+        <div class="filter-field field-search">
+          <label class="field-label">
+            <mat-icon>search</mat-icon> Buscar Cliente / # Orden
+          </label>
+          <div class="search-input-wrap">
+            <input type="text" class="form-input search-box" [(ngModel)]="filtros.search" (keyup.enter)="aplicarFiltros()" placeholder="Nombre o # de orden..." />
+            <button type="button" class="btn-clear-search" *ngIf="filtros.search" (click)="filtros.search = ''; aplicarFiltros()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="filter-actions-col">
+          <button type="button" class="btn-apply-filter" (click)="aplicarFiltros()">
+            <mat-icon>filter_alt</mat-icon> Filtrar
+          </button>
+          <button type="button" class="btn-reset-filter" (click)="limpiarFiltros()" matTooltip="Restablecer todos los filtros">
+            <mat-icon>restart_alt</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA DE CARGA -->
+    <div *ngIf="cargando" class="ventas-loader">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <div class="loader-text">Cargando comandas y cobranzas...</div>
+    </div>
+
+    <!-- TABLA PRINCIPAL DE VENTAS -->
+    <div class="ventas-card" *ngIf="!cargando">
+      <div class="ventas-table-container table-responsive" *ngIf="ventas.length > 0">
+        <table class="ventas-modern-table">
+          <thead>
+            <tr>
+              <th class="th-id">Orden</th>
+              <th class="th-fecha">Fecha y Hora</th>
+              <th class="th-mesa">Mesa</th>
+              <th class="th-cliente">Cliente</th>
+              <th class="th-productos">Comanda / Platos</th>
+              <th class="th-pago">Medio Pago</th>
+              <th class="th-total text-right">Total</th>
+              <th class="th-estado text-center">Estado</th>
+              <th class="th-acciones text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of ventasPaginadas" class="table-row-item">
+              <!-- ID -->
+              <td class="td-id">
+                <span class="badge-order-id">#{{ v.idPedido }}</span>
+              </td>
+
+              <!-- Fecha -->
+              <td class="td-fecha">
+                <span class="fecha-main">{{ v.created_at | date:'dd/MM/yyyy' }}</span>
+                <span class="hora-sub">{{ v.created_at | date:'shortTime':'':'es-ES' }}</span>
+              </td>
+
+              <!-- Mesa -->
+              <td class="td-mesa">
+                <span class="badge-table-name">
+                  <mat-icon>table_restaurant</mat-icon>
+                  {{ v.mesa_nombre }}
+                </span>
+              </td>
+
+              <!-- Cliente -->
+              <td class="td-cliente">
+                <div class="client-name font-bold">{{ v.nombreCliente || 'Consumidor Final' }}</div>
+                <div class="cajero-hint text-muted">Cajero: {{ v.cajero_nombre || 'Asignado' }}</div>
+              </td>
+
+              <!-- Comanda / Platos -->
+              <td class="td-productos">
+                <div class="order-items-summary" [title]="v.resumen_productos || ''">
+                  <span class="badge-items-count">{{ v.items_count }} {{ v.items_count === 1 ? 'item' : 'items' }}</span>
+                  <span class="items-text">{{ v.resumen_productos || 'Sin platos registrados' }}</span>
+                </div>
+              </td>
+
+              <!-- Medio Pago -->
+              <td class="td-pago">
+                <span class="pay-badge" [class.pay-card]="v.pagoCon === 'TA'" [class.pay-cash]="v.pagoCon !== 'TA'">
+                  {{ v.pagoCon === 'TA' ? '💳 Tarjeta' : '💵 Efectivo' }}
+                </span>
+                <div *ngIf="v.caja_nombre" class="caja-subtext text-muted">{{ v.caja_nombre }}</div>
+              </td>
+
+              <!-- Total -->
+              <td class="td-total text-right">
+                <div class="amount-val font-bold">${{ (v.montoTotal || 0) | number:'1.2-2' }}</div>
+              </td>
+
+              <!-- Estado -->
+              <td class="td-estado text-center">
+                <span class="status-pill" [class.pill-atendido]="v.state === 1" [class.pill-pendiente]="v.state !== 1">
+                  <span class="pill-dot"></span>
+                  {{ v.state === 1 ? 'Atendido' : 'Pendiente' }}
+                </span>
+              </td>
+
+              <!-- Acciones -->
+              <td class="td-acciones text-center">
+                <div class="action-buttons-wrap">
+                  <!-- Ver Detalle -->
+                  <button type="button" class="btn-action btn-view" (click)="verDetalle(v.idPedido)" matTooltip="Ver detalle completo / Ticket">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+
+                  <!-- Editar Comanda -->
+                  <button type="button" class="btn-action btn-edit" (click)="iniciarEdicion(v.idPedido)" matTooltip="Editar comanda y platos">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <!-- Anular Pedido -->
+                  <button type="button" class="btn-action btn-delete" (click)="anularVenta(v.idPedido)" matTooltip="Anular comanda">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ESTADO VACÍO -->
+      <div *ngIf="ventas.length === 0" class="empty-sales-state py-5 text-center">
+        <div class="empty-icon-circle">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <h4>No se encontraron ventas ni comandas</h4>
+        <p class="text-muted">Prueba cambiando los filtros de fecha o estado, o crea una nueva orden en el Salón de Mesas.</p>
+        <button type="button" class="btn-goto-resto" (click)="irRestaurante()">
+          <mat-icon>table_restaurant</mat-icon> Ir al Restaurante
+        </button>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div class="table-pagination-footer" *ngIf="ventas.length > 0">
+        <div class="pagination-info">
+          Mostrando {{ ((paginaActual - 1) * registrosPorPagina) + 1 }} - 
+          {{ (paginaActual * registrosPorPagina) > ventas.length ? ventas.length : (paginaActual * registrosPorPagina) }} 
+          de {{ ventas.length }} pedidos
+        </div>
+        <div class="pagination-controls">
+          <button type="button" class="btn-page" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="page-current">{{ paginaActual }} / {{ totalPaginas }}</span>
+          <button type="button" class="btn-page" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+
+  <!-- ============================================================
+       MODO 2: EDICIÓN COMPLETA DE COMANDA / PEDIDO
+       ============================================================ -->
+  <ng-container *ngIf="modo === 'editar'">
+
+    <!-- CABECERA DEL EDITOR -->
+    <header class="editor-hero-banner">
+      <div class="editor-hero-left">
+        <button type="button" class="btn-back" (click)="cancelarEdicion()" matTooltip="Volver al listado">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h2 class="hero-title">Editar Comanda #{{ idPedidoEditando }}</h2>
+          <p class="hero-subtitle">Modificación de productos, cantidades, mesa y cobranza</p>
+        </div>
+      </div>
+
+      <div class="editor-hero-actions">
+        <button type="button" class="btn-editor-cancel" (click)="cancelarEdicion()">
+          Cancelar
+        </button>
+        <button type="button" class="btn-editor-save" [disabled]="isSaving" (click)="guardarCambiosEdicion()">
+          <mat-icon *ngIf="!isSaving">save</mat-icon>
+          <mat-icon *ngIf="isSaving" class="spin-icon">refresh</mat-icon>
+          <span>Guardar Cambios</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- FORMULARIO DE EDICIÓN -->
+    <div class="editor-grid-container" [formGroup]="editForm">
+      
+      <!-- COLUMNA 1: DATOS GENERALES Y COBRO (4 Cols) -->
+      <div class="editor-col-info">
+        <div class="editor-card">
+          <div class="editor-card-header">
+            <mat-icon class="card-icon">tune</mat-icon>
+            <h3 class="card-title">Datos de la Comanda</h3>
+          </div>
+
+          <div class="editor-card-body">
+            <!-- Mesa Asignada -->
+            <div class="form-group mb-3">
+              <label class="field-label">Mesa</label>
+              <select class="form-select" formControlName="idMesa">
+                <option *ngFor="let m of mesasDisponibles" [value]="m.id">{{ m.f_nombre }}</option>
+              </select>
+            </div>
+
+            <!-- Nombre del Cliente -->
+            <div class="form-group mb-3">
+              <label class="field-label">Nombre del Cliente</label>
+              <input type="text" class="form-input" formControlName="nombreCliente" placeholder="Ej: Juan Pérez / Consumidor Final" />
+            </div>
+
+            <!-- Medio de Pago -->
+            <div class="form-group mb-3">
+              <label class="field-label">Medio de Pago</label>
+              <select class="form-select" formControlName="pagoCon">
+                <option value="EF">💵 Efectivo en Caja</option>
+                <option value="TA">💳 Tarjeta Débito/Crédito</option>
+              </select>
+            </div>
+
+            <!-- Caja Asignada -->
+            <div class="form-group mb-3">
+              <label class="field-label">Caja</label>
+              <select class="form-select" formControlName="caja">
+                <option *ngFor="let c of cajasDisponibles" [value]="c.id">{{ c.f_nombre }}</option>
+              </select>
+            </div>
+
+            <!-- Cajero Responsable -->
+            <div class="form-group mb-3">
+              <label class="field-label">Cajero Responsable</label>
+              <select class="form-select" formControlName="cajero">
+                <option *ngFor="let u of cajerosDisponibles" [value]="u.id">{{ u.f_nombre }}</option>
+              </select>
+            </div>
+
+            <!-- Estado de la Comanda -->
+            <div class="form-group mb-4">
+              <label class="field-label">Estado de la Comanda</label>
+              <div class="state-toggle-group">
+                <label class="state-radio" [class.state-radio-active]="editForm.controls['state'].value === 0">
+                  <input type="radio" [value]="0" formControlName="state" />
+                  <span>⏳ Pendiente (En preparación / mesa)</span>
+                </label>
+                <label class="state-radio" [class.state-radio-active]="editForm.controls['state'].value === 1">
+                  <input type="radio" [value]="1" formControlName="state" />
+                  <span>✓ Atendido / Cobrado</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="divider mb-3"></div>
+
+            <!-- Montos de Cobro -->
+            <div class="billing-summary-box">
+              <div class="billing-row total-highlight">
+                <span>Total a Pagar:</span>
+                <span class="big-amount">${{ editForm.controls['montoTotal'].value || '0.00' }}</span>
+              </div>
+
+              <div *ngIf="editForm.controls['pagoCon'].value === 'EF'" class="cash-inputs mt-3">
+                <div class="form-group mb-2">
+                  <label class="field-label">Efectivo Recibido ($)</label>
+                  <input type="number" step="0.5" class="form-input" formControlName="montoEfectivo" (input)="calcularVueltoEdicion()" placeholder="0.00" />
+                </div>
+                <div class="billing-row vuelto-row">
+                  <span>Vuelto:</span>
+                  <span class="vuelto-amount font-bold">${{ editForm.controls['vuelto'].value || '0.00' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA 2: DETALLE DE PRODUCTOS DE LA COMANDA (8 Cols) -->
+      <div class="editor-col-products">
+        <div class="editor-card">
+          <div class="editor-card-header justify-between">
+            <div class="d-flex align-center gap-2">
+              <mat-icon class="card-icon">restaurant_menu</mat-icon>
+              <div>
+                <h3 class="card-title">Platos & Bebidas de la Comanda</h3>
+                <span class="card-sub">{{ listaDetalle.length }} {{ listaDetalle.length === 1 ? 'producto' : 'productos' }} en esta orden</span>
+              </div>
+            </div>
+
+            <!-- Botón Agregar Plato -->
+            <button type="button" class="btn-add-product" (click)="openDialogDetalle()">
+              <mat-icon>add_circle</mat-icon>
+              <span>Agregar Producto</span>
+            </button>
+          </div>
+
+          <div class="editor-card-body p-0">
+            <!-- Tabla de Productos del Pedido -->
+            <div class="table-responsive" *ngIf="listaDetalle.length > 0">
+              <table class="editor-products-table">
+                <thead>
+                  <tr>
+                    <th>Plato / Bebida</th>
+                    <th>Categoría</th>
+                    <th class="text-center">Cant.</th>
+                    <th class="text-right">Precio</th>
+                    <th class="text-right">Subtotal</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of listaDetalle; let i = index">
+                    <!-- Nombre y Foto -->
+                    <td>
+                      <div class="product-cell-wrap">
+                        <img *ngIf="item.f_download_link" [src]="item.f_download_link" class="prod-img-thumb" alt="foto" />
+                        <div *ngIf="!item.f_download_link" class="prod-img-thumb placeholder-thumb">
+                          <mat-icon>lunch_dining</mat-icon>
+                        </div>
+                        <div>
+                          <div class="product-item-name font-bold">{{ item.f_txtProducto }}</div>
+                          <!-- Observación -->
+                          <div *ngIf="item.f_observacion" class="product-item-obs">
+                            <mat-icon>edit_note</mat-icon>
+                            <span>{{ item.f_observacion }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Categoría -->
+                    <td>
+                      <span class="badge-cat">{{ item.f_txtCategoria || 'General' }}</span>
+                    </td>
+
+                    <!-- Controles de Cantidad -->
+                    <td class="text-center">
+                      <div class="qty-stepper-wrap">
+                        <button type="button" class="btn-qty" (click)="decrementarCantidad(i)">
+                          <mat-icon>remove</mat-icon>
+                        </button>
+                        <span class="qty-display font-bold">{{ item.f_cantidad }}</span>
+                        <button type="button" class="btn-qty" (click)="incrementarCantidad(i)">
+                          <mat-icon>add</mat-icon>
+                        </button>
+                      </div>
+                    </td>
+
+                    <!-- Precio Unitario -->
+                    <td class="text-right font-medium">
+                      ${{ (item.f_precio || 0) | number:'1.2-2' }}
+                    </td>
+
+                    <!-- Subtotal -->
+                    <td class="text-right font-bold text-dark">
+                      ${{ (item.f_subTotal || 0) | number:'1.2-2' }}
+                    </td>
+
+                    <!-- Acciones Item -->
+                    <td class="text-center">
+                      <div class="item-actions-row">
+                        <button type="button" class="btn-item-edit" (click)="actualizarProducto(i)" matTooltip="Editar producto / notas">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button type="button" class="btn-item-delete" (click)="eliminarProducto(i)" matTooltip="Quitar de la comanda">
+                          <mat-icon>delete_outline</mat-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Si la lista de productos está vacía -->
+            <div *ngIf="listaDetalle.length === 0" class="empty-products-notice text-center py-5">
+              <mat-icon class="empty-tray-icon">no_food</mat-icon>
+              <h4>No hay productos en esta comanda</h4>
+              <p class="text-muted">Haz clic en "Agregar Producto" para registrar platos o bebidas.</p>
+              <button type="button" class="btn-add-product" (click)="openDialogDetalle()">
+                <mat-icon>add_circle</mat-icon> Agregar Primer Producto
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

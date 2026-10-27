@@ -1,0 +1,151 @@
+<div class="ticket-dialog-wrapper">
+  <!-- Cabecera del Diálogo -->
+  <div class="ticket-modal-header">
+    <div class="header-title-box">
+      <div class="header-icon-circle">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <div>
+        <h3 class="modal-title">Detalle de Comanda #{{ idPedido }}</h3>
+        <p class="modal-subtitle">Resumen completo de consumo y cobranza</p>
+      </div>
+    </div>
+    <button mat-icon-button class="btn-close-modal" (click)="cerrar()" matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="cargando" class="ticket-loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="loader-label">Cargando productos y detalles...</p>
+  </div>
+
+  <!-- Contenido del Ticket -->
+  <div *ngIf="!cargando && pedido" class="ticket-modal-body">
+    <!-- Ticket Card -->
+    <div class="ticket-card printable-ticket">
+      
+      <!-- Encabezado del Ticket -->
+      <div class="ticket-brand-header text-center">
+        <div class="brand-title">RESTAURANTE ZENSYSTEM</div>
+        <div class="brand-sub">Comanda & Comprobante de Consumo</div>
+        <div class="ticket-divider"></div>
+      </div>
+
+      <!-- Metadatos de la Venta -->
+      <div class="ticket-meta-grid">
+        <div class="meta-row">
+          <span class="meta-label">Orden:</span>
+          <span class="meta-val font-bold">#{{ pedido.id }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Mesa:</span>
+          <span class="meta-val badge-mesa">{{ pedido.mesa_nombre }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Cliente:</span>
+          <span class="meta-val">{{ pedido.f_nombreCliente || 'Consumidor Final' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Fecha / Hora:</span>
+          <span class="meta-val">{{ pedido.created_at | date:'short':'':'es-ES' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Cajero:</span>
+          <span class="meta-val">{{ pedido.f_txtCajero || 'Cajero' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Caja:</span>
+          <span class="meta-val">{{ pedido.f_txtCaja || 'Caja' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Estado:</span>
+          <span class="meta-val">
+            <span class="ticket-state-badge" [class.state-atendido]="pedido.f_state === 1" [class.state-pendiente]="pedido.f_state !== 1">
+              {{ pedido.f_state === 1 ? '✓ Atendido / Cobrado' : '⏳ Pendiente en Salón' }}
+            </span>
+          </span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Medio de Pago:</span>
+          <span class="meta-val">
+            {{ pedido.f_pagoCon === 'TA' ? '💳 Tarjeta Débito/Crédito' : '💵 Efectivo en Caja' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="ticket-divider"></div>
+
+      <!-- Tabla de Items / Productos -->
+      <div class="ticket-items-section">
+        <div class="items-header-row">
+          <span class="col-cant">Cant.</span>
+          <span class="col-desc">Descripción</span>
+          <span class="col-unit">P.Unit</span>
+          <span class="col-sub">Subtotal</span>
+        </div>
+
+        <div class="ticket-items-list">
+          <div *ngFor="let item of detalle" class="ticket-item-row">
+            <div class="item-primary-line">
+              <span class="col-cant font-bold">{{ item.f_cantidad }}</span>
+              <span class="col-desc font-bold text-dark">{{ item.f_txtProducto }}</span>
+              <span class="col-unit">${{ (item.f_precio || 0) | number:'1.2-2' }}</span>
+              <span class="col-sub font-bold">${{ (item.f_subTotal || 0) | number:'1.2-2' }}</span>
+            </div>
+            <!-- Nota / Observación del plato si tiene -->
+            <div *ngIf="item.f_observacion" class="item-obs-line">
+              <mat-icon class="obs-icon">edit_note</mat-icon>
+              <span>{{ item.f_observacion }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="detalle.length === 0" class="text-center py-3 text-muted small">
+            Sin productos registrados en esta orden.
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-divider"></div>
+
+      <!-- Resumen Financiero -->
+      <div class="ticket-totals-section">
+        <div class="total-row total-highlight">
+          <span class="total-label">MONTO TOTAL:</span>
+          <span class="total-val">${{ (pedido.f_montoTotal || 0) | number:'1.2-2' }}</span>
+        </div>
+
+        <div *ngIf="pedido.f_pagoCon === 'EF'" class="cash-details-group">
+          <div class="total-row text-muted small">
+            <span>Efectivo Recibido:</span>
+            <span>${{ (pedido.f_montoEfectivo || 0) | number:'1.2-2' }}</span>
+          </div>
+          <div class="total-row text-muted small">
+            <span>Vuelto:</span>
+            <span>${{ (pedido.f_vuelto || 0) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-footer text-center">
+        <p class="footer-msg">¡Gracias por su visita!</p>
+        <span class="footer-sub">Comanda gestionada mediante ZenSystem</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="ticket-modal-actions">
+    <button mat-stroked-button class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir comprobante">
+      <mat-icon>print</mat-icon> Imprimir
+    </button>
+    <button mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
+      <mat-icon>edit</mat-icon> Editar Comanda
+    </button>
+    <button mat-button class="btn-action-close" (click)="cerrar()">
+      Cerrar
+    </button>
+  </div>
+</div>

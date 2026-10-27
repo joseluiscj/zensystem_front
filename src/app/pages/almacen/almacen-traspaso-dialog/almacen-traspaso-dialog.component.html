@@ -1,0 +1,138 @@
+<div class="traspaso-dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box">
+        <mat-icon>swap_horiz</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">Traspaso entre Almacenes</h3>
+        <p class="dialog-subtitle">Transferencia interna de mercadería entre Almacén A y Almacén B</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()" [disabled]="cargando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+
+  <form [formGroup]="traspasoForm" (ngSubmit)="guardar()" class="dialog-body">
+
+    <!-- PRODUCTO A TRASPASAR -->
+    <div class="mb-3">
+      <label class="form-label-custom">Producto a Transferir: *</label>
+      <mat-form-field appearance="outline" class="w-100 custom-field">
+        <mat-select formControlName="idProducto" placeholder="Seleccione un producto">
+          <mat-option *ngFor="let p of productos" [value]="p.idProducto">
+            <strong>[{{ p.codigo }}]</strong> {{ p.nombre }} - (Total Global: {{ p.stock }} {{ p.unidadMedida }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- ORIGEN Y DESTINO -->
+    <div class="row g-3 mb-3">
+      <!-- Origen -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Almacén Origen (Sale): *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="idAlmacenOrigen">
+            <mat-option *ngFor="let alm of almacenes" [value]="alm.id">
+              {{ alm.nombre }} ({{ alm.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Icono Transferencia -->
+      <div class="col-12 col-md-2 d-none d-md-flex align-items-center justify-content-center pt-3">
+        <div class="transfer-arrow-circle">
+          <mat-icon>arrow_forward</mat-icon>
+        </div>
+      </div>
+
+      <!-- Destino -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Almacén Destino (Ingresa): *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="idAlmacenDestino">
+            <mat-option *ngFor="let alm of almacenes" [value]="alm.id">
+              {{ alm.nombre }} ({{ alm.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- CANTIDAD Y MOTIVO -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Cantidad a Traspasar: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput type="number" step="0.01" min="0.01" formControlName="cantidad" placeholder="0.00">
+          <span matSuffix class="suffix-badge">{{ productoSeleccionado?.unidadMedida || 'UND' }}</span>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">Motivo del Traspaso: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="motivo">
+            <mat-option *ngFor="let m of motivosTraspaso" [value]="m">
+              {{ m }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div class="mb-3">
+      <label class="form-label-custom">Notas Adicionales (Opcional):</label>
+      <mat-form-field appearance="outline" class="w-100 custom-field">
+        <input matInput formControlName="observacion" placeholder="Detalle sobre el traslado...">
+        <mat-icon matPrefix class="prefix-icon">notes</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- SIMULADOR VISUAL DE IMPACTO EN AMBOS ALMACENES -->
+    <div class="traspaso-impact-card mb-3">
+      <div class="impact-col origen-col">
+        <span class="impact-badge-tag tag-origen">Almacén Origen</span>
+        <div class="impact-stock-row">
+          <span class="stock-num text-muted">{{ stockEnOrigen | number:'1.2-2' }}</span>
+          <mat-icon class="arrow-down">trending_down</mat-icon>
+          <span class="stock-num text-danger">
+            {{ stockOrigenResultante | number:'1.2-2' }} {{ productoSeleccionado?.unidadMedida || 'UND' }}
+          </span>
+        </div>
+        <span class="impact-sub">Disminuye -{{ cantidadTraspaso | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="impact-divider-line"></div>
+
+      <div class="impact-col destino-col">
+        <span class="impact-badge-tag tag-destino">Almacén Destino</span>
+        <div class="impact-stock-row">
+          <span class="stock-num text-muted">{{ stockEnDestino | number:'1.2-2' }}</span>
+          <mat-icon class="arrow-up">trending_up</mat-icon>
+          <span class="stock-num text-success">
+            {{ stockDestinoResultante | number:'1.2-2' }} {{ productoSeleccionado?.unidadMedida || 'UND' }}
+          </span>
+        </div>
+        <span class="impact-sub">Aumenta +{{ cantidadTraspaso | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn-cancel" (click)="cerrar()" [disabled]="cargando">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="cargando || traspasoForm.invalid || cantidadTraspaso > stockEnOrigen">
+        <mat-icon>sync_alt</mat-icon>
+        <span>Ejecutar Traspaso</span>
+      </button>
+    </div>
+
+  </form>
+</div>

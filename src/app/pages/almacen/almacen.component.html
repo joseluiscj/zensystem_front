@@ -1,0 +1,371 @@
+<div class="almacen-wrapper">
+
+  <!-- CABECERA PRINCIPAL (HERO BANNER) -->
+  <header class="almacen-hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>warehouse</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Almacén & Control Multi-Almacén ERP</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">hub</mat-icon>
+          <span>Visibilidad de existencias distribuidas entre Almacén Central, Barra y Puntos de Venta</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="cargarInventario()" matTooltip="Refrescar catálogo">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span>Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-gestion" (click)="abrirGestionAlmacenes()" matTooltip="Configurar almacenes y áreas físicas">
+        <mat-icon>domain</mat-icon>
+        <span>Gestión de Almacenes</span>
+      </button>
+
+      <button type="button" class="btn-hero-traspaso" (click)="abrirTraspaso()" matTooltip="Transferir stock de un almacén a otro">
+        <mat-icon>swap_horiz</mat-icon>
+        <span>Traspaso entre Almacenes</span>
+      </button>
+
+      <button type="button" class="btn-hero-kardex" (click)="abrirKardex()" matTooltip="Ver historial completo de movimientos">
+        <mat-icon>history_edu</mat-icon>
+        <span>Ver Kardex</span>
+      </button>
+
+      <button type="button" class="btn-hero-primary" (click)="abrirNuevoMovimiento()" matTooltip="Registrar entrada, salida o ajuste">
+        <mat-icon>add_box</mat-icon>
+        <span>+ Registrar Movimiento</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TARJETAS DE KPIS Y RESUMEN POR ALMACÉN -->
+  <div class="row g-3 mb-4">
+    <!-- Valorización Total del Inventario -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-valor">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Valorización Total</span>
+          <div class="kpi-icon-circle valor-circle">
+            <mat-icon>attach_money</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value">S/ {{ kpis.valorTotalInventario | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-blue">
+            <mat-icon>account_balance_wallet</mat-icon> Costo valorizado
+          </span>
+          <span class="kpi-hint">{{ kpis.totalUnidadesStock | number:'1.0-0' }} unidades totales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total de Productos -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-total" (click)="filtrarPorEstado('todos')" [class.kpi-active]="filtros.estadoStock === 'todos'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Productos en Catálogo</span>
+          <div class="kpi-icon-circle total-circle">
+            <mat-icon>category</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value">{{ kpis.totalProductos }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-slate">
+            <mat-icon>list</mat-icon> {{ kpis.totalStockNormal }} con stock normal
+          </span>
+          <span class="kpi-hint">Ver todos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas Stock Bajo -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-bajo" (click)="filtrarPorEstado('bajo')" [class.kpi-active]="filtros.estadoStock === 'bajo'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Alerta: Stock Bajo</span>
+          <div class="kpi-icon-circle bajo-circle">
+            <mat-icon>warning_amber</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-amber">{{ kpis.totalStockBajo }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-amber">
+            <mat-icon>priority_high</mat-icon> Por debajo del mínimo
+          </span>
+          <span class="kpi-hint">Reponer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Puntos de Almacén Activos -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-almacenes-kpi" (click)="abrirGestionAlmacenes()">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Almacenes Operativos</span>
+          <div class="kpi-icon-circle alm-circle">
+            <mat-icon>apartment</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value">{{ almacenes.length }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-purple">
+            <mat-icon>store</mat-icon> Puntos de stock
+          </span>
+          <span class="kpi-hint">Ver gestión</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS & BÚSQUEDA -->
+  <div class="almacen-filters-card mb-4">
+    <div class="filters-row">
+      <!-- Búsqueda rápida por nombre o código -->
+      <div class="filter-item filter-search">
+        <label class="filter-label">Buscar Producto / SKU:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput [(ngModel)]="filtros.search" (keyup.enter)="cargarInventario()" placeholder="Ej: Arroz, PROD-001, Gaseosa...">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <button *ngIf="filtros.search" matSuffix mat-icon-button (click)="filtros.search = ''; cargarInventario()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro por Almacén -->
+      <div class="filter-item">
+        <label class="filter-label">Filtrar por Almacén:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idAlmacen" (selectionChange)="cargarInventario()">
+            <mat-option value="todos">-- Todos los almacenes --</mat-option>
+            <mat-option *ngFor="let alm of almacenes" [value]="alm.id">
+              {{ alm.nombre }} ({{ alm.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro por Categoría -->
+      <div class="filter-item">
+        <label class="filter-label">Categoría:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idCategoria" (selectionChange)="cargarInventario()">
+            <mat-option value="todos">-- Todas las categorías --</mat-option>
+            <mat-option *ngFor="let cat of categorias" [value]="cat.id">
+              {{ cat.f_nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro por Estado de Stock -->
+      <div class="filter-item">
+        <label class="filter-label">Nivel de Stock:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.estadoStock" (selectionChange)="cargarInventario()">
+            <mat-option value="todos">Todos los estados</mat-option>
+            <mat-option value="normal">Normal (Disponible)</mat-option>
+            <mat-option value="bajo">Stock Bajo (Alerta)</mat-option>
+            <mat-option value="agotado">Agotados (Cero)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Botón Buscar y Limpiar -->
+      <div class="filter-actions-inline">
+        <button type="button" class="btn-action-filter" (click)="cargarInventario()" matTooltip="Aplicar filtros">
+          <mat-icon>tune</mat-icon>
+          <span>Filtrar</span>
+        </button>
+        <button type="button" class="btn-action-reset" (click)="limpiarFiltros()" matTooltip="Restablecer">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA PRINCIPAL DE INVENTARIO CON DESGLOSE POR ALMACÉN -->
+  <div class="inventory-card">
+    <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="table-loader"></mat-progress-bar>
+
+    <div class="table-responsive">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Código SKU</th>
+            <th>Producto & Categoría</th>
+            <!-- Columnas independientes por cada Almacén -->
+            <th *ngFor="let alm of almacenes" class="text-center th-almacen" [class.th-almacen-active]="filtros.idAlmacen == alm.id">
+              <div class="th-almacen-content">
+                <span class="th-almacen-badge">{{ alm.codigo }}</span>
+                <span class="th-almacen-name" [matTooltip]="alm.nombre">{{ alm.nombre }}</span>
+              </div>
+            </th>
+            <th class="text-center">Stock Total</th>
+            <th class="text-end">Costo (S/)</th>
+            <th class="text-end">Precio (S/)</th>
+            <th class="text-center">Mínimo</th>
+            <th class="text-end">Valor Total (S/)</th>
+            <th class="text-center">Acciones ERP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prod of productosPaginados" class="inv-row" [ngClass]="{
+            'row-agotado': prod.estado_stock === 'agotado',
+            'row-bajo': prod.estado_stock === 'bajo'
+          }">
+            <!-- SKU -->
+            <td>
+              <span class="sku-tag">{{ prod.codigo }}</span>
+            </td>
+
+            <!-- Producto & Categoria -->
+            <td>
+              <div class="prod-main-cell">
+                <div class="prod-texts">
+                  <span class="prod-title">{{ prod.nombre }}</span>
+                  <span class="prod-cat-pill">{{ prod.categoria_nombre }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Stock por cada Almacén en columna individual -->
+            <td *ngFor="let alm of almacenes" class="text-center td-almacen" [class.td-almacen-active]="filtros.idAlmacen == alm.id"
+                [matTooltip]="getStockAlmacenTooltip(prod, alm)">
+              <div class="alm-cell-stock" [ngClass]="{
+                'stock-has-units': getStockAlmacen(prod, alm.id) > 0,
+                'stock-is-zero': getStockAlmacen(prod, alm.id) <= 0
+              }">
+                <span class="stock-qty">{{ getStockAlmacen(prod, alm.id) | number:'1.2-2' }}</span>
+                <span class="stock-unit">{{ prod.unidadMedida || 'UND' }}</span>
+              </div>
+            </td>
+
+            <!-- Stock Global Total & Estado -->
+            <td class="text-center">
+              <div class="stock-pill-wrapper">
+                <span class="stock-pill" [ngClass]="{
+                  'stock-normal': prod.estado_stock === 'normal',
+                  'stock-bajo': prod.estado_stock === 'bajo',
+                  'stock-agotado': prod.estado_stock === 'agotado'
+                }">
+                  <mat-icon *ngIf="prod.estado_stock === 'normal'">check_circle</mat-icon>
+                  <mat-icon *ngIf="prod.estado_stock === 'bajo'">warning</mat-icon>
+                  <mat-icon *ngIf="prod.estado_stock === 'agotado'">error</mat-icon>
+                  <strong>{{ prod.stock | number:'1.2-2' }}</strong>
+                  <span style="font-size: 10px;">{{ prod.unidadMedida }}</span>
+                </span>
+                <span class="stock-label-sub" [ngClass]="'sub-' + prod.estado_stock">
+                  {{ prod.estado_stock === 'normal' ? 'Disponible' : (prod.estado_stock === 'bajo' ? 'Stock Bajo' : 'Agotado') }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Costo -->
+            <td class="text-end font-mono">
+              S/ {{ prod.costo | number:'1.2-2' }}
+            </td>
+
+            <!-- Precio -->
+            <td class="text-end font-mono text-muted">
+              S/ {{ prod.precio | number:'1.2-2' }}
+            </td>
+
+            <!-- Stock Mínimo -->
+            <td class="text-center">
+              <span class="min-tag">{{ prod.stockMinimo | number:'1.0-0' }}</span>
+            </td>
+
+            <!-- Valor Total -->
+            <td class="text-end valor-cell">
+              S/ {{ prod.valor_total | number:'1.2-2' }}
+            </td>
+
+            <!-- Acciones ERP -->
+            <td class="text-center">
+              <div class="actions-group">
+                <!-- Botón Traspaso entre almacenes -->
+                <button type="button" class="btn-action-mini btn-traspaso" 
+                  matTooltip="Traspasar este producto entre Almacén A y B" 
+                  [disabled]="prod.stock <= 0"
+                  (click)="abrirTraspaso(prod)">
+                  <mat-icon>swap_horiz</mat-icon>
+                </button>
+
+                <!-- Entrada Rápida -->
+                <button type="button" class="btn-action-mini btn-add" 
+                  matTooltip="Registrar Entrada (+)" 
+                  (click)="abrirNuevoMovimiento(prod, 'E')">
+                  <mat-icon>add</mat-icon>
+                </button>
+
+                <!-- Salida Rápida -->
+                <button type="button" class="btn-action-mini btn-sub" 
+                  matTooltip="Registrar Salida (-)" 
+                  [disabled]="prod.stock <= 0"
+                  (click)="abrirNuevoMovimiento(prod, 'S')">
+                  <mat-icon>remove</mat-icon>
+                </button>
+
+                <!-- Ver Kardex individual -->
+                <button type="button" class="btn-action-mini btn-kardex" 
+                  matTooltip="Ver Kardex de este producto" 
+                  (click)="abrirKardex(prod)">
+                  <mat-icon>history</mat-icon>
+                </button>
+
+                <!-- Ir a edición maestra de producto en Administración -->
+                <button type="button" class="btn-action-mini btn-settings" 
+                  matTooltip="Editar precios, costo y stock mínimo en Administración / Producto" 
+                  (click)="irAdministracionProducto()">
+                  <mat-icon>open_in_new</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Estado Vacío -->
+          <tr *ngIf="productos.length === 0 && !cargando">
+            <td [attr.colspan]="8 + (almacenes.length || 1)" class="text-center py-5">
+              <div class="empty-state">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <h4 class="empty-title">No se encontraron productos</h4>
+                <p class="empty-desc">Intente modificando los filtros o el texto de búsqueda.</p>
+                <button type="button" class="btn-clear-empty" (click)="limpiarFiltros()">
+                  Limpiar Filtros
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PIE DE PAGINACIÓN -->
+    <div class="inventory-footer" *ngIf="productos.length > 0">
+      <div class="footer-left">
+        <span class="footer-info">
+          Mostrando {{ (paginaActual - 1) * registrosPorPagina + 1 }} - 
+          {{ (paginaActual * registrosPorPagina > productos.length ? productos.length : paginaActual * registrosPorPagina) }} 
+          de {{ productos.length }} productos
+        </span>
+      </div>
+
+      <div class="footer-right">
+        <button type="button" class="btn-page" (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-indicator">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn-page" (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,189 @@
+<div class="mov-dialog-container">
+  <!-- CABECERA -->
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box" [ngClass]="{
+        'icon-entrada': tipoActual === 'E',
+        'icon-salida': tipoActual === 'S',
+        'icon-ajuste': tipoActual === 'A'
+      }">
+        <mat-icon *ngIf="tipoActual === 'E'">login</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'S'">logout</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'A'">tune</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">Registrar Movimiento de Almacén</h3>
+        <p class="dialog-subtitle">Actualización en tiempo real del Kardex de inventario</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()" [disabled]="cargando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+
+  <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="dialog-body">
+
+    <!-- SELECTOR DE TIPO DE MOVIMIENTO -->
+    <div class="tipo-selector-group mb-3">
+      <label class="form-label-custom">Tipo de Operación:</label>
+      <div class="tipo-buttons-grid">
+        <button type="button" class="tipo-btn" 
+          [class.active-e]="tipoActual === 'E'"
+          (click)="setTipo('E')">
+          <mat-icon>add_circle_outline</mat-icon>
+          <div class="tipo-info">
+            <span class="tipo-name">ENTRADA</span>
+            <span class="tipo-desc">Compras, recepciones, devoluciones</span>
+          </div>
+        </button>
+
+        <button type="button" class="tipo-btn" 
+          [class.active-s]="tipoActual === 'S'"
+          (click)="setTipo('S')">
+          <mat-icon>remove_circle_outline</mat-icon>
+          <div class="tipo-info">
+            <span class="tipo-name">SALIDA</span>
+            <span class="tipo-desc">Consumo interno, merma, baja</span>
+          </div>
+        </button>
+
+        <button type="button" class="tipo-btn" 
+          [class.active-a]="tipoActual === 'A'"
+          (click)="setTipo('A')">
+          <mat-icon>published_with_changes</mat-icon>
+          <div class="tipo-info">
+            <span class="tipo-name">AJUSTE</span>
+            <span class="tipo-desc">Conteo físico / Cuadratura de stock</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- SELECCIÓN DE ALMACÉN Y PRODUCTO -->
+    <div class="row g-3 mb-3">
+      <!-- Almacén a Afectar -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Almacén a Afectar: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="idAlmacen">
+            <mat-option *ngFor="let a of almacenes" [value]="a.id">
+              {{ a.nombre }} ({{ a.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Producto a Afectar -->
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">Producto a Afectar: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="idProducto" placeholder="Seleccione un producto">
+            <mat-option *ngFor="let p of productos" [value]="p.idProducto">
+              <strong>[{{ p.codigo }}]</strong> {{ p.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- CANTIDAD, COSTO Y MOTIVO -->
+    <div class="row g-3 mb-3">
+      <!-- Cantidad -->
+      <div class="col-12 col-md-4">
+        <label class="form-label-custom">
+          {{ tipoActual === 'A' ? 'Nuevo Stock Real (Conteo): *' : 'Cantidad a Mover: *' }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput type="number" step="0.01" min="0.01" formControlName="cantidad" placeholder="0.00">
+          <span matSuffix class="suffix-badge">{{ productoSeleccionado?.unidadMedida || 'UND' }}</span>
+        </mat-form-field>
+      </div>
+
+      <!-- Costo Unitario -->
+      <div class="col-12 col-md-4">
+        <label class="form-label-custom">Costo Unitario ($):</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput type="number" step="0.01" min="0" formControlName="costoUnitario" placeholder="0.00">
+          <span matPrefix class="px-1 text-muted">$</span>
+        </mat-form-field>
+      </div>
+
+      <!-- Motivo -->
+      <div class="col-12 col-md-4">
+        <label class="form-label-custom">Motivo / Causa: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="motivo" placeholder="Seleccione un motivo">
+            <mat-option *ngFor="let mot of motivosPredefinidos[tipoActual]" [value]="mot">
+              {{ mot }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- DOCUMENTO Y OBSERVACIONES -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Doc. Referencia (Factura / Guía / Boleta):</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput formControlName="documento" placeholder="Ej. F001-00284, G-552">
+          <mat-icon matPrefix class="prefix-icon">receipt</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">Observaciones / Notas Adicionales:</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput formControlName="observacion" placeholder="Detalle adicional sobre este movimiento...">
+          <mat-icon matPrefix class="prefix-icon">notes</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- SIMULADOR / RESUMEN DE IMPACTO EN STOCK DEL ALMACEN -->
+    <div class="stock-impact-box mb-3" [ngClass]="{
+      'impact-green': tipoActual === 'E',
+      'impact-red': tipoActual === 'S',
+      'impact-blue': tipoActual === 'A'
+    }">
+      <div class="impact-item">
+        <span class="impact-label">Stock en este Almacén</span>
+        <span class="impact-val">{{ stockAnterior | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="impact-operator">
+        <mat-icon *ngIf="tipoActual === 'E'">add</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'S'">remove</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'A'">arrow_forward</mat-icon>
+      </div>
+
+      <div class="impact-item">
+        <span class="impact-label">{{ tipoActual === 'A' ? 'Ajustado a' : 'Movimiento' }}</span>
+        <span class="impact-val">{{ cantidadIngresada | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="impact-operator">
+        <mat-icon>drag_handle</mat-icon>
+      </div>
+
+      <div class="impact-item impact-result">
+        <span class="impact-label">Stock Proyectado</span>
+        <span class="impact-val-projected">{{ stockProyectado | number:'1.2-2' }} {{ productoSeleccionado?.unidadMedida || 'UND' }}</span>
+      </div>
+    </div>
+
+    <!-- PIE DE ACCIONES -->
+    <div class="dialog-footer">
+      <button type="button" class="btn-cancel" (click)="cerrar()" [disabled]="cargando">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="cargando || movimientoForm.invalid">
+        <mat-icon>check_circle</mat-icon>
+        <span>Registrar en Kardex</span>
+      </button>
+    </div>
+
+  </form>
+</div>

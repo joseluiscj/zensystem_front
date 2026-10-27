@@ -1,10 +1,10 @@
 <div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
     <div class="m-section-title">
-        <h4 class="m-title mb-1">Gestión de Productos</h4>
-        <div class="m-title-description">Desde aquí puedes gestionar tus Productos.</div>
+        <h4 class="m-title mb-1">Gestión de Catálogo de Productos</h4>
+        <div class="m-title-description">Administre nombres, precios de venta, costos de compra, códigos SKU y stock mínimo.</div>
     </div>
-    <div class="m-section-buttons " align="center">
-        <button mat-raised-button   (click)="openDialog()" class=" btn_primary" >
+    <div class="m-section-buttons" align="center">
+        <button mat-raised-button (click)="openDialog()" class="btn_primary">
             <mat-icon>add</mat-icon> Nuevo Producto
         </button>
     </div>
@@ -22,12 +22,12 @@
     <div class="row"> 
       <div class="col-md-4">
         <mat-form-field appearance="fill" class="custom-input" style="width: 100%;">
-          <mat-label class="labeltext">Nombre:</mat-label>
+          <mat-label class="labeltext">Nombre o Código SKU:</mat-label>
           <input matInput placeholder="Escribir..." formControlName="nombres" autocomplete="off" maxlength="30">
         </mat-form-field>
       </div>
       <div class="col-md-4">
-        <mat-form-field  appearance="fill"  class="custom-input" style="width: 100%;">
+        <mat-form-field appearance="fill" class="custom-input" style="width: 100%;">
           <mat-label class="labeltext">Categoría</mat-label>
           <mat-select placeholder="Seleccione una opción" [formControl]="ValueCategoria">
             <mat-option>
@@ -41,73 +41,123 @@
       </div>
       <div class="col-md-3 btn_boton_filter">
         <div align="center" style="display: flex; align-items: center;">
-          <button mat-raised-button color="primary" type="submit" class="btn_primary" >
-            <mat-icon>search</mat-icon>Buscar
+          <button mat-raised-button color="primary" type="submit" class="btn_primary">
+            <mat-icon>search</mat-icon> Buscar
           </button> &nbsp;
           <button mat-raised-button (click)="onClear()" class="btn_secondary">
-            <mat-icon>disabled_by_default</mat-icon>Limpiar
+            <mat-icon>disabled_by_default</mat-icon> Limpiar
           </button>
         </div>
       </div>
     </div>
   </form>
 </mat-expansion-panel>
+
 <div style="margin: 10px 28px;" *ngIf="cargaContenido">
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>
+
 <div class="content_body_web">
   <div class="row m-2" style="justify-content: center;">
     <div class="col-md-12">
-      <mat-card class="p-0 stable"  >
-        <mat-card-content class=" "> 
-          <div class="table-container small-font-table" style="overflow-x: auto;border-radius: 10px;">
+      <mat-card class="p-0 stable">
+        <mat-card-content class=""> 
+          <div class="table-container small-font-table" style="overflow-x: auto; border-radius: 10px;">
             <table mat-table [dataSource]="dataSource" matSort>
+              <!-- # -->
               <ng-container matColumnDef="#">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> # </th>
                 <td mat-cell *matCellDef="let row; let i = index"> {{getRowNumber(i)}} </td>
               </ng-container>
 
+              <!-- SKU -->
+              <ng-container matColumnDef="codigo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> SKU </th>
+                <td mat-cell *matCellDef="let row">
+                  <span style="font-family: monospace; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">
+                    {{row.codigo}}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Imagen -->
               <ng-container matColumnDef="imgId">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Img </th>
                 <td mat-cell *matCellDef="let row">
-                  <div  class="{{row.imgId!=''?'':'d-none'}}">
-                    <img src="{{row.imgId}}" alt="" style="width: 50px;height: 50px;">
+                  <div class="{{row.imgId!=''?'':'d-none'}}">
+                    <img src="{{row.imgId}}" alt="" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;">
                   </div>
                 </td>
               </ng-container> 
 
+              <!-- Categoria -->
               <ng-container matColumnDef="categoria">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Categoría </th>
-                <td mat-cell *matCellDef="let row"> {{row.categoria}} </td>
+                <td mat-cell *matCellDef="let row">
+                  <span style="font-size: 11px; font-weight: 600; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">
+                    {{row.categoria}}
+                  </span>
+                </td>
               </ng-container>
 
+              <!-- Nombre -->
               <ng-container matColumnDef="nombre">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombres </th>
-                <td mat-cell *matCellDef="let row"> {{row.nombre}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Producto </th>
+                <td mat-cell *matCellDef="let row">
+                  <strong>{{row.nombre}}</strong>
+                  <div *ngIf="row.descripcion" style="font-size: 11px; color: #64748b;">{{row.descripcion}}</div>
+                </td>
               </ng-container>
 
-              <ng-container matColumnDef="descripcion">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
-                <td mat-cell *matCellDef="let row"> {{row.descripcion}} </td>
+              <!-- Costo Compra -->
+              <ng-container matColumnDef="costo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Costo Compra </th>
+                <td mat-cell *matCellDef="let row" style="font-family: monospace; font-weight: 700; color: #475569;">
+                  ${{row.costo | number:'1.2-2'}}
+                </td>
               </ng-container>
 
+              <!-- Precio Venta -->
               <ng-container matColumnDef="precio">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio </th>
-                <td mat-cell *matCellDef="let row"> {{row.precio}} </td>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio Venta </th>
+                <td mat-cell *matCellDef="let row" style="font-family: monospace; font-weight: 700; color: #0f172a;">
+                  ${{row.precio | number:'1.2-2'}}
+                </td>
               </ng-container>
 
+              <!-- Stock Minimo -->
+              <ng-container matColumnDef="stockMinimo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock Mínimo </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                  <span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
+                    {{row.stockMinimo}}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Unidad Medida -->
+              <ng-container matColumnDef="unidadMedida">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Unidad </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                  <span style="background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">
+                    {{row.unidadMedida}}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Acciones -->
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef style="text-align: center;">Acción</th>
                 <td mat-cell *matCellDef="let row">
-                  <div style="display: flex;justify-content: space-evenly;">
+                  <div style="display: flex; justify-content: center; gap: 6px;">
                     <button mat-raised-button (click)="openDialog(row.id)" class="small-buttonc btn_action"
-                      matTooltip="Editar Información">
+                      matTooltip="Editar Producto, Precios y Stock Mínimo">
                       <mat-icon class="m-0">edit_square</mat-icon>
-                    </button>&nbsp;&nbsp; 
+                    </button>
 
                     <button mat-raised-button (click)="deletDialog(row.id)" class="small-buttonc btn_delete"
                       matTooltip="Eliminar">
-                      <mat-icon class="m-0"  style="color: #EB5757 !important;">delete</mat-icon>
+                      <mat-icon class="m-0" style="color: #EB5757 !important;">delete</mat-icon>
                     </button>
                   </div>
                 </td>
@@ -117,78 +167,11 @@
               <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;"
                 [ngClass]="getRowClass(i)">
               </tr>
-         
             </table>
           </div>
-          <mat-paginator [pageSizeOptions]="[10, 20,50, 100]" aria-label="Select page of users"></mat-paginator>
+          <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" aria-label="Select page of products"></mat-paginator>
         </mat-card-content>
       </mat-card>
     </div>
   </div>
 </div>
-
-<div class="content_body_movil">
-  <div style="margin: 9px;">
-    <div *ngFor="let values of paginatedItems"> 
-      <mat-card class="example-card car_mat-card_body " style="border-radius: 8px;" >
-        <mat-card-header>
-          <mat-card-title style="font-size: 13px;">
-              Nombre: <span>{{values.nombre}}</span> 
-          </mat-card-title>
-        </mat-card-header>
-        <hr class="car_cls-hr">
-        <mat-card-content>
-          <ul class="car_ul_cls" >
-            <li class="car_ulli">
-              <mat-icon style="font-size: 21px;">arrow_right</mat-icon> 
-              <span class="car_lispan">img:&nbsp;</span> {{values.img}}
-            </li> 
-            <li class="car_ulli">
-              <mat-icon style="font-size: 21px;">arrow_right</mat-icon> 
-              <span class="car_lispan">Descripción:&nbsp;</span> {{values.descripcion}}
-            </li> 
-            <li class="car_ulli">
-              <mat-icon style="font-size: 21px;">arrow_right</mat-icon> 
-              <span class="car_lispan">Precio:&nbsp;</span> {{values.precio}}
-            </li> 
-            <li class="car_ulli">
-              <mat-icon style="font-size: 21px;">arrow_right</mat-icon> 
-              <span class="car_lispan">Categoría:&nbsp;</span> {{values.categoria}}
-            </li> 
-            <li class="car_ulli">
-              <mat-icon style="font-size: 21px;">arrow_right</mat-icon> 
-              <span class="car_lispan">Tipo:&nbsp;</span> {{values.tipo}}
-            </li> 
-          </ul>
-        </mat-card-content>
-        <mat-card-actions  class="{{values.state == 'OB'?'car_footer_obs':'car_footer'}}"  style="border-radius: 0px 0px 8px 8px;" >
-          <!-- <div style="display: flex;justify-content: space-evenly;" *ngIf="values.active === 1; else deleteTemplatemov"> -->
-          <div  > 
-            <button mat-raised-button class="car_action_button" matTooltip="Editar Información" (click)="openDialog(values.id)" >
-              <mat-icon class="car_icon_mat car_color_footer">edit_square</mat-icon>
-              <span class="car_buton_span car_color_footer">Edit</span> 
-            </button>&nbsp;&nbsp;
-            <button mat-raised-button class="car_action_button" matTooltip="Historial" (click)="openHistorial(values.id)" >
-              <mat-icon class="car_icon_mat car_color_footer">history</mat-icon>
-              <span class="car_buton_span car_color_footer">Hist</span> 
-            </button>&nbsp;&nbsp;
-            <button *ngIf="values.state == 'PE'" mat-raised-button class="car_action_button" matTooltip="Elimianr" (click)="deletDialog(values.id)" >
-              <mat-icon class="car_icon_mat car_color_footer" style="color: #EB5757;">delete</mat-icon>
-              <span class="car_buton_span car_color_footer" style="color: #EB5757;">Elim</span> 
-            </button>&nbsp;&nbsp;
-          </div>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-    <mat-paginator [length]="dataMovil.length" [pageSizeOptions]="[10, 20,50, 100]" (page)="onPageChange($event)"></mat-paginator>
-    <br> 
-  </div>
-</div> 
-
-
-
-
-
-
-
-

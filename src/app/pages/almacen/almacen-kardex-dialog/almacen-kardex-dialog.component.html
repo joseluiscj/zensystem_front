@@ -1,0 +1,204 @@
+<div class="kardex-dialog-container">
+  <!-- CABECERA -->
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box">
+        <mat-icon>history_edu</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">Kardex de Movimientos de Almacén</h3>
+        <p class="dialog-subtitle">Auditoría detallada de entradas, salidas y ajustes de inventario</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+
+  <div class="dialog-body">
+
+    <!-- BARRA DE FILTROS DEL KARDEX -->
+    <div class="kardex-filters-bar mb-3">
+      <!-- Selector de Producto -->
+      <div class="filter-col">
+        <label class="filter-label">Producto:</label>
+        <mat-form-field appearance="outline" class="filter-input-field">
+          <mat-select [(ngModel)]="productoFiltro" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">-- Todos los productos --</mat-option>
+            <mat-option *ngFor="let p of productos" [value]="p.idProducto">
+              [{{ p.codigo }}] {{ p.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Selector de Tipo -->
+      <div class="filter-col">
+        <label class="filter-label">Tipo Movimiento:</label>
+        <mat-form-field appearance="outline" class="filter-input-field">
+          <mat-select [(ngModel)]="filtros.tipo" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">Todos los tipos</mat-option>
+            <mat-option value="E">Solo Entradas (E)</mat-option>
+            <mat-option value="S">Solo Salidas (S)</mat-option>
+            <mat-option value="A">Solo Ajustes (A)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Inicio -->
+      <div class="filter-col">
+        <label class="filter-label">Desde:</label>
+        <mat-form-field appearance="outline" class="filter-input-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Fin -->
+      <div class="filter-col">
+        <label class="filter-label">Hasta:</label>
+        <mat-form-field appearance="outline" class="filter-input-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Botón Limpiar -->
+      <div class="filter-actions">
+        <button type="button" class="btn-clear-filter" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+          <mat-icon>filter_alt_off</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLA DE MOVIMIENTOS -->
+    <div class="table-responsive kardex-table-wrapper">
+      <table class="table-kardex">
+        <thead>
+          <tr>
+            <th>Fecha / Hora</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Motivo / Ref.</th>
+            <th class="text-end">Cantidad</th>
+            <th class="text-center">Stock: Ant. → Result.</th>
+            <th class="text-end">Costo Unit.</th>
+            <th>Usuario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of movimientosPaginados" class="kardex-row">
+            <!-- Fecha -->
+            <td class="cell-date">
+              <span class="date-main">{{ m.created_at | date:'dd/MM/yyyy' }}</span>
+              <span class="date-hour">{{ m.created_at | date:'HH:mm' }}</span>
+            </td>
+
+            <!-- Producto -->
+            <td>
+              <div class="prod-cell">
+                <span class="sku-badge">{{ m.producto_codigo }}</span>
+                <span class="prod-name">{{ m.producto_nombre }}</span>
+              </div>
+            </td>
+
+            <!-- Tipo Badge -->
+            <td>
+              <span *ngIf="m.tipo === 'E'" class="badge-tipo badge-entrada">
+                <mat-icon>arrow_downward</mat-icon> ENTRADA
+              </span>
+              <span *ngIf="m.tipo === 'S'" class="badge-tipo badge-salida">
+                <mat-icon>arrow_upward</mat-icon> SALIDA
+              </span>
+              <span *ngIf="m.tipo === 'A'" class="badge-tipo badge-ajuste">
+                <mat-icon>sync</mat-icon> AJUSTE
+              </span>
+            </td>
+
+            <!-- Motivo & Ref -->
+            <td>
+              <div class="motivo-cell">
+                <span class="motivo-text">{{ m.motivo }}</span>
+                <span *ngIf="m.documento" class="doc-badge">
+                  <mat-icon>receipt</mat-icon> {{ m.documento }}
+                </span>
+                <span *ngIf="m.observacion" class="obs-hint" [title]="m.observacion">
+                  {{ m.observacion }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Cantidad -->
+            <td class="text-end">
+              <span class="cant-value" [ngClass]="{
+                'cant-pos': m.tipo === 'E',
+                'cant-neg': m.tipo === 'S',
+                'cant-adj': m.tipo === 'A'
+              }">
+                {{ m.tipo === 'E' ? '+' : (m.tipo === 'S' ? '-' : '') }}{{ m.cantidad | number:'1.2-2' }}
+              </span>
+              <span class="cant-unit">{{ m.unidadMedida }}</span>
+            </td>
+
+            <!-- Stock Anterior -> Final -->
+            <td class="text-center">
+              <div class="stock-trans-box">
+                <span class="stock-before">{{ m.stockAnterior | number:'1.2-2' }}</span>
+                <mat-icon class="arrow-trans">trending_flat</mat-icon>
+                <span class="stock-after">{{ m.stockActual | number:'1.2-2' }}</span>
+              </div>
+            </td>
+
+            <!-- Costo Unitario -->
+            <td class="text-end cell-costo">
+              ${{ m.costoUnitario | number:'1.2-2' }}
+            </td>
+
+            <!-- Usuario -->
+            <td>
+              <span class="user-pill">
+                <mat-icon>person</mat-icon> {{ m.usuario_nombre }}
+              </span>
+            </td>
+          </tr>
+
+          <!-- Vacío -->
+          <tr *ngIf="movimientos.length === 0 && !cargando">
+            <td colspan="8" class="text-center py-5">
+              <div class="empty-state">
+                <mat-icon class="empty-icon">inventory_2</mat-icon>
+                <p class="empty-title">No hay movimientos registrados</p>
+                <span class="empty-desc">No se encontraron movimientos para el filtro seleccionado.</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="kardex-footer-pagination" *ngIf="movimientos.length > 0">
+      <span class="pagination-info">
+        Mostrando {{ (paginaActual - 1) * registrosPorPagina + 1 }} - 
+        {{ (paginaActual * registrosPorPagina > movimientos.length ? movimientos.length : paginaActual * registrosPorPagina) }} 
+        de {{ movimientos.length }} movimientos
+      </span>
+      <div class="pagination-controls">
+        <button type="button" class="btn-page" (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-current">Pág. {{ paginaActual }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn-page" (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dialog-footer">
+    <button type="button" class="btn-close-action" (click)="cerrar()">
+      Cerrar
+    </button>
+  </div>
+</div>

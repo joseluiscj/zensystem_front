@@ -1,0 +1,201 @@
+<div class="caja-mov-dialog-container">
+  <!-- CABECERA -->
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box" [ngClass]="{
+        'icon-ingreso': tipoActual === 'I',
+        'icon-egreso': tipoActual === 'E'
+      }">
+        <mat-icon *ngIf="tipoActual === 'I'">trending_up</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'E'">trending_down</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">
+          {{ tipoActual === 'I' ? 'Registrar Ingreso de Caja' : 'Registrar Gasto / Egreso de Caja' }}
+        </h3>
+        <p class="dialog-subtitle">Control financiero y cuadratura contable en tiempo real</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()" [disabled]="cargando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+
+  <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="dialog-body">
+
+    <!-- SELECTOR DE OPERACIÓN (INGRESO O GASTO) -->
+    <div class="tipo-selector-group mb-3">
+      <label class="form-label-custom">Naturaleza de la Transacción:</label>
+      <div class="tipo-buttons-grid">
+        <button type="button" class="tipo-btn" 
+          [class.active-e]="tipoActual === 'E'"
+          (click)="setTipo('E')">
+          <mat-icon>remove_circle</mat-icon>
+          <div class="tipo-info">
+            <span class="tipo-name">GASTO / EGRESO</span>
+            <span class="tipo-desc">Compras, servicios, pagos, adelantos</span>
+          </div>
+        </button>
+
+        <button type="button" class="tipo-btn" 
+          [class.active-i]="tipoActual === 'I'"
+          (click)="setTipo('I')">
+          <mat-icon>add_circle</mat-icon>
+          <div class="tipo-info">
+            <span class="tipo-name">INGRESO EXTRAORDINARIO</span>
+            <span class="tipo-desc">Aportes de caja, cobranzas, otros</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- CAJA DESTINO Y MONTO -->
+    <div class="row g-3 mb-3">
+      <!-- Selector de Caja -->
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">Caja a Afectar: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="idCaja" placeholder="Seleccione una caja">
+            <mat-option *ngFor="let c of cajas" [value]="c.id">
+              <strong>{{ c.nombre }}</strong> (Saldo actual: ${{ c.saldo | number:'1.2-2' }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Monto -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Importe / Monto ($): *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput type="number" step="0.01" min="0.01" formControlName="monto" placeholder="0.00">
+          <span matPrefix class="px-1 font-bold text-muted">$</span>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- CATEGORÍA Y MEDIO DE PAGO -->
+    <div class="row g-3 mb-3">
+      <!-- Categoría -->
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">Concepto / Categoría: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="categoria" placeholder="Seleccione categoría">
+            <mat-option *ngFor="let cat of categoriasActuales" [value]="cat">
+              {{ cat }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Medio de Pago -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Medio de Pago: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="metodoPago">
+            <mat-option *ngFor="let m of mediosPago" [value]="m.codigo">
+              {{ m.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- BENEFICIARIO Y FECHA -->
+    <div class="row g-3 mb-3">
+      <!-- Beneficiario -->
+      <div class="col-12 col-md-7">
+        <label class="form-label-custom">
+          {{ tipoActual === 'E' ? 'Pagado a (Proveedor / Persona):' : 'Recibido de (Cliente / Persona):' }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput formControlName="beneficiario" placeholder="Ej: Luz del Sur, Insumos S.A., Carlos Ruiz">
+          <mat-icon matPrefix class="prefix-icon">person_outline</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha -->
+      <div class="col-12 col-md-5">
+        <label class="form-label-custom">Fecha del Movimiento: *</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput type="date" formControlName="fecha">
+          <mat-icon matPrefix class="prefix-icon">calendar_today</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- COMPROBANTE DE RESPALDO -->
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-6">
+        <label class="form-label-custom">Tipo de Comprobante:</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <mat-select formControlName="tipoComprobante">
+            <mat-option *ngFor="let tc of tiposComprobante" [value]="tc">
+              {{ tc }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label class="form-label-custom">N° Comprobante / Referencia:</label>
+        <mat-form-field appearance="outline" class="w-100 custom-field">
+          <input matInput formControlName="nroComprobante" placeholder="Ej: F001-00384, B002-120">
+          <mat-icon matPrefix class="prefix-icon">receipt</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- DESCRIPCIÓN DETALLADA -->
+    <div class="mb-3">
+      <label class="form-label-custom">Descripción / Glosa del Movimiento: *</label>
+      <mat-form-field appearance="outline" class="w-100 custom-field">
+        <input matInput formControlName="descripcion" placeholder="Ej: Pago de recibo de agua potable correspondiente al mes...">
+        <mat-icon matPrefix class="prefix-icon">notes</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- SIMULADOR DE IMPACTO EN SALDO DE CAJA -->
+    <div class="saldo-impact-box mb-3" [ngClass]="{
+      'impact-green': tipoActual === 'I',
+      'impact-red': tipoActual === 'E'
+    }">
+      <div class="impact-item">
+        <span class="impact-label">Saldo Actual en Caja</span>
+        <span class="impact-val">${{ saldoActual | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="impact-operator">
+        <mat-icon *ngIf="tipoActual === 'I'">add</mat-icon>
+        <mat-icon *ngIf="tipoActual === 'E'">remove</mat-icon>
+      </div>
+
+      <div class="impact-item">
+        <span class="impact-label">Importe {{ tipoActual === 'I' ? 'Ingreso' : 'Egreso' }}</span>
+        <span class="impact-val">${{ montoIngresado | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="impact-operator">
+        <mat-icon>drag_handle</mat-icon>
+      </div>
+
+      <div class="impact-item impact-result">
+        <span class="impact-label">Saldo Final en Caja</span>
+        <span class="impact-val-result">${{ saldoResultante | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- PIE DE ACCIONES -->
+    <div class="dialog-footer">
+      <button type="button" class="btn-cancel" (click)="cerrar()" [disabled]="cargando">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="cargando || movimientoForm.invalid">
+        <mat-icon>check_circle</mat-icon>
+        <span>Registrar en Caja</span>
+      </button>
+    </div>
+
+  </form>
+</div>
