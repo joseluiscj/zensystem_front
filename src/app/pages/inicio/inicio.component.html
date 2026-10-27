@@ -29,11 +29,6 @@
         <span class="d-none d-sm-inline">Actualizar</span>
       </button>
 
-      <!-- <button type="button" class="btn-hero-action btn-caja-shortcut" (click)="irAperturaCaja()">
-        <mat-icon>point_of_sale</mat-icon>
-        <span>Turnos de Caja</span>
-      </button> -->
-
       <button type="button" class="btn-hero-action btn-primary-restaurant" (click)="irRestaurante()">
         <mat-icon>table_restaurant</mat-icon>
         <span>Salón de Mesas</span>
@@ -41,10 +36,88 @@
     </div>
   </header>
 
+  <!-- BARRA DE FILTROS POR FECHA -->
+  <section class="dashboard-filter-card">
+    <div class="filter-card-header">
+      <div class="filter-header-title">
+        <mat-icon class="filter-icon">filter_alt</mat-icon>
+        <span class="filter-title-text">Filtrar por Período</span>
+      </div>
+      <div class="filter-badge" [class.badge-today]="filtroActivo === 'hoy'" [class.badge-range]="filtroActivo === 'rango'">
+        <mat-icon class="badge-icon">{{ filtroActivo === 'hoy' ? 'today' : (filtroActivo === 'rango' ? 'date_range' : 'public') }}</mat-icon>
+        <span>{{ descripcionFiltro }}</span>
+      </div>
+    </div>
+
+    <div class="filter-card-body">
+      <div class="filter-inputs-group">
+        <!-- Fecha Inicio -->
+        <div class="filter-field-item">
+          <label class="filter-field-label">
+            <mat-icon>calendar_today</mat-icon>
+            <span>Fecha Inicio</span>
+          </label>
+          <input 
+            type="date" 
+            class="filter-date-input" 
+            [(ngModel)]="fechaInicio"
+            (change)="aplicarFiltro()"
+            placeholder="YYYY-MM-DD" />
+        </div>
+
+        <!-- Fecha Fin -->
+        <div class="filter-field-item">
+          <label class="filter-field-label">
+            <mat-icon>event</mat-icon>
+            <span>Fecha Fin</span>
+          </label>
+          <input 
+            type="date" 
+            class="filter-date-input" 
+            [(ngModel)]="fechaFin"
+            (change)="aplicarFiltro()"
+            placeholder="YYYY-MM-DD" />
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="filter-buttons-row">
+          <button 
+            type="button" 
+            class="btn-filter-action btn-apply" 
+            (click)="aplicarFiltro()" 
+            matTooltip="Aplicar rango de fechas">
+            <mat-icon>search</mat-icon>
+            <span>Filtrar</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn-filter-action btn-today" 
+            [class.active-today]="filtroActivo === 'hoy'" 
+            (click)="filtrarHoy()" 
+            matTooltip="Ver resultados solo del día de hoy">
+            <mat-icon>today</mat-icon>
+            <span>Hoy</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn-filter-action btn-reset" 
+            (click)="limpiarFiltro()" 
+            *ngIf="fechaInicio || fechaFin" 
+            matTooltip="Restablecer a histórico general">
+            <mat-icon>restart_alt</mat-icon>
+            <span>Histórico</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- BARRA DE CARGA INDETERMINADA -->
   <div *ngIf="cargando" class="dashboard-loader">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <div class="loader-text">Sincronizando métricas del restaurante y caja...</div>
+    <div class="loader-text">Sincronizando métricas del restaurante...</div>
   </div>
 
   <!-- CONTENIDO PRINCIPAL DEL DASHBOARD -->
@@ -64,14 +137,33 @@
           <div class="kpi-card-value">${{ dashboard.kpis.ventasTotales | number:'1.2-2' }}</div>
           <div class="kpi-card-footer">
             <span class="kpi-badge badge-green">
-              <mat-icon>check_circle</mat-icon> {{ dashboard.kpis.pedidosAtendidos }} pedidos cobrados
+              <mat-icon>check_circle</mat-icon> {{ dashboard.kpis.pedidosAtendidos }} cobrados
             </span>
-            <span class="kpi-hint">Recaudación acumulada</span>
+            <span class="kpi-hint">{{ filtroActivo === 'hoy' ? 'Hoy' : (filtroActivo === 'rango' ? 'En período' : 'Acumulado') }}</span>
           </div>
         </div>
       </div>
 
-      <!-- KPI 2: Ocupación del Salón -->
+      <!-- KPI 2: Pedidos Totales -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-metric-card kpi-orders" (click)="irRestaurante()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Pedidos / Comandas</span>
+            <div class="kpi-icon-circle orders-circle">
+              <mat-icon>receipt_long</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">{{ dashboard.kpis.pedidosTotales }} Pedidos</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-orange">
+              <mat-icon>hourglass_empty</mat-icon> {{ dashboard.kpis.pedidosPendientes }} pendientes
+            </span>
+            <span class="kpi-hint">{{ dashboard.kpis.pedidosAtendidos }} atendidos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI 3: Ocupación del Salón -->
       <div class="col-12 col-sm-6 col-xl-3">
         <div class="kpi-metric-card kpi-tables" (click)="irRestaurante()">
           <div class="kpi-card-header">
@@ -91,12 +183,12 @@
             <span class="kpi-badge badge-blue">
               <mat-icon>event_seat</mat-icon> {{ dashboard.kpis.mesasDisponibles }} libres
             </span>
-            <span class="kpi-hint">Capacidad en salón</span>
+            <span class="kpi-hint">Mesas en vivo</span>
           </div>
         </div>
       </div>
 
-      <!-- KPI 3: Estado de Cajas -->
+      <!-- KPI 4: Estado de Cajas -->
       <div class="col-12 col-sm-6 col-xl-3">
         <div class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
           <div class="kpi-card-header">
@@ -119,38 +211,13 @@
           </div>
         </div>
       </div>
-
-      <!-- KPI 4: Comandas en Curso -->
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-metric-card kpi-orders" (click)="irRestaurante()">
-          <div class="kpi-card-header">
-            <span class="kpi-card-title">Comandas en Curso</span>
-            <div class="kpi-icon-circle orders-circle">
-              <mat-icon>restaurant_menu</mat-icon>
-            </div>
-          </div>
-          <div class="kpi-card-value">
-            {{ dashboard.kpis.pedidosPendientes }} Pendientes
-          </div>
-          <div class="kpi-card-footer">
-            <span class="kpi-badge badge-orange">
-              <mat-icon>hourglass_empty</mat-icon> En preparación
-            </span>
-            <span class="kpi-hint">{{ dashboard.kpis.pedidosTotales }} pedidos totales</span>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- FILA 2: DISTRIBUCIÓN EN 2 COLUMNAS (8 cols y 4 cols) -->
-    <div class="row g-3">
-      <!-- ====================================================
-           COLUMNA IZQUIERDA (8 COLUMNAS)
-           ==================================================== -->
-      <div class="col-lg-8">
-
-        <!-- BLOQUE A: MESAS OCUPADAS EN TIEMPO REAL -->
-        <div class="dash-card mb-4">
+    <!-- FILA 2: DISTRIBUCIÓN PRINCIPAL (MESAS OCUPADAS Y PLATOS MÁS VENDIDOS) -->
+    <div class="row g-3 mb-4">
+      <!-- BLOQUE A: MESAS OCUPADAS EN TIEMPO REAL -->
+      <div class="col-12 col-xl-6">
+        <div class="dash-card h-100">
           <div class="dash-card-header">
             <div class="dash-card-header-left">
               <div class="dash-card-icon-badge badge-tables">
@@ -158,11 +225,11 @@
               </div>
               <div>
                 <h3 class="dash-card-title">Mesas Ocupadas en el Salón</h3>
-                <p class="dash-card-subtitle">Seguimiento en vivo de consumo y estado de pedidos</p>
+                <p class="dash-card-subtitle">Seguimiento en vivo de consumo y comanda en salón</p>
               </div>
             </div>
             <button type="button" class="dash-btn-link" (click)="irRestaurante()">
-              <span>Ir al Salón Completo</span>
+              <span>Salón</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
           </div>
@@ -215,15 +282,17 @@
               <mat-icon>dining</mat-icon>
             </div>
             <h4>Todas las mesas están disponibles</h4>
-            <p>El salón se encuentra libre en este momento para recibir nuevos clientes.</p>
+            <p>El salón se encuentra libre en este momento para recibir nuevos comensales.</p>
             <button type="button" class="btn-empty-action" (click)="irRestaurante()">
               <mat-icon>add_circle_outline</mat-icon> Abrir Pedido en una Mesa
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- BLOQUE B: TOP PLATOS MÁS VENDIDOS -->
-        <div class="dash-card mb-4">
+      <!-- BLOQUE B: TOP PLATOS MÁS VENDIDOS -->
+      <div class="col-12 col-xl-6">
+        <div class="dash-card h-100">
           <div class="dash-card-header">
             <div class="dash-card-header-left">
               <div class="dash-card-icon-badge badge-popular">
@@ -231,11 +300,11 @@
               </div>
               <div>
                 <h3 class="dash-card-title">Platos Más Vendidos</h3>
-                <p class="dash-card-subtitle">Platos y bebidas con mayor preferencia y facturación</p>
+                <p class="dash-card-subtitle">Platos y bebidas más solicitados {{ filtroActivo === 'hoy' ? 'hoy' : (filtroActivo === 'rango' ? 'en el período' : '') }}</p>
               </div>
             </div>
             <button type="button" class="dash-btn-link" (click)="irProductos()">
-              <span>Ver Menú</span>
+              <span>Menú</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
           </div>
@@ -279,11 +348,19 @@
           </div>
 
           <div *ngIf="!dashboard.topProductos || dashboard.topProductos.length === 0" class="empty-state-card py-4">
-            <p class="text-muted">No se registran ventas de productos aún.</p>
+            <div class="empty-icon-circle">
+              <mat-icon>restaurant_menu</mat-icon>
+            </div>
+            <h4>Sin ventas de platos registradas</h4>
+            <p class="text-muted">No se registran ventas para el período seleccionado.</p>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- BLOQUE C: ÚLTIMOS PEDIDOS REGISTRADOS -->
+    <!-- FILA 3: ÚLTIMOS PEDIDOS REGISTRADOS (TABLA COMPLETA) -->
+    <div class="row g-3">
+      <div class="col-12">
         <div class="dash-card">
           <div class="dash-card-header">
             <div class="dash-card-header-left">
@@ -291,10 +368,14 @@
                 <mat-icon>receipt_long</mat-icon>
               </div>
               <div>
-                <h3 class="dash-card-title">Últimos Pedidos Registrados</h3>
-                <p class="dash-card-subtitle">Historial de comandas recientes en salón</p>
+                <h3 class="dash-card-title">Historial de Pedidos</h3>
+                <p class="dash-card-subtitle">Comandas registradas en salón {{ filtroActivo === 'hoy' ? 'hoy' : (filtroActivo === 'rango' ? 'en el rango de fechas' : '') }}</p>
               </div>
             </div>
+            <button type="button" class="dash-btn-link" (click)="irRestaurante()">
+              <span>Ver Salón</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
           </div>
 
           <div *ngIf="dashboard.ultimosPedidos && dashboard.ultimosPedidos.length > 0" class="table-responsive">
@@ -307,7 +388,7 @@
                   <th>Total</th>
                   <th>Medio Pago</th>
                   <th>Estado</th>
-                  <th>Hora</th>
+                  <th>Fecha / Hora</th>
                 </tr>
               </thead>
               <tbody>
@@ -335,219 +416,23 @@
                     </span>
                   </td>
                   <td>
-                    <span class="time-cell-text">{{ pedido.created_at | date:'shortTime':'':'es-ES' }}</span>
+                    <span class="time-cell-text">{{ pedido.created_at | date:'short':'':'es-ES' }}</span>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
 
-      </div>
-
-      <!-- ====================================================
-           COLUMNA DERECHA (4 COLUMNAS)
-           ==================================================== -->
-      <div class="col-lg-4">
-
-        <!-- BLOQUE D: ESTADO DEL TURNO DE CAJA -->
-        <div class="dash-card mb-4">
-          <div class="dash-card-header">
-            <div class="dash-card-header-left">
-              <div class="dash-card-icon-badge badge-caja">
-                <mat-icon>account_balance_wallet</mat-icon>
-              </div>
-              <div>
-                <h3 class="dash-card-title">Caja en Turno</h3>
-                <p class="dash-card-subtitle">Control de efectivo y responsable</p>
-              </div>
+          <div *ngIf="!dashboard.ultimosPedidos || dashboard.ultimosPedidos.length === 0" class="empty-state-card py-4">
+            <div class="empty-icon-circle">
+              <mat-icon>inbox</mat-icon>
             </div>
-          </div>
-
-          <div *ngIf="dashboard.kpis.cajaActiva" class="active-register-card">
-            <div class="register-header-banner">
-              <div class="register-status-indicator">
-                <span class="pulse-indicator-dot"></span>
-                <span class="register-status-text">Turno Abierto</span>
-              </div>
-              <h4 class="register-name">{{ dashboard.kpis.cajaActiva.caja_nombre }}</h4>
-            </div>
-
-            <div class="register-balance-display">
-              <span class="balance-title">Saldo Actual en Gaveta</span>
-              <span class="balance-big-amount">${{ (dashboard.kpis.cajaActiva.saldo || 0) | number:'1.2-2' }}</span>
-            </div>
-
-            <div class="register-meta-list">
-              <div class="meta-item">
-                <mat-icon class="meta-icon">person</mat-icon>
-                <div class="meta-text">
-                  <span class="meta-label">Cajero a Cargo</span>
-                  <span class="meta-value">{{ dashboard.kpis.cajaActiva.cajero_nombre || dashboard.kpis.cajaActiva.cajero_user }}</span>
-                </div>
-              </div>
-
-              <div class="meta-item">
-                <mat-icon class="meta-icon">schedule</mat-icon>
-                <div class="meta-text">
-                  <span class="meta-label">Hora de Apertura</span>
-                  <span class="meta-value">{{ dashboard.kpis.cajaActiva.aFecha | date:'shortTime':'':'es-ES' }}</span>
-                </div>
-              </div>
-
-              <div class="meta-item">
-                <mat-icon class="meta-icon">attach_money</mat-icon>
-                <div class="meta-text">
-                  <span class="meta-label">Monto Base Inicial</span>
-                  <span class="meta-value">${{ (dashboard.kpis.cajaActiva.aMonto || 0) | number:'1.2-2' }}</span>
-                </div>
-              </div>
-            </div>
-
-            <button type="button" class="btn-register-action" (click)="irAperturaCaja()">
-              <mat-icon>point_of_sale</mat-icon>
-              <span>Gestionar Turno / Arqueo</span>
-            </button>
-          </div>
-
-          <div *ngIf="!dashboard.kpis.cajaActiva" class="empty-register-card text-center p-3">
-            <mat-icon class="empty-reg-icon">lock</mat-icon>
-            <h5>No hay turnos abiertos</h5>
-            <p class="text-muted small">Abre una caja para iniciar la facturación del día.</p>
-            <button type="button" class="btn-open-register" (click)="irAperturaCaja()">
-              <mat-icon>add_circle</mat-icon> Abrir Caja Ahora
-            </button>
+            <h4>No hay pedidos registrados</h4>
+            <p class="text-muted">No se encontraron pedidos en el rango de fechas seleccionado.</p>
           </div>
         </div>
-
-        <!-- BLOQUE E: DISTRIBUCIÓN POR MEDIO DE PAGO -->
-        <div class="dash-card mb-4">
-          <div class="dash-card-header">
-            <div class="dash-card-header-left">
-              <div class="dash-card-icon-badge badge-payment">
-                <mat-icon>pie_chart</mat-icon>
-              </div>
-              <div>
-                <h3 class="dash-card-title">Medios de Pago</h3>
-                <p class="dash-card-subtitle">Cobros registrados por modalidad</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="payment-methods-breakdown">
-            <div *ngFor="let m of dashboard.metodosPago" class="payment-method-row">
-              <div class="method-header-row">
-                <div class="method-name-wrap">
-                  <span class="method-symbol">{{ m.pagoCon === 'TA' ? '💳' : '💵' }}</span>
-                  <span class="method-label">{{ m.pagoCon === 'TA' ? 'Tarjeta Débito/Crédito' : 'Efectivo en Caja' }}</span>
-                </div>
-                <div class="method-amounts">
-                  <span class="method-total">${{ (m.total || 0) | number:'1.2-2' }}</span>
-                  <span class="method-pct">({{ calcularPorcentajeMetodo(m.total) }}%)</span>
-                </div>
-              </div>
-              <div class="method-progress-track">
-                <div 
-                  class="method-progress-bar" 
-                  [class.bar-card]="m.pagoCon === 'TA'"
-                  [class.bar-cash]="m.pagoCon !== 'TA'"
-                  [style.width.%]="calcularPorcentajeMetodo(m.total)"></div>
-              </div>
-            </div>
-
-            <div *ngIf="!dashboard.metodosPago || dashboard.metodosPago.length === 0" class="text-center py-3 text-muted small">
-              Sin cobros registrados aún.
-            </div>
-          </div>
-        </div>
-
-        <!-- BLOQUE F: ÚLTIMOS MOVIMIENTOS EN CAJA -->
-        <div class="dash-card mb-4">
-          <div class="dash-card-header">
-            <div class="dash-card-header-left">
-              <div class="dash-card-icon-badge badge-mov">
-                <mat-icon>history</mat-icon>
-              </div>
-              <div>
-                <h3 class="dash-card-title">Movimientos en Caja</h3>
-                <p class="dash-card-subtitle">Flujo de cobros y retiros en vivo</p>
-              </div>
-            </div>
-          </div>
-
-          <div *ngIf="dashboard.ultimosMovimientos && dashboard.ultimosMovimientos.length > 0" class="mov-feed-list">
-            <div *ngFor="let mov of dashboard.ultimosMovimientos" class="mov-feed-item">
-              <div class="mov-type-badge" [class.type-in]="mov.tipo === 'I'" [class.type-out]="mov.tipo === 'E'">
-                <mat-icon>{{ mov.tipo === 'I' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-              </div>
-              <div class="mov-content-col">
-                <span class="mov-desc" [title]="mov.descripcion">{{ mov.descripcion }}</span>
-                <div class="mov-meta-row">
-                  <span class="mov-caja-tag">{{ mov.caja_nombre }}</span>
-                  <span class="mov-time">{{ mov.created_at | date:'shortTime':'':'es-ES' }}</span>
-                </div>
-              </div>
-              <div class="mov-amount-col" [class.amount-in]="mov.tipo === 'I'" [class.amount-out]="mov.tipo === 'E'">
-                {{ mov.tipo === 'I' ? '+' : '-' }}${{ (mov.monto || 0) | number:'1.2-2' }}
-              </div>
-            </div>
-          </div>
-
-          <div *ngIf="!dashboard.ultimosMovimientos || dashboard.ultimosMovimientos.length === 0" class="text-center py-3 text-muted small">
-            Sin movimientos registrados.
-          </div>
-        </div>
-
-        <!-- BLOQUE G: ACCESOS RÁPIDOS -->
-        <div class="dash-card">
-          <div class="dash-card-header">
-            <div class="dash-card-header-left">
-              <div class="dash-card-icon-badge badge-shortcuts">
-                <mat-icon>apps</mat-icon>
-              </div>
-              <div>
-                <h3 class="dash-card-title">Accesos Rápidos</h3>
-                <p class="dash-card-subtitle">Navegación directa a módulos clave</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="shortcuts-grid">
-            <div class="shortcut-tile" (click)="irRestaurante()">
-              <div class="shortcut-icon-box shortcut-resto">
-                <mat-icon>table_restaurant</mat-icon>
-              </div>
-              <span class="shortcut-title">Salón Mesas</span>
-              <span class="shortcut-desc">Gestión POS</span>
-            </div>
-
-            <div class="shortcut-tile" (click)="irAperturaCaja()">
-              <div class="shortcut-icon-box shortcut-apertura">
-                <mat-icon>point_of_sale</mat-icon>
-              </div>
-              <span class="shortcut-title">Apertura Caja</span>
-              <span class="shortcut-desc">Turnos & Arqueo</span>
-            </div>
-
-            <div class="shortcut-tile" (click)="irProductos()">
-              <div class="shortcut-icon-box shortcut-prod">
-                <mat-icon>lunch_dining</mat-icon>
-              </div>
-              <span class="shortcut-title">Productos</span>
-              <span class="shortcut-desc">Platos & Menú</span>
-            </div>
-
-            <div class="shortcut-tile" (click)="irCategorias()">
-              <div class="shortcut-icon-box shortcut-cat">
-                <mat-icon>category</mat-icon>
-              </div>
-              <span class="shortcut-title">Categorías</span>
-              <span class="shortcut-desc">Organización</span>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
+
   </div>
 </div>

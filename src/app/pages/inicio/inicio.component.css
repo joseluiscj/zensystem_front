@@ -14,7 +14,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #285787 0%, #0e3a67 100%);
   color: #ffffff;
   padding: 22px 28px;
   border-radius: 16px;
@@ -268,7 +268,7 @@
 .kpi-card-value {
   font-size: 1.55rem;
   font-weight: 900;
-  color: #0f172a;
+  color: #293f73;
   margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
@@ -440,7 +440,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #3b4d79;
 }
 
 .dash-card-subtitle {
@@ -530,7 +530,7 @@
 .table-card-name {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #293e6f;
 }
 
 .table-status-pill {
@@ -794,7 +794,7 @@
   margin: 1px 0 4px 0;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #2c3959;
   line-height: 1.25;
 }
 
@@ -892,7 +892,7 @@
 
 .table-cell-name {
   font-weight: 700;
-  color: #0f172a;
+  color: #3b4457;
 }
 
 .client-cell-name {
@@ -941,402 +941,195 @@
 }
 
 /* ============================================================
-   BLOQUE D: CAJA EN TURNO
+   BARRA DE FILTROS POR FECHA
    ============================================================ */
-.active-register-card {
-  display: flex;
-  flex-direction: column;
+.dashboard-filter-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
 }
 
-.register-header-banner {
+.filter-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.register-status-indicator {
+.filter-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.filter-icon {
+  color: #2563eb;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.filter-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #ecfdf5;
-  color: #059669;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.pulse-indicator-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-}
-
-.register-name {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.register-balance-display {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  border-radius: 12px;
-  padding: 14px 16px;
-  color: #ffffff;
-  margin-bottom: 14px;
-}
-
-.balance-title {
-  display: block;
-  font-size: 0.72rem;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  border: 1px solid #e2e8f0;
 }
 
-.balance-big-amount {
-  display: block;
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: #38bdf8;
-  margin-top: 2px;
+.filter-badge .badge-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
 }
 
-.register-meta-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 14px;
+.badge-today {
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+  border-color: #a7f3d0 !important;
 }
 
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8rem;
+.badge-range {
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border-color: #bfdbfe !important;
 }
 
-.meta-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  color: #94a3b8;
-}
-
-.meta-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.meta-label {
-  font-size: 0.68rem;
-  color: #94a3b8;
-}
-
-.meta-value {
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.btn-register-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  color: #334155;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.filter-card-body {
   width: 100%;
 }
 
-.btn-register-action:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+.filter-inputs-group {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
-.btn-register-action mat-icon {
-  font-size: 17px;
-  width: 17px;
-  height: 17px;
-}
-
-.empty-register-card .empty-reg-icon {
-  font-size: 36px;
-  width: 36px;
-  height: 36px;
-  color: #94a3b8;
-  margin-bottom: 8px;
-}
-
-.empty-register-card h5 {
-  margin: 0 0 4px 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.btn-open-register {
-  display: inline-flex;
-  align-items: center;
+.filter-field-item {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
-  background: #d97706;
-  border: none;
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 8px;
+  min-width: 170px;
+  flex: 1 1 180px;
 }
 
-/* ============================================================
-   BLOQUE E: MEDIOS DE PAGO
-   ============================================================ */
-.payment-methods-breakdown {
+.filter-field-label {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.payment-method-row {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 5px;
-}
-
-.method-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.method-name-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.method-symbol {
-  font-size: 1.05rem;
-}
-
-.method-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #334155;
-}
-
-.method-amounts {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.method-total {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.method-pct {
-  font-size: 0.72rem;
-  color: #64748b;
-}
-
-.method-progress-track {
-  height: 7px;
-  background: #f1f5f9;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.method-progress-bar {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.bar-cash {
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-}
-
-.bar-card {
-  background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
-/* ============================================================
-   BLOQUE F: ÚLTIMOS MOVIMIENTOS EN CAJA
-   ============================================================ */
-.mov-feed-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mov-feed-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
-}
-
-.mov-type-badge {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.mov-type-badge mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-}
-
-.type-in {
-  background: #ecfdf5;
-  color: #059669;
-}
-
-.type-out {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.mov-content-col {
-  flex: 1;
-  min-width: 0;
-}
-
-.mov-desc {
-  display: block;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #1e293b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #64748b;
+  margin: 0;
 }
 
-.mov-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.68rem;
+.filter-field-label mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
   color: #94a3b8;
 }
 
-.mov-caja-tag {
-  font-weight: 600;
-  color: #64748b;
-}
-
-.mov-amount-col {
+.filter-date-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #1e293b;
   font-size: 0.88rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.amount-in {
-  color: #16a34a;
-}
-
-.amount-out {
-  color: #dc2626;
-}
-
-/* ============================================================
-   BLOQUE G: ACCESOS RÁPIDOS
-   ============================================================ */
-.shortcuts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.shortcut-tile {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 14px 10px;
-  text-align: center;
-  cursor: pointer;
+  font-weight: 500;
+  outline: none;
   transition: all 0.2s ease;
+}
+
+.filter-date-input:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.filter-buttons-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.shortcut-tile:hover {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transform: translateY(-2px);
-}
-
-.shortcut-icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
+.btn-filter-action {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  height: 40px;
 }
 
-.shortcut-icon-box mat-icon {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
+.btn-filter-action mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-.shortcut-resto {
-  background: #ecfdf5;
-  color: #059669;
+.btn-apply {
+  background: #2563eb;
+  color: #ffffff;
 }
 
-.shortcut-apertura {
-  background: #fffbeb;
-  color: #d97706;
+.btn-apply:hover {
+  background: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 
-.shortcut-prod {
-  background: #eff6ff;
-  color: #2563eb;
+.btn-today {
+  background: #ffffff;
+  color: #1e293b;
+  border-color: #cbd5e1;
 }
 
-.shortcut-cat {
-  background: #ede9fe;
-  color: #7c3aed;
+.btn-today:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
 }
 
-.shortcut-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #0f172a;
+.btn-today.active-today {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
 }
 
-.shortcut-desc {
-  font-size: 0.68rem;
-  color: #64748b;
+.btn-reset {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.btn-reset:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
 /* ============================================================

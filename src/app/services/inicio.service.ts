@@ -3,7 +3,7 @@ import { GenericService } from './generic.service';
 import { Inicio } from '../../model/inicio';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { DashboardData } from '../../model/dashboard';
 
 @Injectable({
@@ -24,7 +24,14 @@ export class InicioService extends GenericService<Inicio> {
     return this.inicioChange.asObservable();
   }
 
-  getResumenDashboard(): Observable<{ code: number; data: DashboardData }> {
-    return this.http.get<{ code: number; data: DashboardData }>(`${environment.HOST}/dashboard/resumen`);
+  getResumenDashboard(fechaInicio?: string, fechaFin?: string): Observable<{ code: number; data: DashboardData }> {
+    let params = new HttpParams();
+    if (fechaInicio) {
+      params = params.set('fechaInicio', fechaInicio);
+    }
+    if (fechaFin) {
+      params = params.set('fechaFin', fechaFin);
+    }
+    return this.http.get<{ code: number; data: DashboardData }>(`${environment.HOST}/dashboard/resumen`, { params });
   }
 }

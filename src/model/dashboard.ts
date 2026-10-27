@@ -82,6 +82,10 @@ export interface DashboardData {
   metodosPago: DashboardMetodoPago[];
   ultimosMovimientos: DashboardMovimiento[];
   ultimosPedidos: DashboardPedidoReciente[];
+  filtro?: {
+    fechaInicio?: string;
+    fechaFin?: string;
+  };
   usuario: {
     username: string;
     nombreCompleto: string;

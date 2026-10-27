@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MaterialModule } from '../../material/material.module';
-import { CommonModule, NgFor, NgIf, DecimalPipe, DatePipe } from '@angular/common';
+import { CommonModule, NgFor, NgIf, DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InicioService } from '../../services/inicio.service';
 import { DashboardData } from '../../../model/dashboard';
@@ -17,10 +18,12 @@ registerLocaleData(localeEs);
   imports: [
     MaterialModule,
     CommonModule,
+    FormsModule,
     NgIf,
     NgFor,
     DecimalPipe,
     DatePipe,
+    TitleCasePipe,
     MatProgressBarModule
   ],
   templateUrl: './inicio.component.html',
@@ -31,6 +34,11 @@ export class InicioComponent implements OnInit {
   dashboard: DashboardData | null = null;
   fechaActual: Date = new Date();
   saludo: string = 'Bienvenido';
+
+  // Filtros de fecha
+  fechaInicio: string = '';
+  fechaFin: string = '';
+  filtroActivo: 'hoy' | 'rango' | 'todo' = 'todo';
 
   constructor(
     private inicioService: InicioService,
@@ -54,9 +62,17 @@ export class InicioComponent implements OnInit {
     }
   }
 
+  obtenerFechaHoy(): string {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   cargarDashboard(): void {
     this.cargando = true;
-    this.inicioService.getResumenDashboard().subscribe({
+    this.inicioService.getResumenDashboard(this.fechaInicio, this.fechaFin).subscribe({
       next: (res) => {
         this.cargando = false;
         if (res && res.code === 200) {
@@ -71,15 +87,48 @@ export class InicioComponent implements OnInit {
     });
   }
 
-  get totalVentasMetodos(): number {
-    if (!this.dashboard?.metodosPago) return 0;
-    return this.dashboard.metodosPago.reduce((acc, m) => acc + Number(m.total || 0), 0);
+  filtrarHoy(): void {
+    const hoy = this.obtenerFechaHoy();
+    this.fechaInicio = hoy;
+    this.fechaFin = hoy;
+    this.filtroActivo = 'hoy';
+    this.cargarDashboard();
   }
 
-  calcularPorcentajeMetodo(totalMetodo: number | string): number {
-    const totalG = this.totalVentasMetodos;
-    if (totalG <= 0) return 0;
-    return Math.round((Number(totalMetodo) / totalG) * 100);
+  aplicarFiltro(): void {
+    if (this.fechaInicio && this.fechaFin && this.fechaInicio > this.fechaFin) {
+      this._snackBar.open('La fecha de inicio no puede ser posterior a la fecha fin', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    const hoy = this.obtenerFechaHoy();
+    if (this.fechaInicio === hoy && this.fechaFin === hoy) {
+      this.filtroActivo = 'hoy';
+    } else if (this.fechaInicio || this.fechaFin) {
+      this.filtroActivo = 'rango';
+    } else {
+      this.filtroActivo = 'todo';
+    }
+    this.cargarDashboard();
+  }
+
+  limpiarFiltro(): void {
+    this.fechaInicio = '';
+    this.fechaFin = '';
+    this.filtroActivo = 'todo';
+    this.cargarDashboard();
+  }
+
+  get descripcionFiltro(): string {
+    if (this.filtroActivo === 'hoy') {
+      return 'Mostrando métricas de Hoy';
+    } else if (this.fechaInicio && this.fechaFin) {
+      return `Período: ${this.fechaInicio} al ${this.fechaFin}`;
+    } else if (this.fechaInicio) {
+      return `Desde: ${this.fechaInicio}`;
+    } else if (this.fechaFin) {
+      return `Hasta: ${this.fechaFin}`;
+    }
+    return 'Histórico General Completo';
   }
 
   get maxVendidoProducto(): number {
