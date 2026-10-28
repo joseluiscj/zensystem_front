@@ -86,21 +86,26 @@ export class RestauranteDialogDetalleComponent implements OnInit {
       let datax = {
         idCategoria: value
       }
-      this.productoService.productoCbo(datax).subscribe((data2) => {
-        if(data2['code'] == 200){
-          this.lst_producto = data2['data'];
-          this.filteredProducto = this.filterProducto.valueChanges.pipe(
-            startWith(''),
-            map(value => this._filterProducto(value))
-          );
-          if (this.productox?.f_categoria == value && this.productox?.f_producto) {
-            const selectedProduct = this.lst_producto.find(item => item.id == this.productox.f_producto);
-            const selectedValue = selectedProduct ? selectedProduct.id : this.productox.f_producto;
-            this.basicForm.controls["producto"].setValue(selectedValue);
-            this.ValueProducto.setValue(selectedValue);
+      this.productoService.productoCbo(datax).subscribe({
+        next: (data2: any) => {
+          if (data2 && data2['code'] == 200) {
+            this.lst_producto = data2['data'] || [];
+            this.filteredProducto = this.filterProducto.valueChanges.pipe(
+              startWith(''),
+              map(val => this._filterProducto(val))
+            );
+            if (this.productox?.f_categoria == value && this.productox?.f_producto) {
+              const selectedProduct = this.lst_producto.find(item => item.id == this.productox.f_producto);
+              const selectedValue = selectedProduct ? selectedProduct.id : this.productox.f_producto;
+              this.basicForm.controls["producto"].setValue(selectedValue);
+              this.ValueProducto.setValue(selectedValue);
+            }
+          } else {
+            this._snackbar.open(data2?.['message'] || 'No se pudieron cargar los productos', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
           }
-        }else{
-          this._snackbar.open(data2['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+        },
+        error: (err: any) => {
+          this._snackbar.open(err?.error?.message || 'Error al consultar productos de la categoría', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
         }
       }) 
     });
@@ -110,32 +115,37 @@ export class RestauranteDialogDetalleComponent implements OnInit {
       let datax = {
         idProducto: this.ValueProducto.value
       }
-      this.productoService.productoInfo(datax).subscribe((data3) => {
-        if(data3['code'] == 200){
-          let productoInfo = data3['data'];
-          this.ft_categoria = productoInfo?.f_categoria;
-          this.ft_producto = productoInfo?.f_nombre;
-          this.ft_precio = productoInfo?.f_precio;
-          this.ft_download_link = productoInfo?.f_download_link;
-          this.ft_descripcion = productoInfo?.f_descripcion;
-          if (this.primerCambio<2) {
-            this.primerCambio++;
-            this.basicForm.controls["precio"].setValue(this.productox?.f_precio?this.productox?.f_precio:productoInfo?.f_precio);
-          }else{
-            this.basicForm.controls["precio"].setValue(productoInfo?.f_precio);
-          }
-          if (this.productox?.f_cantidad) {
-              this.basicForm.controls["cantidad"].setValue(this.productox?.f_cantidad);
-          }else{
-            if (!this.basicForm.controls["cantidad"].value) {
-              this.basicForm.controls["cantidad"].setValue(productoInfo?.f_cantidad ?? 1);
+      this.productoService.productoInfo(datax).subscribe({
+        next: (data3: any) => {
+          if (data3 && data3['code'] == 200) {
+            let productoInfo = data3['data'];
+            this.ft_categoria = productoInfo?.f_categoria;
+            this.ft_producto = productoInfo?.f_nombre;
+            this.ft_precio = productoInfo?.f_precio;
+            this.ft_download_link = productoInfo?.f_download_link;
+            this.ft_descripcion = productoInfo?.f_descripcion;
+            if (this.primerCambio < 2) {
+              this.primerCambio++;
+              this.basicForm.controls["precio"].setValue(this.productox?.f_precio ? this.productox?.f_precio : productoInfo?.f_precio);
+            } else {
+              this.basicForm.controls["precio"].setValue(productoInfo?.f_precio);
             }
+            if (this.productox?.f_cantidad) {
+              this.basicForm.controls["cantidad"].setValue(this.productox?.f_cantidad);
+            } else {
+              if (!this.basicForm.controls["cantidad"].value) {
+                this.basicForm.controls["cantidad"].setValue(productoInfo?.f_cantidad ?? 1);
+              }
+            }
+            if (this.productox?.f_observacion) {
+              this.basicForm.controls["observacion"].setValue(this.productox?.f_observacion ?? '');
+            }
+          } else {
+            this._snackbar.open(data3?.['message'] || 'No se pudo obtener información del producto', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
           }
-          if (this.productox?.f_observacion) {
-            this.basicForm.controls["observacion"].setValue(this.productox?.f_observacion ?? '');
-          }
-        }else{
-          this._snackbar.open(data3['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+        },
+        error: (err: any) => {
+          this._snackbar.open(err?.error?.message || 'Error al obtener información del producto', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
         }
       }); 
     });
@@ -179,8 +189,9 @@ export class RestauranteDialogDetalleComponent implements OnInit {
     });
   }
   private _filterCategoria(value: string): any[] {
-    const filterValue = value.toLowerCase();
-    return this.lst_categoria.filter(option => option.nombre.toLowerCase().includes(filterValue));
+    if (!this.lst_categoria) return [];
+    const filterValue = (value || '').toLowerCase();
+    return this.lst_categoria.filter(option => (option?.nombre || '').toLowerCase().includes(filterValue));
   }
   fnCargaCboCategoria(){
     this.globalService.getCategoria().subscribe((data) => {
@@ -195,8 +206,9 @@ export class RestauranteDialogDetalleComponent implements OnInit {
     })
   }
   private _filterProducto(value: string): any[] {
-    const filterValue = value.toLowerCase();
-    return this.lst_producto.filter(option => option.nombre.toLowerCase().includes(filterValue));
+    if (!this.lst_producto) return [];
+    const filterValue = (value || '').toLowerCase();
+    return this.lst_producto.filter(option => (option?.nombre || '').toLowerCase().includes(filterValue));
   }
   close(){
     this._dialogRef.close();
