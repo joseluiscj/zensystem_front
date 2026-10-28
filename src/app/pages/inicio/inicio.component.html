@@ -18,7 +18,7 @@
           <span>{{ fechaActual | date:'fullDate':'':'es-ES' | titlecase }}</span>
           <span class="subtitle-divider">&bull;</span>
           <mat-icon class="subtitle-icon">storefront</mat-icon>
-          <span>Panel de Control & Ventas ZenSystem</span>
+          <span>Panel de Control & Ventas  </span>
         </p>
       </div>
     </div>
@@ -127,7 +127,7 @@
     <div class="row g-3 mb-4">
       <!-- KPI 1: Ventas Totales -->
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-metric-card kpi-sales" (click)="irRestaurante()">
+        <div class="kpi-metric-card kpi-sales"  >
           <div class="kpi-card-header">
             <span class="kpi-card-title">Ventas Totales</span>
             <div class="kpi-icon-circle sales-circle">
@@ -137,7 +137,8 @@
           <div class="kpi-card-value">${{ dashboard.kpis.ventasTotales | number:'1.2-2' }}</div>
           <div class="kpi-card-footer">
             <span class="kpi-badge badge-green">
-              <mat-icon>check_circle</mat-icon> {{ dashboard.kpis.pedidosAtendidos }} cobrados
+              <mat-icon>check_circle</mat-icon> 
+              <!-- <mat-icon>check_circle</mat-icon> {{ dashboard.kpis.pedidosAtendidos }} cobrados -->
             </span>
             <span class="kpi-hint">{{ filtroActivo === 'hoy' ? 'Hoy' : (filtroActivo === 'rango' ? 'En período' : 'Acumulado') }}</span>
           </div>
@@ -358,7 +359,7 @@
       </div>
     </div>
 
-    <!-- FILA 3: ÚLTIMOS PEDIDOS REGISTRADOS (TABLA COMPLETA) -->
+    <!-- FILA 3: ÚLTIMOS PEDIDOS REGISTRADOS (TABLA COMPLETA) 
     <div class="row g-3">
       <div class="col-12">
         <div class="dash-card">
@@ -432,7 +433,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
 
   </div>
 </div>
