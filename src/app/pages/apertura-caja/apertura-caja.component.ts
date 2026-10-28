@@ -129,7 +129,8 @@ export class AperturaCajaComponent implements OnInit {
     const dialogRef = this.dialog.open(AperturaDialogComponent, {
       width: '450px',
       disableClose: true,
-      panelClass: 'modal-dialog-responsive'
+      // panelClass: 'modal-dialog-responsive'
+      panelClass: 'modal-dialog-right',
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -163,7 +164,8 @@ export class AperturaCajaComponent implements OnInit {
         cajaNombre: item.cajaNombre,
         state: item.state
       },
-      panelClass: 'modal-dialog-responsive'
+      // panelClass: 'modal-dialog-responsive'
+      panelClass: 'modal-dialog-right',
     });
   }
 

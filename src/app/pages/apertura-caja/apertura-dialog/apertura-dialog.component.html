@@ -9,7 +9,7 @@
     </button>
   </div>
 
-  <mat-dialog-content class="dialog-content">
+  <mat-dialog-content class=" ">
     <div *ngIf="cargandoCajas" class="loading-state">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       <p class="text-muted mt-2">Cargando cajas disponibles...</p>
@@ -58,14 +58,19 @@
     </form>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-button (click)="close()" class="btn-cancel">Cancelar</button>
+  <!-- <mat-dialog-actions align="end" class="dialog-actions"> -->
+  <div class="button-container">
+    <hr style="margin-right: -15px;">
+    <button type="button" mat-raised-button color="accent" (click)="close()" class="btn-cancel" class="btn_secondary">
+      <mat-icon>close</mat-icon> Cancelar
+    </button>
     <button mat-raised-button 
             color="primary" 
             (click)="save()" 
             [disabled]="isButtonDisabled || cargandoCajas || cajasDisponibles.length === 0" 
-            class="btn-confirm">
+            class="btn-confirm btn_primary">
       <mat-icon>check_circle</mat-icon> Aperturar Turno
     </button>
-  </mat-dialog-actions>
+  </div>
+  <!-- </mat-dialog-actions> -->
 </div>

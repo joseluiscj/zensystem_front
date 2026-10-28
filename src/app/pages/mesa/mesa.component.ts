@@ -71,7 +71,7 @@ export class MesaComponent implements OnInit{
       disableClose: true,
       panelClass: 'modal-dialog-right',
     })
-  }
+  } 
 
   btnBuscar(): void {
     this.mesaService.findAllList(this.basicForm.value).subscribe((data)=>{

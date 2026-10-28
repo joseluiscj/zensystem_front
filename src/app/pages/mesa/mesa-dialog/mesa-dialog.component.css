@@ -7,6 +7,11 @@
     max-height: max-content;
     margin-bottom: 69px;
 }
+.btn_primary{
+  margin-left: 5px; 
+  background-color: #113C68;
+  color: #fff !important;
+}
 
 /***********************/
 .expediente-container {
