@@ -331,7 +331,7 @@
 }
 
 .btn-submit {
-  /* display: inline-flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 10px 24px;
@@ -342,7 +342,7 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-  transition: all 0.2s ease; */
+  transition: all 0.2s ease;
 }
 
 .btn-submit:hover:not(:disabled) {

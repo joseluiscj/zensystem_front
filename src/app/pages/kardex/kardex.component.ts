@@ -63,7 +63,7 @@ export class KardexComponent implements OnInit {
 
   ngOnInit(): void {
     // Si viene con queryParams (ej: ?idProducto=5)
-    this.aplicarFiltroHoy();
+    // this.aplicarFiltroHoy();
     this.route.queryParams.subscribe(params => {
       if (params['idProducto']) {
         this.filtros.idProducto = params['idProducto'];
