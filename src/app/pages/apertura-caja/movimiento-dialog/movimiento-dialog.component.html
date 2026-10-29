@@ -1,52 +1,130 @@
-<div class="dialog-container">
-  <div class="dialog-header">
-    <div class="dialog-title-group">
-      <mat-icon class="header-icon">receipt_long</mat-icon>
-      <div>
-        <h2 mat-dialog-title class="m-0">Movimientos de Caja</h2>
-        <span class="text-muted" style="font-size: 12px;">{{ data.cajaNombre }}</span>
+<div class="side-drawer-container">
+  <!-- Cabecera del Panel Lateral -->
+  <div class="drawer-header">
+    <div class="drawer-header-main">
+      <div class="drawer-icon-circle">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <div class="drawer-header-text">
+        <h3 class="drawer-title">Movimientos de Caja</h3>
+        <div class="drawer-subtitle-row">
+          <span class="drawer-caja-name">{{ data.cajaNombre }}</span>
+          <span class="shift-badge" [class.shift-open]="data.state === 1" [class.shift-closed]="data.state !== 1">
+            <span class="shift-dot"></span>
+            {{ data.state === 1 ? 'Turno Abierto' : 'Turno Cerrado' }}
+          </span>
+        </div>
       </div>
     </div>
-    <div class="d-flex align-items-center gap-2">
-      <button mat-raised-button 
-              color="primary" 
-              class="btn-sm-action" 
-              (click)="toggleNuevoMovimiento()" 
-              *ngIf="data.state === 1">
-        <mat-icon>{{ mostrarNuevoMovimiento ? 'close' : 'add' }}</mat-icon>
-        {{ mostrarNuevoMovimiento ? 'Cancelar' : 'Nuevo Movimiento' }}
-      </button>
-      <button mat-icon-button (click)="close()" class="btn-close-dialog">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+    <button type="button" class="btn-drawer-close" (click)="close()" matTooltip="Cerrar panel">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 
-  <mat-dialog-content class="dialog-content">
-    <!-- Formulario para agregar movimiento manual (Ingreso / Egreso) -->
-    <div class="new-movement-box mb-3" *ngIf="mostrarNuevoMovimiento">
-      <h6 class="mb-2" style="font-weight: 600; color: #1a635a;">Registrar Movimiento Manual</h6>
+  <mat-divider></mat-divider>
+
+  <!-- Contenido con Scroll Vertical -->
+  <div class="drawer-body">
+
+    <!-- 1. RESUMEN EJECUTIVO / KPIS DEL TURNO -->
+    <div class="kpi-mini-grid">
+      <!-- Total Ingresos -->
+      <div class="kpi-mini-card kpi-ingresos">
+        <div class="kpi-mini-top">
+          <span class="kpi-mini-label">Ingresos (+)</span>
+          <mat-icon class="kpi-mini-icon">south_west</mat-icon>
+        </div>
+        <div class="kpi-mini-val text-success">+S/ {{ totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-sub">{{ conteoIngresos }} registro(s)</div>
+      </div>
+
+      <!-- Total Egresos -->
+      <div class="kpi-mini-card kpi-egresos">
+        <div class="kpi-mini-top">
+          <span class="kpi-mini-label">Egresos (-)</span>
+          <mat-icon class="kpi-mini-icon">north_east</mat-icon>
+        </div>
+        <div class="kpi-mini-val text-danger">-S/ {{ totalEgresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-sub">{{ conteoEgresos }} registro(s)</div>
+      </div>
+
+      <!-- Balance Neto -->
+      <div class="kpi-mini-card kpi-balance">
+        <div class="kpi-mini-top">
+          <span class="kpi-mini-label">Balance Neto</span>
+          <mat-icon class="kpi-mini-icon">account_balance_wallet</mat-icon>
+        </div>
+        <div class="kpi-mini-val" [ngClass]="{'text-success': balanceNeto >= 0, 'text-danger': balanceNeto < 0}">
+          S/ {{ balanceNeto | number:'1.2-2' }}
+        </div>
+        <div class="kpi-mini-sub">En este turno</div>
+      </div>
+    </div>
+
+    <!-- 2. BOTÓN DE ACCIÓN PARA NUEVO MOVIMIENTO -->
+    <div class="action-toggle-wrapper" *ngIf="data.state === 1">
+      <button 
+        type="button" 
+        class="btn-toggle-movement" 
+        [class.btn-toggle-active]="mostrarNuevoMovimiento"
+        (click)="toggleNuevoMovimiento()">
+        <mat-icon>{{ mostrarNuevoMovimiento ? 'expand_less' : 'add_circle' }}</mat-icon>
+        <span>{{ mostrarNuevoMovimiento ? 'Ocultar Formulario' : '+ Registrar Movimiento Manual' }}</span>
+      </button>
+    </div>
+
+    <!-- 3. FORMULARIO VERTICAL DE NUEVO MOVIMIENTO (adaptado al drawer lateral) -->
+    <div class="movement-form-card" *ngIf="mostrarNuevoMovimiento && data.state === 1">
+      <div class="form-card-header">
+        <span class="form-card-title">Registrar Movimiento Manual</span>
+        <button type="button" class="btn-card-close" (click)="toggleNuevoMovimiento()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
       <form [formGroup]="movimientoForm">
-        <div class="row g-2">
-          <div class="col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Tipo</mat-label>
-              <mat-select formControlName="tipo">
-                <mat-option value="I">Ingreso (+)</mat-option>
-                <mat-option value="E">Egreso / Gasto (-)</mat-option>
-              </mat-select>
+        <!-- Selector Tipo (Segmented Switch) -->
+        <div class="form-group-custom mb-3">
+          <label class="form-label-custom">Tipo de Movimiento</label>
+          <div class="segmented-type-toggle">
+            <button 
+              type="button" 
+              class="btn-segment segment-ingreso"
+              [class.active]="movimientoForm.controls['tipo'].value === 'I'"
+              (click)="setTipoMovimiento('I')">
+              <mat-icon>add_circle_outline</mat-icon>
+              <span>Ingreso (+)</span>
+            </button>
+            <button 
+              type="button" 
+              class="btn-segment segment-egreso"
+              [class.active]="movimientoForm.controls['tipo'].value === 'E'"
+              (click)="setTipoMovimiento('E')">
+              <mat-icon>remove_circle_outline</mat-icon>
+              <span>Egreso / Gasto (-)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Fila: Monto y Método de Pago -->
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label-custom">Monto (S/)</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <input 
+                matInput 
+                type="number" 
+                step="0.01" 
+                min="0.01" 
+                placeholder="0.00" 
+                formControlName="monto"
+                required>
+              <span matPrefix class="currency-prefix">S/&nbsp;</span>
             </mat-form-field>
           </div>
-          <div class="col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Monto</mat-label>
-              <input matInput type="number" step="0.01" min="0.01" placeholder="0.00" formControlName="monto">
-              <mat-icon matSuffix>attach_money</mat-icon>
-            </mat-form-field>
-          </div>
-          <div class="col-md-4">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Medio de Pago</mat-label>
+          <div class="col-6">
+            <label class="form-label-custom">Medio de Pago</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
               <mat-select formControlName="metodoPago">
                 <mat-option value="EF">Efectivo</mat-option>
                 <mat-option value="TA">Tarjeta</mat-option>
@@ -54,60 +132,151 @@
               </mat-select>
             </mat-form-field>
           </div>
-          <div class="col-12">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Descripción / Motivo</mat-label>
-              <input matInput placeholder="Ej. Retiro para compras, Ingreso adicional..." formControlName="descripcion">
-            </mat-form-field>
-          </div>
-          <div class="col-12 text-end">
-            <button mat-raised-button color="primary" (click)="guardarMovimiento()" [disabled]="isSaving">
-              <mat-icon>save</mat-icon> Guardar Movimiento
-            </button>
-          </div>
         </div>
-      </form>
-      <hr>
-    </div>
 
-    <!-- Lista de Movimientos -->
-    <div *ngIf="cargando" class="loading-state">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      <p class="text-muted mt-2">Cargando movimientos...</p>
-    </div>
+        <!-- Descripción / Motivo -->
+        <div class="form-group-custom mb-2">
+          <label class="form-label-custom">Descripción / Motivo</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <input 
+              matInput 
+              placeholder="Ej. Aporte sencillo, Pago de insumos..." 
+              formControlName="descripcion"
+              required>
+          </mat-form-field>
 
-    <div *ngIf="!cargando && movimientos.length === 0" class="empty-state text-center py-4">
-      <mat-icon style="font-size: 36px; height: 36px; width: 36px; color: #94a3b8;">receipt</mat-icon>
-      <p class="text-muted mt-2 mb-0">No se registran movimientos en este turno.</p>
-    </div>
-
-    <div class="movements-list" *ngIf="!cargando && movimientos.length > 0">
-      <div class="movement-item" *ngFor="let m of movimientos">
-        <div class="movement-left">
-          <div class="type-icon-badge" [ngClass]="{'badge-ingreso': m.tipo === 'I', 'badge-egreso': m.tipo === 'E'}">
-            <mat-icon>{{ m.tipo === 'I' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-          </div>
-          <div class="movement-details">
-            <strong class="movement-desc">{{ m.descripcion }}</strong>
-            <div class="movement-meta">
-              <span class="meta-tag">{{ m.metodoPago === 'EF' ? 'Efectivo' : (m.metodoPago === 'TA' ? 'Tarjeta' : 'Transf.') }}</span>
-              <span>&bull;</span>
-              <span>{{ m.created_at | date:'short' }}</span>
-              <span *ngIf="m.usuarioNombre">&bull;</span>
-              <span *ngIf="m.usuarioNombre">{{ m.usuarioNombre }}</span>
+          <!-- Sugerencias rápidas -->
+          <div class="quick-chips-wrapper">
+            <span class="chips-label">Sugerencias:</span>
+            <div class="chips-list" *ngIf="movimientoForm.controls['tipo'].value === 'I'">
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Aporte de sencillo')">Sencillo</button>
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Ingreso extraordinario')">Extraordinario</button>
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Ajuste de caja')">Ajuste (+)</button>
+            </div>
+            <div class="chips-list" *ngIf="movimientoForm.controls['tipo'].value === 'E'">
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de insumos urgentes')">Insumos</button>
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de delivery')">Delivery</button>
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Retiro de efectivo')">Retiro</button>
+              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Gasto de limpieza')">Limpieza</button>
             </div>
           </div>
         </div>
-        <div class="movement-right">
-          <strong [ngClass]="{'text-success': m.tipo === 'I', 'text-danger': m.tipo === 'E'}">
-            {{ m.tipo === 'I' ? '+' : '-' }}{{ m.monto | currency:'USD':'symbol':'1.2-2' }}
-          </strong>
+
+        <!-- Botón Guardar -->
+        <div class="form-submit-row mt-3">
+          <button 
+            type="button" 
+            class="btn-save-movement" 
+            (click)="guardarMovimiento()" 
+            [disabled]="isSaving || movimientoForm.invalid">
+            <mat-icon *ngIf="!isSaving">save</mat-icon>
+            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+            <span>{{ isSaving ? 'Guardando...' : 'Guardar Movimiento' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 4. HISTORIAL DE MOVIMIENTOS & FILTROS -->
+    <div class="history-section-header">
+      <div class="history-title-box">
+        <mat-icon class="history-icon">history</mat-icon>
+        <span class="history-title">Historial</span>
+      </div>
+
+      <!-- Filtro tipo pestañas/chips -->
+      <div class="filter-chips-group">
+        <button 
+          type="button" 
+          class="filter-chip-btn" 
+          [class.chip-active]="filtroTipo === 'TODOS'"
+          (click)="filtroTipo = 'TODOS'">
+          Todos ({{ movimientos.length }})
+        </button>
+        <button 
+          type="button" 
+          class="filter-chip-btn chip-in" 
+          [class.chip-active]="filtroTipo === 'I'"
+          (click)="filtroTipo = 'I'">
+          +{{ conteoIngresos }}
+        </button>
+        <button 
+          type="button" 
+          class="filter-chip-btn chip-out" 
+          [class.chip-active]="filtroTipo === 'E'"
+          (click)="filtroTipo = 'E'">
+          -{{ conteoEgresos }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Loader de Carga -->
+    <div *ngIf="cargando" class="loading-state">
+      <mat-progress-bar mode="indeterminate" class="drawer-progress"></mat-progress-bar>
+      <span class="loading-text">Cargando movimientos de la caja...</span>
+    </div>
+
+    <!-- Estado Vacío -->
+    <div *ngIf="!cargando && movimientosFiltrados.length === 0" class="empty-state">
+      <div class="empty-icon-circle">
+        <mat-icon>receipt</mat-icon>
+      </div>
+      <h5 class="empty-title">Sin movimientos</h5>
+      <p class="empty-sub">
+        {{ filtroTipo === 'TODOS' ? 'No se han registrado movimientos en este turno aún.' : 'No hay movimientos con el filtro seleccionado.' }}
+      </p>
+    </div>
+
+    <!-- Lista de Cards de Movimientos -->
+    <div class="movements-container" *ngIf="!cargando && movimientosFiltrados.length > 0">
+      <div 
+        class="movement-row-card" 
+        *ngFor="let m of movimientosFiltrados"
+        [class.movement-row-in]="m.tipo === 'I'"
+        [class.movement-row-out]="m.tipo === 'E'">
+        
+        <!-- Icono de tipo -->
+        <div class="movement-icon-box" [ngClass]="{'icon-in': m.tipo === 'I', 'icon-out': m.tipo === 'E'}">
+          <mat-icon>{{ m.tipo === 'I' ? 'south_west' : 'north_east' }}</mat-icon>
+        </div>
+
+        <!-- Información Central -->
+        <div class="movement-main-info">
+          <div class="movement-desc-text" [title]="m.descripcion">{{ m.descripcion }}</div>
+          <div class="movement-meta-row">
+            <span class="meta-pill-method">
+              {{ m.metodoPago === 'EF' ? 'Efectivo' : (m.metodoPago === 'TA' ? 'Tarjeta' : 'Transf.') }}
+            </span>
+            <span class="meta-dot">&bull;</span>
+            <span class="meta-time">{{ m.created_at | date:'shortTime' }}</span>
+            <span class="meta-dot" *ngIf="m.usuarioNombre">&bull;</span>
+            <span class="meta-user" *ngIf="m.usuarioNombre">{{ m.usuarioNombre }}</span>
+          </div>
+        </div>
+
+        <!-- Monto a la derecha -->
+        <div class="movement-right-amount">
+          <span class="amount-text" [ngClass]="{'amount-in': m.tipo === 'I', 'amount-out': m.tipo === 'E'}">
+            {{ m.tipo === 'I' ? '+' : '-' }}S/ {{ m.monto | number:'1.2-2' }}
+          </span>
+          <span class="amount-date-sub">{{ m.created_at | date:'dd/MM' }}</span>
         </div>
       </div>
     </div>
-  </mat-dialog-content>
 
-  <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-button (click)="close()">Cerrar</button>
-  </mat-dialog-actions>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Pie del Drawer Lateral -->
+  <div class="drawer-footer">
+    <div class="footer-summary-left">
+      <span class="footer-count">{{ movimientos.length }} movimiento(s)</span>
+    </div>
+    <div class="footer-actions-right">
+      <button type="button" class="btn-drawer-close-action" (click)="close()">
+        Cerrar
+      </button>
+    </div>
+  </div>
 </div>

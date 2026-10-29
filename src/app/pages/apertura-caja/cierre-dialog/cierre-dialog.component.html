@@ -1,117 +1,203 @@
-<div class="dialog-container">
-  <div class="dialog-header">
-    <div class="dialog-title-group">
-      <mat-icon class="header-icon">lock_clock</mat-icon>
-      <h2 mat-dialog-title class="m-0">Cierre de Caja / Arqueo</h2>
+<div class="side-drawer-container">
+  <!-- Cabecera del Panel Lateral -->
+  <div class="drawer-header">
+    <div class="drawer-header-main">
+      <div class="drawer-icon-circle">
+        <mat-icon>lock_clock</mat-icon>
+      </div>
+      <div class="drawer-header-text">
+        <h3 class="drawer-title">Cierre de Caja</h3>
+        <div class="drawer-subtitle-row">
+          <span class="drawer-caja-name">{{ data.cajaNombre || resumen?.detalle?.cajaNombre || 'Caja' }}</span>
+          <span class="shift-badge shift-closing">
+            <span class="shift-dot"></span>
+            Arqueo Final
+          </span>
+        </div>
+      </div>
     </div>
-    <button mat-icon-button (click)="close()" class="btn-close-dialog">
+    <button type="button" class="btn-drawer-close" (click)="close()" matTooltip="Cerrar panel">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <mat-dialog-content class="dialog-content">
+  <mat-divider></mat-divider>
+
+  <!-- Contenido con Scroll Vertical -->
+  <div class="drawer-body">
+
+    <!-- Loader de Carga de Resumen -->
     <div *ngIf="cargandoResumen" class="loading-state">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      <p class="text-muted mt-2">Calculando resumen de movimientos del turno...</p>
+      <mat-progress-bar mode="indeterminate" class="drawer-progress"></mat-progress-bar>
+      <span class="loading-text">Calculando arqueo y saldo teórico del turno...</span>
     </div>
 
-    <div *ngIf="!cargandoResumen && resumen">
-      <!-- Info del Turno -->
-      <div class="shift-info-card mb-3">
+    <div *ngIf="!cargandoResumen && resumen" class="cierre-content-flow">
+      
+      <!-- 1. Tarjeta de Datos del Turno -->
+      <div class="shift-info-card">
         <div class="row g-2">
           <div class="col-6">
-            <span class="info-label">Caja:</span>
-            <strong class="info-value">{{ resumen.detalle.cajaNombre }}</strong>
+            <span class="info-label">Cajero en Turno</span>
+            <strong class="info-value text-truncate d-block">{{ resumen.detalle.usuarioNombre || 'No asignado' }}</strong>
           </div>
           <div class="col-6">
-            <span class="info-label">Cajero:</span>
-            <strong class="info-value">{{ resumen.detalle.usuarioNombre }}</strong>
+            <span class="info-label">Sucursal</span>
+            <span class="info-value text-truncate d-block">{{ resumen.detalle.sucursalNombre || 'Principal' }}</span>
           </div>
           <div class="col-6">
-            <span class="info-label">Apertura:</span>
+            <span class="info-label">Fecha Apertura</span>
             <span class="info-value">{{ resumen.detalle.aFecha | date:'short' }}</span>
           </div>
           <div class="col-6">
-            <span class="info-label">Sucursal:</span>
-            <span class="info-value">{{ resumen.detalle.sucursalNombre }}</span>
+            <span class="info-label">Moneda</span>
+            <span class="info-value font-monospace">{{ resumen.detalle.moneda || 'SOL (S/)' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Resumen Financiero -->
-      <div class="financial-summary mb-3">
-        <div class="summary-row">
-          <span>Monto Inicial (Apertura):</span>
-          <strong>{{ resumen.aMonto | currency:'USD':'symbol':'1.2-2' }}</strong>
+      <!-- 2. Desglose Financiero (Arqueo Teórico) -->
+      <div class="financial-breakdown-card">
+        <div class="breakdown-header">
+          <mat-icon class="breakdown-icon">calculate</mat-icon>
+          <span class="breakdown-title">Arqueo Teórico del Turno</span>
         </div>
-        <div class="summary-row">
-          <span>Ventas en Efectivo (+):</span>
-          <span class="text-success">+{{ resumen.totalEfectivo | currency:'USD':'symbol':'1.2-2' }}</span>
+
+        <div class="breakdown-list">
+          <div class="breakdown-row">
+            <span class="row-label">Monto Inicial (Apertura)</span>
+            <span class="row-val font-monospace">S/ {{ resumen.aMonto | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="breakdown-row">
+            <span class="row-label">Ventas en Efectivo (+)</span>
+            <span class="row-val font-monospace text-success">+S/ {{ resumen.totalEfectivo | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="breakdown-row" *ngIf="resumen.totalIngresos > 0">
+            <span class="row-label">Ingresos Manuales (+)</span>
+            <span class="row-val font-monospace text-success">+S/ {{ resumen.totalIngresos | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="breakdown-row" *ngIf="resumen.totalEgresos > 0">
+            <span class="row-label">Egresos / Gastos (-)</span>
+            <span class="row-val font-monospace text-danger">-S/ {{ resumen.totalEgresos | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="breakdown-row text-muted" *ngIf="resumen.totalTarjeta > 0">
+            <span class="row-label">Ventas con Tarjeta (Info)</span>
+            <span class="row-val font-monospace text-primary">S/ {{ resumen.totalTarjeta | number:'1.2-2' }}</span>
+          </div>
         </div>
-        <div class="summary-row">
-          <span>Ventas con Tarjeta (Info):</span>
-          <span class="text-primary">{{ resumen.totalTarjeta | currency:'USD':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="summary-row" *ngIf="resumen.totalEgresos > 0">
-          <span>Egresos / Gastos (-):</span>
-          <span class="text-danger">-{{ resumen.totalEgresos | currency:'USD':'symbol':'1.2-2' }}</span>
-        </div>
-        <hr class="my-2">
-        <div class="summary-row total-expected">
-          <span>Saldo Esperado en Efectivo:</span>
-          <span class="expected-amount">{{ resumen.saldoEsperadoEfectivo | currency:'USD':'symbol':'1.2-2' }}</span>
+
+        <mat-divider class="my-2"></mat-divider>
+
+        <!-- Banner de Saldo Teórico Esperado -->
+        <div class="expected-balance-box">
+          <div class="expected-texts">
+            <span class="expected-sub">Saldo Esperado en Efectivo</span>
+            <span class="expected-hint">Apertura + Entradas - Salidas</span>
+          </div>
+          <div class="expected-amount">
+            S/ {{ resumen.saldoEsperadoEfectivo | number:'1.2-2' }}
+          </div>
         </div>
       </div>
 
-      <!-- Formulario de Conteo Real -->
-      <form [formGroup]="basicForm">
-        <div class="row">
-          <div class="col-12 mb-2">
-            <mat-form-field appearance="outline" class="w-100">
-              <mat-label>Efectivo Real en Caja (Arqueo)</mat-label>
-              <input matInput 
-                     type="number" 
-                     step="0.01" 
-                     min="0" 
-                     placeholder="0.00" 
-                     formControlName="cMonto" 
-                     (input)="calcularDiferencia()" 
-                     autocomplete="off">
-              <mat-icon matSuffix>payments</mat-icon>
-              <mat-hint>Total de efectivo contado físicamente en la gaveta.</mat-hint>
+      <!-- 3. Formulario de Conteo Físico Real -->
+      <div class="conteo-card">
+        <div class="conteo-header">
+          <div class="conteo-title-group">
+            <mat-icon class="conteo-icon">payments</mat-icon>
+            <span class="conteo-title">Conteo Real en Caja</span>
+          </div>
+          <button 
+            type="button" 
+            class="btn-copy-expected" 
+            (click)="copiarSaldoEsperado()"
+            matTooltip="Autocompletar con el saldo esperado">
+            <mat-icon>content_copy</mat-icon>
+            <span>Cuadrar con Teórico</span>
+          </button>
+        </div>
+
+        <form [formGroup]="basicForm">
+          <div class="form-group-custom">
+            <label class="form-label-custom">Efectivo Físico Contado (S/)</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <input 
+                matInput 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                placeholder="0.00" 
+                formControlName="cMonto" 
+                (input)="calcularDiferencia()" 
+                autocomplete="off"
+                required>
+              <span matPrefix class="currency-prefix">S/&nbsp;</span>
+              <mat-icon matSuffix class="field-icon-suffix">point_of_sale</mat-icon>
             </mat-form-field>
           </div>
 
-          <!-- Indicador de Diferencia -->
-          <div class="col-12 mt-2">
-            <div class="difference-badge" 
-                 [ngClass]="{'diff-equal': diferencia === 0, 'diff-surplus': diferencia > 0, 'diff-deficit': diferencia < 0}">
-              <div class="diff-title">
-                <mat-icon *ngIf="diferencia === 0">check_circle</mat-icon>
-                <mat-icon *ngIf="diferencia > 0">trending_up</mat-icon>
-                <mat-icon *ngIf="diferencia < 0">warning</mat-icon>
-                <span>
-                  {{ diferencia === 0 ? 'Cuadre Perfecto' : (diferencia > 0 ? 'Sobrante en Caja' : 'Faltante en Caja') }}
+          <!-- Indicador Visual de Diferencia -->
+          <div class="difference-box mt-3" 
+               [ngClass]="{
+                 'diff-box-equal': esCuadreExacto,
+                 'diff-box-surplus': esSobrante,
+                 'diff-box-deficit': esFaltante
+               }">
+            <div class="diff-left">
+              <div class="diff-icon-circle">
+                <mat-icon *ngIf="esCuadreExacto">check_circle</mat-icon>
+                <mat-icon *ngIf="esSobrante">trending_up</mat-icon>
+                <mat-icon *ngIf="esFaltante">warning</mat-icon>
+              </div>
+              <div class="diff-texts">
+                <strong class="diff-main-status">
+                  {{ esCuadreExacto ? 'Cuadre Perfecto' : (esSobrante ? 'Sobrante en Caja' : 'Faltante en Caja') }}
+                </strong>
+                <span class="diff-desc-status">
+                  {{ esCuadreExacto ? 'Efectivo físico coincide con el sistema' : (esSobrante ? 'Hay dinero de más en la gaveta' : 'Falta dinero según lo registrado') }}
                 </span>
               </div>
-              <strong class="diff-val">
-                {{ diferencia | currency:'USD':'symbol':'1.2-2' }}
-              </strong>
+            </div>
+            <div class="diff-right">
+              <span class="diff-amount-tag font-monospace">
+                {{ esCuadreExacto ? 'S/ 0.00' : (esSobrante ? '+S/ ' + (diferencia | number:'1.2-2') : '-S/ ' + ((diferencia * -1) | number:'1.2-2')) }}
+              </span>
             </div>
           </div>
-        </div>
-      </form>
-    </div>
-  </mat-dialog-content>
+        </form>
+      </div>
 
-  <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-button (click)="close()" class="btn-cancel">Cancelar</button>
-    <button mat-raised-button 
-            color="warn" 
-            (click)="save()" 
-            [disabled]="isButtonDisabled || cargandoResumen" 
-            class="btn-close-register">
-      <mat-icon>lock</mat-icon> Confirmar Cierre
+      <!-- 4. Aviso Preventivo de Bloqueo -->
+      <div class="warning-alert-card">
+        <mat-icon class="warning-icon">info</mat-icon>
+        <span class="warning-text">
+          Al confirmar el cierre, la caja se dará por concluida y se requerirá una nueva apertura para registrar más ventas o movimientos.
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Pie del Drawer Lateral -->
+  <div class="drawer-footer">
+    <button type="button" class="btn-drawer-cancel" (click)="close()">
+      Cancelar
     </button>
-  </mat-dialog-actions>
+    <button 
+      type="button" 
+      class="btn-drawer-submit" 
+      (click)="save()" 
+      [disabled]="isButtonDisabled || cargandoResumen || basicForm.invalid">
+      <mat-icon *ngIf="!isButtonDisabled">lock</mat-icon>
+      <i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i>
+      <span>{{ isButtonDisabled ? 'Cerrando...' : 'Confirmar Cierre' }}</span>
+    </button>
+  </div>
 </div>

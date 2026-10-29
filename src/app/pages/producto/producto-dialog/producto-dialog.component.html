@@ -1,146 +1,226 @@
-<mat-dialog-content class="cl_model">
-    <div class="modal_div_cab_title">
-        <div class="card-title-text" style="font-weight: 600; font-size: 1.15rem;">
-            Gestión de Producto & Precios
-        </div> 
-        <div class="modal_close_tile" (click)="close()">
-            <mat-icon>close</mat-icon>
-        </div> 
-    </div>  
-    <mat-divider></mat-divider>  
-    <div class="example-container mt-3">
-        <div style="text-align: center;margin-bottom: 5px;font-size: 11px;" class="{{ocultar}}">
-            <span>
-                <b><i class="fas fa-spinner fa-spin"></i> Cargando datos...</b>
-            </span>
+<div class="side-drawer-container">
+  <!-- Cabecera del Panel Lateral -->
+  <div class="drawer-header">
+    <div class="drawer-header-main">
+      <div class="drawer-icon-circle">
+        <mat-icon>{{ idProductoSelected ? 'edit_note' : 'add_box' }}</mat-icon>
+      </div>
+      <div class="drawer-header-text">
+        <h3 class="drawer-title">
+          {{ idProductoSelected ? 'Editar Producto' : 'Nuevo Producto' }}
+        </h3>
+        <div class="drawer-subtitle-row">
+          <span class="drawer-subtitle text-truncate">
+            {{ idProductoSelected ? (producto?.f_nombre || 'Actualización de catálogo') : 'Registrar nuevo producto en catálogo' }}
+          </span>
         </div>
-        <form [formGroup]="basicForm">  
-            <div class="row wrap"> 
-                <div class="col-md-12">   
+      </div>
+    </div>
+    <button type="button" class="btn-drawer-close" (click)="close()" [disabled]="isButtonDisabled" matTooltip="Cerrar panel">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-                    <!-- CODIGO SKU Y CATEGORIA -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Código SKU / Barra</mat-label>
-                                <input matInput placeholder="Ej: PROD-001" name="codigo" formControlName="codigo" autocomplete="off">
-                                <mat-icon matPrefix style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px; color: #64748b;">qr_code</mat-icon>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Categoría *</mat-label>
-                                <mat-select required placeholder="Seleccione una opción" [formControl]="ValueCategoria">
-                                  <mat-option>
-                                    <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar"></ngx-mat-select-search>
-                                  </mat-option>
-                                  <mat-option *ngFor="let option of filteredCategoria | async" [value]="option.id">
-                                    {{ option.nombre }}
-                                  </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                
-                    <!-- NOMBRE -->
-                    <mat-form-field appearance="outline" class="custom-input w-100">
-                        <mat-label class="labeltext">Nombre del Producto *</mat-label>
-                        <input matInput placeholder="Ej: Arroz Chaufa Especial" name="nombre" formControlName="nombre" autocomplete="off" class="uppercase">
-                        <mat-hint *ngIf="basicForm.controls['nombre'].hasError('required') && basicForm.controls['nombre'].touched"
-                            class="form-error-msg"> El campo es obligatorio.
-                        </mat-hint>
-                    </mat-form-field>
+  <mat-divider></mat-divider>
 
-                    <!-- PRECIO VENTA Y COSTO COMPRA -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Precio Venta ($) *</mat-label>
-                                <input type="number" step="0.01" min="0" matInput placeholder="0.00" name="precio" formControlName="precio" autocomplete="off">
-                                <span matPrefix class="px-1 text-muted font-bold">$</span>
-                                <mat-hint class="text-muted" style="font-size: 10px;"></mat-hint>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Costo de Compra ($)</mat-label>
-                                <input type="number" step="0.01" min="0" matInput placeholder="0.00" name="costo" formControlName="costo" autocomplete="off">
-                                <span matPrefix class="px-1 text-muted font-bold">$</span>
-                                <mat-hint class="text-muted" style="font-size: 10px;"></mat-hint>
-                            </mat-form-field>
-                        </div>
-                    </div>
+  <!-- Formulario con Scroll Vertical -->
+  <form [formGroup]="basicForm" (ngSubmit)="save()" class="drawer-form-content">
+    <div class="drawer-body">
 
-                    <!-- STOCK MINIMO Y UNIDAD DE MEDIDA -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Stock Mínimo (Alerta)</mat-label>
-                                <input type="number" step="1" min="0" matInput placeholder="5" name="stockMinimo" formControlName="stockMinimo" autocomplete="off">
-                                <mat-icon matPrefix style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px; color: #f59e0b;">warning_amber</mat-icon>
-                                <mat-hint class="text-muted" style="font-size: 10px;"> </mat-hint>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-md-6">
-                            <mat-form-field appearance="outline" class="custom-input w-100">
-                                <mat-label class="labeltext">Unidad de Medida *</mat-label>
-                                <mat-select formControlName="unidadMedida">
-                                    <mat-option *ngFor="let u of unidadesMedida" [value]="u">
-                                        {{ u }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </div>
+      <!-- Loader de Carga de Datos Existentes -->
+      <div *ngIf="ocultar !== 'd-none'" class="loading-state">
+        <mat-progress-bar mode="indeterminate" class="drawer-progress"></mat-progress-bar>
+        <span class="loading-text">Cargando información del producto...</span>
+      </div>
 
-                    <!-- DESCRIPCION -->
-                    <mat-form-field appearance="outline" class="custom-input w-100">
-                        <mat-label class="labeltext">Descripción / Notas</mat-label>
-                        <textarea matInput name="descripcion" formControlName="descripcion" placeholder="Ingredientes, presentación o detalle..."></textarea>
-                    </mat-form-field>
- 
-                    <!-- IMAGEN -->
-                    <div class="form-group mb-0 {{download_link!=''?'':'d-none'}}">
-                        <div style="text-align: center;border: 1px solid #e2e8f0;border-radius: 10px; padding: 6px;">
-                            <img src="{{download_link}}" alt="" style="max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 8px;">
-                        </div>  
-                        <ul class="wrap_files wrap_files_anexos mb-0" id="">
-                            <li class="li_files li_div_0">                                            
-                                <div class="detail_evidence">
-                                    <div class="wrap_svg">
-                                      <a href="{{download_link}}" target="_blank" title="Descargar" style="cursor: pointer;">
-                                          <i class="fas fa-solid fa-download"></i>
-                                      </a>
-                                    </div>
-                                    <span class="textoption">{{file_txt}}</span>
-                                </div>
-                                <div class="actions_files pt-1">
-                                    <a class="delete_div" (click)="delteFile()" title="Eliminar" style="cursor: pointer;" data-pos="0">
-                                        <i class="fas fa-solid fa-trash" style="color: #DC3545;"></i>
-                                    </a>
-                                </div>
-                            </li> 
-                        </ul>
-                    </div>
-                    <span style="font-size: 10px;font-weight: 500;" class="{{ocultar_carga}}">
-                        <i class="fas fa-spinner fa-spin"></i> Subiendo archivo....
-                    </span>
-                    <div class="custom-file-upload {{download_link!=''?'d-none':''}}">
-                        <input type="file" id="fileInput" hidden (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.PNG,.JPG,.JPEG">
-                        <label for="fileInput" class="file-label style_btn_file">{{textFile}}</label>
-                        <button type="button" class="upload-btn" (click)="triggerFileInput()">Adjuntar Foto</button>
-                    </div> 
-                </div> 
+      <div class="form-content-flow" *ngIf="ocultar === 'd-none'">
+
+        <!-- 1. FOTO DEL PRODUCTO -->
+        <div class="product-photo-card">
+          <div class="photo-preview-box" *ngIf="download_link">
+            <img [src]="download_link" alt="Foto Producto" class="photo-img">
+            <div class="photo-overlay-actions">
+              <a [href]="download_link" target="_blank" class="btn-photo-action" title="Descargar imagen">
+                <mat-icon>download</mat-icon>
+              </a>
+              <button type="button" class="btn-photo-action btn-photo-del" (click)="delteFile()" title="Eliminar foto">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
-            <div class="button-container mt-3">
-                <hr>
-                <button type="button" mat-raised-button color="accent" (click)="close()" class="btn_secondary">
-                    <mat-icon>close</mat-icon> Cancelar
-                </button>
-                <button type="submit" mat-raised-button color="primary" (click)="save()" [disabled]="isButtonDisabled" style="margin-left: 5px; background-color: #113C68; color: #fff;">
-                    <mat-icon>save</mat-icon><i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i> Guardar
-                </button>
+          </div>
+
+          <div class="photo-upload-empty" *ngIf="!download_link">
+            <input type="file" id="fileInput" hidden (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.PNG,.JPG,.JPEG">
+            <div class="upload-dropzone" (click)="triggerFileInput()">
+              <mat-icon class="upload-icon">add_a_photo</mat-icon>
+              <span class="upload-label">{{ textFile }}</span>
+              <span class="upload-hint">Formatos: PNG, JPG (Máx 5MB)</span>
             </div>
-        </form>
-    </div>      
-</mat-dialog-content>
+          </div>
+
+          <span class="photo-uploading-tag" *ngIf="ocultar_carga !== 'd-none'">
+            <i class="fas fa-spinner fa-spin"></i> Subiendo imagen...
+          </span>
+        </div>
+
+        <!-- 2. CÓDIGO SKU Y CATEGORÍA -->
+        <div class="row g-2" style="margin-bottom: -25px;">
+          <!-- Código SKU -->
+          <div class="col-6">
+            <label class="form-label-custom">Código SKU / Barra</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <input 
+                matInput 
+                placeholder="Ej: PROD-001" 
+                formControlName="codigo" 
+                autocomplete="off">
+              <mat-icon matPrefix class="field-icon-prefix">qr_code</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Categoría -->
+          <div class="col-6">
+            <label class="form-label-custom">Categoría *</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <mat-select required placeholder="Seleccione" [formControl]="ValueCategoria">
+                <mat-option>
+                  <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar categoría..."></ngx-mat-select-search>
+                </mat-option>
+                <mat-option *ngFor="let option of filteredCategoria | async" [value]="option.id">
+                  {{ option.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- 3. NOMBRE DEL PRODUCTO -->
+        <div class="form-group-custom" style="margin-bottom: -25px;">
+          <label class="form-label-custom">Nombre del Producto *</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <input 
+              matInput 
+              placeholder="Ej: Arroz Chaufa Especial" 
+              formControlName="nombre" 
+              autocomplete="off" 
+              class="uppercase"
+              required>
+            <mat-icon matPrefix class="field-icon-prefix">restaurant</mat-icon>
+            <mat-hint *ngIf="basicForm.controls['nombre'].hasError('required') && basicForm.controls['nombre'].touched"
+              class="form-error-msg"> El campo es obligatorio.
+            </mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- 4. PRECIOS Y MARGEN (S/) -->
+        <div class="pricing-card" >
+          <div class="row g-2 mb-2" style="margin-bottom: -25px !important;">
+            <!-- Precio de Venta -->
+            <div class="col-6">
+              <label class="form-label-custom">Precio Venta (S/) *</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field field-precio">
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  matInput 
+                  placeholder="0.00" 
+                  formControlName="precio" 
+                  autocomplete="off"
+                  required>
+                <span matPrefix class="currency-prefix">S/&nbsp;</span>
+              </mat-form-field>
+            </div>
+
+            <!-- Costo de Compra -->
+            <div class="col-6">
+              <label class="form-label-custom">Costo Compra (S/)</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field">
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  min="0" 
+                  matInput 
+                  placeholder="0.00" 
+                  formControlName="costo" 
+                  autocomplete="off">
+                <span matPrefix class="currency-prefix text-muted">S/&nbsp;</span>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Preview de Margen -->
+          <div class="margin-preview-box">
+            <span class="margin-label">Margen estimado por unidad:</span>
+            <strong class="margin-val font-monospace" [ngClass]="margenEstimado >= 0 ? 'text-success' : 'text-danger'">
+              S/ {{ margenEstimado | number:'1.2-2' }}
+            </strong>
+          </div>
+        </div>
+
+        <!-- 5. STOCK MÍNIMO Y UNIDAD DE MEDIDA -->
+        <div class="row g-2"  style="margin-bottom: -25px !important;">
+          <!-- Stock Mínimo -->
+          <div class="col-6">
+            <label class="form-label-custom">Stock Mínimo (Alerta)</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <input 
+                type="number" 
+                step="1" 
+                min="0" 
+                matInput 
+                placeholder="5" 
+                formControlName="stockMinimo" 
+                autocomplete="off">
+              <mat-icon matPrefix class="field-icon-prefix text-amber">warning_amber</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Unidad de Medida -->
+          <div class="col-6">
+            <label class="form-label-custom">Unidad de Medida *</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <mat-select formControlName="unidadMedida" required>
+                <mat-option *ngFor="let u of unidadesMedida" [value]="u">
+                  {{ u }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- 6. DESCRIPCIÓN / NOTAS -->
+        <div class="form-group-custom">
+          <label class="form-label-custom">Descripción / Especificaciones</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <textarea 
+              matInput 
+              rows="2" 
+              formControlName="descripcion" 
+              placeholder="Ingredientes, presentación o detalle opcional..."></textarea>
+            <mat-icon matPrefix class="field-icon-prefix">notes</mat-icon>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Pie Fijo de Acciones -->
+    <div class="drawer-footer">
+      <button type="button" class="btn-drawer-cancel" (click)="close()" [disabled]="isButtonDisabled">
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        class="btn-drawer-submit" 
+        [disabled]="isButtonDisabled || basicForm.invalid">
+        <mat-icon *ngIf="!isButtonDisabled">save</mat-icon>
+        <i class="fas fa-spinner fa-spin" *ngIf="isButtonDisabled"></i>
+        <span>{{ isButtonDisabled ? 'Guardando...' : (idProductoSelected ? 'Actualizar Producto' : 'Guardar Producto') }}</span>
+      </button>
+    </div>
+  </form>
+</div>

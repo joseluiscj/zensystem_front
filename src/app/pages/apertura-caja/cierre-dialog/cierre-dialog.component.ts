@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
-import { CommonModule, CurrencyPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -19,6 +19,7 @@ import { AperturaCajaService } from '../../../services/apertura-caja.service';
     FormsModule,
     DatePipe,
     CurrencyPipe,
+    DecimalPipe,
     MatProgressBarModule
   ],
   templateUrl: './cierre-dialog.component.html',
@@ -32,7 +33,7 @@ export class CierreDialogComponent implements OnInit {
   diferencia: number = 0;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { idCajaDetalle: number },
+    @Inject(MAT_DIALOG_DATA) public data: { idCajaDetalle: number, cajaNombre?: string, aMonto?: number },
     private dialogRef: MatDialogRef<CierreDialogComponent>,
     private aperturaService: AperturaCajaService,
     private snackBar: MatSnackBar
@@ -73,7 +74,25 @@ export class CierreDialogComponent implements OnInit {
   calcularDiferencia() {
     const conteoReal = parseFloat(this.basicForm.controls['cMonto'].value || 0);
     const saldoEsperado = this.resumen?.saldoEsperadoEfectivo || 0;
-    this.diferencia = conteoReal - saldoEsperado;
+    this.diferencia = Math.round((conteoReal - saldoEsperado) * 100) / 100;
+  }
+
+  copiarSaldoEsperado() {
+    const saldoEsperado = this.resumen?.saldoEsperadoEfectivo || 0;
+    this.basicForm.controls['cMonto'].setValue(saldoEsperado);
+    this.calcularDiferencia();
+  }
+
+  get esCuadreExacto(): boolean {
+    return Math.abs(this.diferencia) < 0.001;
+  }
+
+  get esSobrante(): boolean {
+    return this.diferencia > 0.001;
+  }
+
+  get esFaltante(): boolean {
+    return this.diferencia < -0.001;
   }
 
   save() {

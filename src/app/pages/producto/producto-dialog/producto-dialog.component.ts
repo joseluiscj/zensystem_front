@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { CommonModule, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Producto } from '../../../../model/producto';
 import { map, Observable, startWith } from 'rxjs';
@@ -8,6 +8,7 @@ import { Categoria } from '../../../../model/categoria';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GlobalService } from '../../../services/global.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ProductoService } from '../../../services/producto.service';
 
 @Component({
@@ -15,11 +16,13 @@ import { ProductoService } from '../../../services/producto.service';
   standalone: true,
   imports: [
     MaterialModule,
+    MatProgressBarModule,
     NgFor, 
     NgIf, 
     ReactiveFormsModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    DecimalPipe
   ],
   templateUrl: './producto-dialog.component.html',
   styleUrl: './producto-dialog.component.css'
@@ -31,7 +34,7 @@ export class ProductoDialogComponent implements OnInit {
   ocultar: string = 'd-none';
   selectedFile: File | null = null;
   error: boolean = false;
-  textFile: string = 'Seleccionar adjunto';
+  textFile: string = 'Seleccionar foto';
   file_txt: string = "";
   download_link: string = "";
   ocultar_carga = "d-none";
@@ -56,7 +59,7 @@ export class ProductoDialogComponent implements OnInit {
   lst_categoria: Categoria[] = [];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) private idProductoSelected: number,
+    @Inject(MAT_DIALOG_DATA) public idProductoSelected: number,
     private _dialogRef: MatDialogRef<ProductoDialogComponent>,
     private globalService: GlobalService,
     private _snackbar: MatSnackBar,
@@ -82,8 +85,15 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   private _filterCategoria(value: string): any[] {
+    if (!this.lst_categoria) return [];
     const filterValue = (value || '').toLowerCase();
-    return this.lst_categoria.filter(option => option.nombre.toLowerCase().includes(filterValue));
+    return this.lst_categoria.filter(option => (option.nombre || '').toLowerCase().includes(filterValue));
+  }
+
+  get margenEstimado(): number {
+    const precio = parseFloat(this.basicForm?.get('precio')?.value || 0);
+    const costo = parseFloat(this.basicForm?.get('costo')?.value || 0);
+    return Math.round((precio - costo) * 100) / 100;
   }
 
   private initialFrm() {

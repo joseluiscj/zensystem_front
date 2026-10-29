@@ -134,8 +134,8 @@ export class MovimientoCajaComponent implements OnInit {
 
   abrirNuevoMovimiento(tipoInicial: 'I' | 'E' = 'E'): void {
     const ref = this.dialog.open(MovimientoCajaDialogComponent, {
-      width: '680px',
       disableClose: true,
+      panelClass: 'modal-dialog-right',
       data: {
         tipoInicial,
         cajas: this.cajas,

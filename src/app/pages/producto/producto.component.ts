@@ -115,9 +115,9 @@ export class ProductoComponent {
 
   openDialog(id?: number) {
     this._dialog.open(ProductoDialogComponent, {
-      width: '600px',
       data: id,
       disableClose: true,
+      panelClass: 'modal-dialog-right',
     });
   }
 

@@ -33,6 +33,7 @@ export class MovimientoCajaDialogComponent implements OnInit {
   cargando: boolean = false;
   cajas: CajaCatalogo[] = [];
   cajaSeleccionada: CajaCatalogo | null = null;
+  mostrarDetallesAvanzados: boolean = false;
 
   categoriasGastos: string[] = [];
   categoriasIngresos: string[] = [];
@@ -112,6 +113,14 @@ export class MovimientoCajaDialogComponent implements OnInit {
 
   setTipo(t: 'I' | 'E'): void {
     this.movimientoForm.get('tipo')?.setValue(t);
+  }
+
+  setDescripcionRapida(desc: string): void {
+    this.movimientoForm.get('descripcion')?.setValue(desc);
+  }
+
+  toggleDetallesAvanzados(): void {
+    this.mostrarDetallesAvanzados = !this.mostrarDetallesAvanzados;
   }
 
   get tipoActual(): 'I' | 'E' {

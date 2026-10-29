@@ -44,7 +44,7 @@
             <mat-icon>trending_down</mat-icon>
           </div>
         </div>
-        <div class="kpi-card-value text-danger">-${{ kpis.totalEgresos | number:'1.2-2' }}</div>
+        <div class="kpi-card-value text-danger">-S/ {{ kpis.totalEgresos | number:'1.2-2' }}</div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-rose">
             <mat-icon>arrow_downward</mat-icon> Salidas registradas
@@ -63,7 +63,7 @@
             <mat-icon>trending_up</mat-icon>
           </div>
         </div>
-        <div class="kpi-card-value text-success">+${{ kpis.totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-card-value text-success">+S/ {{ kpis.totalIngresos | number:'1.2-2' }}</div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-emerald">
             <mat-icon>arrow_upward</mat-icon> Cobros y aportes
@@ -83,7 +83,7 @@
           </div>
         </div>
         <div class="kpi-card-value" [ngClass]="kpis.balanceNeto >= 0 ? 'text-primary' : 'text-danger'">
-          ${{ kpis.balanceNeto | number:'1.2-2' }}
+          S/ {{ kpis.balanceNeto | number:'1.2-2' }}
         </div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-blue">
@@ -103,7 +103,7 @@
             <mat-icon>savings</mat-icon>
           </div>
         </div>
-        <div class="kpi-card-value text-slate">${{ kpis.saldoTotalCajas | number:'1.2-2' }}</div>
+        <div class="kpi-card-value text-slate">S/ {{ kpis.saldoTotalCajas | number:'1.2-2' }}</div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-slate">
             <mat-icon>point_of_sale</mat-icon> Fondos disponibles
@@ -298,7 +298,7 @@
             <!-- Monto -->
             <td class="text-end font-mono">
               <span class="monto-val" [ngClass]="m.tipo === 'I' ? 'monto-ingreso' : 'monto-gasto'">
-                {{ m.tipo === 'I' ? '+' : '-' }}${{ m.monto | number:'1.2-2' }}
+                {{ m.tipo === 'I' ? '+' : '-' }}S/ {{ m.monto | number:'1.2-2' }}
               </span>
             </td>
 

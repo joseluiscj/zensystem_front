@@ -142,10 +142,13 @@ export class AperturaCajaComponent implements OnInit {
 
   openCerrarDialog(item: CajaDetalle): void {
     const dialogRef = this.dialog.open(CierreDialogComponent, {
-      width: '480px',
       disableClose: true,
-      data: { idCajaDetalle: item.id || item.idCajaDetalle },
-      panelClass: 'modal-dialog-responsive'
+      data: { 
+        idCajaDetalle: item.id || item.idCajaDetalle,
+        cajaNombre: item.cajaNombre,
+        aMonto: item.aMonto
+      },
+      panelClass: 'modal-dialog-right'
     });
 
     dialogRef.afterClosed().subscribe((result) => {

@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
-import { CommonModule, CurrencyPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,6 +20,7 @@ import { CajaMovimiento } from '../../../../model/cajaMovimiento';
     FormsModule,
     DatePipe,
     CurrencyPipe,
+    DecimalPipe,
     MatProgressBarModule
   ],
   templateUrl: './movimiento-dialog.component.html',
@@ -31,6 +32,7 @@ export class MovimientoDialogComponent implements OnInit {
   mostrarNuevoMovimiento: boolean = false;
   movimientoForm: UntypedFormGroup;
   isSaving: boolean = false;
+  filtroTipo: 'TODOS' | 'I' | 'E' = 'TODOS';
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { idCajaDetalle: number, cajaNombre: string, state: number },
@@ -53,13 +55,55 @@ export class MovimientoDialogComponent implements OnInit {
     });
   }
 
+  get totalIngresos(): number {
+    return this.movimientos
+      .filter(m => m.tipo === 'I')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+  }
+
+  get totalEgresos(): number {
+    return this.movimientos
+      .filter(m => m.tipo === 'E')
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+  }
+
+  get balanceNeto(): number {
+    return this.totalIngresos - this.totalEgresos;
+  }
+
+  get conteoIngresos(): number {
+    return this.movimientos.filter(m => m.tipo === 'I').length;
+  }
+
+  get conteoEgresos(): number {
+    return this.movimientos.filter(m => m.tipo === 'E').length;
+  }
+
+  get movimientosFiltrados(): CajaMovimiento[] {
+    if (this.filtroTipo === 'I') {
+      return this.movimientos.filter(m => m.tipo === 'I');
+    }
+    if (this.filtroTipo === 'E') {
+      return this.movimientos.filter(m => m.tipo === 'E');
+    }
+    return this.movimientos;
+  }
+
+  setTipoMovimiento(tipo: 'I' | 'E'): void {
+    this.movimientoForm.controls['tipo'].setValue(tipo);
+  }
+
+  setDescripcionRapida(desc: string): void {
+    this.movimientoForm.controls['descripcion'].setValue(desc);
+  }
+
   cargarMovimientos() {
     this.cargando = true;
     this.aperturaService.getMovimientos(this.data.idCajaDetalle).subscribe({
       next: (res) => {
         this.cargando = false;
         if (res.code === 200) {
-          this.movimientos = res.data;
+          this.movimientos = res.data || [];
         } else {
           this.snackBar.open(res.message || 'Error al cargar movimientos', 'Error', { duration: 4000 });
         }

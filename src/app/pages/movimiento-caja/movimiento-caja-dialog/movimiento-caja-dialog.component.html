@@ -1,201 +1,259 @@
-<div class="caja-mov-dialog-container">
-  <!-- CABECERA -->
-  <div class="dialog-header">
-    <div class="dialog-header-left">
-      <div class="header-icon-box" [ngClass]="{
-        'icon-ingreso': tipoActual === 'I',
-        'icon-egreso': tipoActual === 'E'
+<div class="side-drawer-container">
+  <!-- Cabecera del Panel Lateral -->
+  <div class="drawer-header">
+    <div class="drawer-header-main">
+      <div class="drawer-icon-circle" [ngClass]="{
+        'icon-circle-ingreso': tipoActual === 'I',
+        'icon-circle-egreso': tipoActual === 'E'
       }">
         <mat-icon *ngIf="tipoActual === 'I'">trending_up</mat-icon>
         <mat-icon *ngIf="tipoActual === 'E'">trending_down</mat-icon>
       </div>
-      <div>
-        <h3 class="dialog-title">
-          {{ tipoActual === 'I' ? 'Registrar Ingreso de Caja' : 'Registrar Gasto / Egreso de Caja' }}
+      <div class="drawer-header-text">
+        <h3 class="drawer-title">
+          {{ tipoActual === 'I' ? 'Ingreso Extraordinario' : 'Registrar Gasto / Egreso' }}
         </h3>
-        <p class="dialog-subtitle">Control financiero y cuadratura contable en tiempo real</p>
+        <div class="drawer-subtitle-row">
+          <span class="drawer-subtitle">Control de flujos y caja en tiempo real</span>
+        </div>
       </div>
     </div>
-    <button type="button" class="btn-close-dialog" (click)="cerrar()" [disabled]="cargando">
+    <button type="button" class="btn-drawer-close" (click)="cerrar()" [disabled]="cargando" matTooltip="Cerrar panel">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="header-loader"></mat-progress-bar>
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="drawer-progress"></mat-progress-bar>
+  <mat-divider *ngIf="!cargando"></mat-divider>
 
-  <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="dialog-body">
+  <!-- Formulario con Scroll Vertical -->
+  <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="drawer-form-content">
+    <div class="drawer-body">
 
-    <!-- SELECTOR DE OPERACIÓN (INGRESO O GASTO) -->
-    <div class="tipo-selector-group mb-3">
-      <label class="form-label-custom">Naturaleza de la Transacción:</label>
-      <div class="tipo-buttons-grid">
-        <button type="button" class="tipo-btn" 
-          [class.active-e]="tipoActual === 'E'"
-          (click)="setTipo('E')">
-          <mat-icon>remove_circle</mat-icon>
-          <div class="tipo-info">
-            <span class="tipo-name">GASTO / EGRESO</span>
-            <span class="tipo-desc">Compras, servicios, pagos, adelantos</span>
-          </div>
-        </button>
-
-        <button type="button" class="tipo-btn" 
-          [class.active-i]="tipoActual === 'I'"
-          (click)="setTipo('I')">
-          <mat-icon>add_circle</mat-icon>
-          <div class="tipo-info">
-            <span class="tipo-name">INGRESO EXTRAORDINARIO</span>
-            <span class="tipo-desc">Aportes de caja, cobranzas, otros</span>
-          </div>
-        </button>
+      <!-- 1. SELECTOR DE TIPO (Segmented Toggle) -->
+      <div class="form-group-custom" >
+        <label class="form-label-custom">Naturaleza de la Transacción</label>
+        <div class="segmented-type-toggle">
+          <button 
+            type="button" 
+            class="btn-segment segment-egreso"
+            [class.active]="tipoActual === 'E'"
+            (click)="setTipo('E')">
+            <mat-icon>remove_circle</mat-icon>
+            <span>Gasto / Egreso (-)</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn-segment segment-ingreso"
+            [class.active]="tipoActual === 'I'"
+            (click)="setTipo('I')">
+            <mat-icon>add_circle</mat-icon>
+            <span>Ingreso Extra (+)</span>
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- CAJA DESTINO Y MONTO -->
-    <div class="row g-3 mb-3">
-      <!-- Selector de Caja -->
-      <div class="col-12 col-md-7">
-        <label class="form-label-custom">Caja a Afectar: *</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
+      <!-- 2. CAJA A AFECTAR -->
+      <div class="form-group-custom" style="margin-bottom: -25px;">
+        <label class="form-label-custom">Caja a Afectar *</label>
+        <mat-form-field appearance="outline" class="w-100 drawer-field">
           <mat-select formControlName="idCaja" placeholder="Seleccione una caja">
             <mat-option *ngFor="let c of cajas" [value]="c.id">
-              <strong>{{ c.nombre }}</strong> (Saldo actual: ${{ c.saldo | number:'1.2-2' }})
+              <strong>{{ c.nombre }}</strong> &bull; Saldo: S/ {{ c.saldo | number:'1.2-2' }}
             </mat-option>
           </mat-select>
+          <mat-icon matPrefix class="field-icon-prefix">point_of_sale</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- Monto -->
-      <div class="col-12 col-md-5">
-        <label class="form-label-custom">Importe / Monto ($): *</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <input matInput type="number" step="0.01" min="0.01" formControlName="monto" placeholder="0.00">
-          <span matPrefix class="px-1 font-bold text-muted">$</span>
-        </mat-form-field>
-      </div>
-    </div>
+      <!-- 3. MONTO E IMPORTE (S/) Y MEDIO DE PAGO -->
+      <div class="row g-2"  style="margin-bottom: -25px;">
+        <!-- Monto -->
+        <div class="col-6">
+          <label class="form-label-custom">Importe / Monto (S/) *</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <input 
+              matInput 
+              type="number" 
+              step="0.01" 
+              min="0.01" 
+              formControlName="monto" 
+              placeholder="0.00"
+              required>
+            <span matPrefix class="currency-prefix">S/&nbsp;</span>
+          </mat-form-field>
+        </div>
 
-    <!-- CATEGORÍA Y MEDIO DE PAGO -->
-    <div class="row g-3 mb-3">
-      <!-- Categoría -->
-      <div class="col-12 col-md-7">
-        <label class="form-label-custom">Concepto / Categoría: *</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <mat-select formControlName="categoria" placeholder="Seleccione categoría">
+        <!-- Medio de Pago -->
+        <div class="col-6">
+          <label class="form-label-custom">Medio de Pago *</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <mat-select formControlName="metodoPago">
+              <mat-option *ngFor="let m of mediosPago" [value]="m.codigo">
+                {{ m.nombre }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- 4. CATEGORÍA / CONCEPTO -->
+      <div class="form-group-custom" style="margin-bottom: -25px;">
+        <label class="form-label-custom">Categoría / Concepto *</label>
+        <mat-form-field appearance="outline" class="w-100 drawer-field">
+          <mat-select formControlName="categoria" placeholder="Seleccione concepto">
             <mat-option *ngFor="let cat of categoriasActuales" [value]="cat">
               {{ cat }}
             </mat-option>
           </mat-select>
+          <mat-icon matPrefix class="field-icon-prefix">category</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- Medio de Pago -->
-      <div class="col-12 col-md-5">
-        <label class="form-label-custom">Medio de Pago: *</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <mat-select formControlName="metodoPago">
-            <mat-option *ngFor="let m of mediosPago" [value]="m.codigo">
-              {{ m.nombre }}
-            </mat-option>
-          </mat-select>
+      <!-- 5. DESCRIPCIÓN Y SUGERENCIAS RÁPIDAS -->
+      <div class="form-group-custom" >
+        <label class="form-label-custom">Descripción / Glosa *</label>
+        <mat-form-field appearance="outline" class="w-100 drawer-field">
+          <input 
+            matInput 
+            formControlName="descripcion" 
+            placeholder="Ej: Pago de recibo de luz, compra urgente de hielo..."
+            required>
+          <mat-icon matPrefix class="field-icon-prefix">edit_note</mat-icon>
         </mat-form-field>
+
+        <!-- Sugerencias en chips -->
+        <div class="quick-chips-wrapper">
+          <span class="chips-label">Sugerencias rápidas:</span>
+          <div class="chips-list" *ngIf="tipoActual === 'E'">
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Compra urgente de insumos')">Insumos</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de delivery')">Delivery</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de servicio público')">Servicios</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Adelanto de personal')">Adelanto</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Gastos de limpieza y aseo')">Limpieza</button>
+          </div>
+          <div class="chips-list" *ngIf="tipoActual === 'I'">
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Aporte de sencillo para caja')">Sencillo</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Cobranza de cuenta pendiente')">Cobranza</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Ingreso extraordinario')">Extraordinario</button>
+            <button type="button" class="quick-chip" (click)="setDescripcionRapida('Aporte de capital')">Capital</button>
+          </div>
+        </div>
       </div>
+
+      <!-- 6. DETALLES AVANZADOS / COMPROBANTE Y BENEFICIARIO (Colapsable) -->
+      <div class="advanced-section-wrapper">
+        <button 
+          type="button" 
+          class="btn-toggle-advanced" 
+          (click)="toggleDetallesAvanzados()">
+          <mat-icon>{{ mostrarDetallesAvanzados ? 'expand_less' : 'add_circle_outline' }}</mat-icon>
+          <span>{{ mostrarDetallesAvanzados ? 'Ocultar datos de comprobante' : '+ Datos de comprobante y beneficiario (opcional)' }}</span>
+        </button>
+
+        <div class="advanced-fields-box mt-2" *ngIf="mostrarDetallesAvanzados">
+          <!-- Beneficiario y Fecha -->
+          <div class="row g-2 mb-2">
+            <div class="col-7">
+              <label class="form-label-custom">
+                {{ tipoActual === 'E' ? 'Pagado a (Proveedor / Persona)' : 'Recibido de (Cliente / Persona)' }}
+              </label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field">
+                <input matInput formControlName="beneficiario" placeholder="Ej: Luz del Sur, Insumos S.A.">
+                <mat-icon matPrefix class="field-icon-prefix">person_outline</mat-icon>
+              </mat-form-field>
+            </div>
+            <div class="col-5">
+              <label class="form-label-custom">Fecha *</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field">
+                <input matInput type="date" formControlName="fecha">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Tipo y Número de Comprobante -->
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label-custom">Tipo de Comprobante</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field">
+                <mat-select formControlName="tipoComprobante">
+                  <mat-option *ngFor="let tc of tiposComprobante" [value]="tc">
+                    {{ tc }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-6">
+              <label class="form-label-custom">N° Comprobante</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field">
+                <input matInput formControlName="nroComprobante" placeholder="Ej: F001-204">
+                <mat-icon matPrefix class="field-icon-prefix">receipt</mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. SIMULADOR DE IMPACTO EN EL SALDO DE CAJA -->
+      <div class="saldo-impact-card" [ngClass]="{
+        'impact-card-in': tipoActual === 'I',
+        'impact-card-out': tipoActual === 'E'
+      }">
+        <div class="impact-header-row">
+          <span class="impact-title">Proyección de Saldo</span>
+          <span class="impact-badge" [ngClass]="tipoActual === 'I' ? 'badge-in' : 'badge-out'">
+            {{ tipoActual === 'I' ? '+ Ingreso' : '- Salida' }}
+          </span>
+        </div>
+
+        <div class="impact-calc-grid">
+          <div class="calc-col">
+            <span class="calc-label">Saldo Actual</span>
+            <strong class="calc-num font-monospace">S/ {{ saldoActual | number:'1.2-2' }}</strong>
+          </div>
+
+          <div class="calc-op">
+            <mat-icon *ngIf="tipoActual === 'I'">add</mat-icon>
+            <mat-icon *ngIf="tipoActual === 'E'">remove</mat-icon>
+          </div>
+
+          <div class="calc-col">
+            <span class="calc-label">Monto</span>
+            <strong class="calc-num font-monospace" [ngClass]="tipoActual === 'I' ? 'text-success' : 'text-danger'">
+              S/ {{ montoIngresado | number:'1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="calc-op">
+            <mat-icon>drag_handle</mat-icon>
+          </div>
+
+          <div class="calc-col calc-result">
+            <span class="calc-label">Saldo Final</span>
+            <strong class="calc-num font-monospace result-val">
+              S/ {{ saldoResultante | number:'1.2-2' }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- BENEFICIARIO Y FECHA -->
-    <div class="row g-3 mb-3">
-      <!-- Beneficiario -->
-      <div class="col-12 col-md-7">
-        <label class="form-label-custom">
-          {{ tipoActual === 'E' ? 'Pagado a (Proveedor / Persona):' : 'Recibido de (Cliente / Persona):' }}
-        </label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <input matInput formControlName="beneficiario" placeholder="Ej: Luz del Sur, Insumos S.A., Carlos Ruiz">
-          <mat-icon matPrefix class="prefix-icon">person_outline</mat-icon>
-        </mat-form-field>
-      </div>
+    <mat-divider></mat-divider>
 
-      <!-- Fecha -->
-      <div class="col-12 col-md-5">
-        <label class="form-label-custom">Fecha del Movimiento: *</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <input matInput type="date" formControlName="fecha">
-          <mat-icon matPrefix class="prefix-icon">calendar_today</mat-icon>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <!-- COMPROBANTE DE RESPALDO -->
-    <div class="row g-3 mb-3">
-      <div class="col-12 col-md-6">
-        <label class="form-label-custom">Tipo de Comprobante:</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <mat-select formControlName="tipoComprobante">
-            <mat-option *ngFor="let tc of tiposComprobante" [value]="tc">
-              {{ tc }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="col-12 col-md-6">
-        <label class="form-label-custom">N° Comprobante / Referencia:</label>
-        <mat-form-field appearance="outline" class="w-100 custom-field">
-          <input matInput formControlName="nroComprobante" placeholder="Ej: F001-00384, B002-120">
-          <mat-icon matPrefix class="prefix-icon">receipt</mat-icon>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <!-- DESCRIPCIÓN DETALLADA -->
-    <div class="mb-3">
-      <label class="form-label-custom">Descripción / Glosa del Movimiento: *</label>
-      <mat-form-field appearance="outline" class="w-100 custom-field">
-        <input matInput formControlName="descripcion" placeholder="Ej: Pago de recibo de agua potable correspondiente al mes...">
-        <mat-icon matPrefix class="prefix-icon">notes</mat-icon>
-      </mat-form-field>
-    </div>
-
-    <!-- SIMULADOR DE IMPACTO EN SALDO DE CAJA -->
-    <div class="saldo-impact-box mb-3" [ngClass]="{
-      'impact-green': tipoActual === 'I',
-      'impact-red': tipoActual === 'E'
-    }">
-      <div class="impact-item">
-        <span class="impact-label">Saldo Actual en Caja</span>
-        <span class="impact-val">${{ saldoActual | number:'1.2-2' }}</span>
-      </div>
-
-      <div class="impact-operator">
-        <mat-icon *ngIf="tipoActual === 'I'">add</mat-icon>
-        <mat-icon *ngIf="tipoActual === 'E'">remove</mat-icon>
-      </div>
-
-      <div class="impact-item">
-        <span class="impact-label">Importe {{ tipoActual === 'I' ? 'Ingreso' : 'Egreso' }}</span>
-        <span class="impact-val">${{ montoIngresado | number:'1.2-2' }}</span>
-      </div>
-
-      <div class="impact-operator">
-        <mat-icon>drag_handle</mat-icon>
-      </div>
-
-      <div class="impact-item impact-result">
-        <span class="impact-label">Saldo Final en Caja</span>
-        <span class="impact-val-result">${{ saldoResultante | number:'1.2-2' }}</span>
-      </div>
-    </div>
-
-    <!-- PIE DE ACCIONES -->
-    <div class="dialog-footer">
-      <button type="button" class="btn-cancel" (click)="cerrar()" [disabled]="cargando">
+    <!-- Pie Fijo de Acciones -->
+    <div class="drawer-footer">
+      <button type="button" class="btn-drawer-cancel" (click)="cerrar()" [disabled]="cargando">
         Cancelar
       </button>
-      <button type="submit" class="btn-submit" [disabled]="cargando || movimientoForm.invalid">
-        <mat-icon>check_circle</mat-icon>
-        <span>Registrar en Caja</span>
+      <button 
+        type="submit" 
+        class="btn-drawer-submit" 
+        [disabled]="cargando || movimientoForm.invalid">
+        <mat-icon *ngIf="!cargando">check_circle</mat-icon>
+        <i class="fas fa-spinner fa-spin" *ngIf="cargando"></i>
+        <span>{{ cargando ? 'Guardando...' : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto') }}</span>
       </button>
     </div>
-
   </form>
 </div>
