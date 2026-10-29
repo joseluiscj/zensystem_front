@@ -10,6 +10,7 @@ import { AperturaCajaComponent } from "./apertura-caja/apertura-caja.component";
 import { ProductoComponent } from "./producto/producto.component";
 import { RestauranteComponent } from "./restaurante/restaurante.component";
 import { AlmacenComponent } from "./almacen/almacen.component";
+import { KardexComponent } from "./kardex/kardex.component";
 import { MovimientoCajaComponent } from "./movimiento-caja/movimiento-caja.component";
 
 export const pagesRoutes: Routes = [
@@ -18,6 +19,7 @@ export const pagesRoutes: Routes = [
     {path: 'categoria', component:CategoriaComponent, canActivate: [certGuard]},
     // {path: 'pedido', component:PedidoComponent, canActivate: [certGuard]},
     {path: 'almacen', component:AlmacenComponent, canActivate: [certGuard]},
+    {path: 'kardex', component:KardexComponent, canActivate: [certGuard]},
     {path: 'restaurante', component:RestauranteComponent, canActivate: [certGuard]},
     {path: 'mesa', component:MesaComponent, canActivate: [certGuard]},
     {path: 'venta', component:VentaComponent, canActivate: [certGuard]},

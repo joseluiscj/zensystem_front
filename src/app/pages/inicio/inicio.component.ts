@@ -47,8 +47,9 @@ export class InicioComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.establecerSaludo();
-    this.cargarDashboard();
+    this.filtrarHoy();
+    // this.establecerSaludo();
+    // this.cargarDashboard();
   }
 
   establecerSaludo(): void {

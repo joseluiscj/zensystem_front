@@ -170,14 +170,11 @@ export class AlmacenComponent implements OnInit {
   }
 
   abrirKardex(producto?: ProductoAlmacen): void {
-    this.dialog.open(AlmacenKardexDialogComponent, {
-      width: '1050px',
-      maxWidth: '95vw',
-      data: {
-        producto,
-        productosList: this.productos
-      }
-    });
+    if (producto) {
+      this.router.navigate(['/pages/kardex'], { queryParams: { idProducto: producto.idProducto } });
+    } else {
+      this.router.navigate(['/pages/kardex']);
+    }
   }
 
   irAdministracionProducto(): void {

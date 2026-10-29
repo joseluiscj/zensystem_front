@@ -80,8 +80,9 @@ export class VentaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cargarMesasCatalogo();
-    this.cargarVentas();
+    this.filtrarHoy();
+    // this.cargarMesasCatalogo();
+    // this.cargarVentas();
   }
 
   obtenerFechaHoy(): string {

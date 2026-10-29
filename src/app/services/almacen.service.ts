@@ -55,20 +55,31 @@ export interface MovimientoAlmacen {
   idMovimiento: number;
   idAlmacen: number;
   almacen_nombre: string;
+  almacen_codigo?: string;
   idProducto: number;
   producto_nombre: string;
   producto_codigo: string;
   unidadMedida: string;
+  categoria_nombre?: string;
   tipo: 'E' | 'S' | 'A';
   motivo: string;
   cantidad: number;
   costoUnitario: number;
+  totalValorizado?: number;
   stockAnterior: number;
   stockActual: number;
   documento: string;
   observacion: string;
   usuario_nombre: string;
   created_at: string;
+}
+
+export interface KpisKardex {
+  totalMovimientos: number;
+  totalEntradas: number;
+  totalSalidas: number;
+  totalAjustes: number;
+  valorTotalEntradas: number;
 }
 
 export interface AlmacenItem {
@@ -146,7 +157,22 @@ export class AlmacenService {
     return this.http.post<{ code: number; message: string; data?: any }>(`${this.baseUrl}/traspaso`, payload);
   }
 
-  getMovimientos(filtros: { idProducto?: string | number; idAlmacen?: string | number; tipo?: string; fechaInicio?: string; fechaFin?: string } = {}): Observable<{ code: number; data: MovimientoAlmacen[] }> {
+  getMovimientos(filtros: { 
+    idProducto?: string | number; 
+    idAlmacen?: string | number; 
+    tipo?: string; 
+    fechaInicio?: string; 
+    fechaFin?: string;
+    search?: string;
+  } = {}): Observable<{ 
+    code: number; 
+    data: MovimientoAlmacen[];
+    kpis?: KpisKardex;
+    catalogos?: {
+      almacenes: { id: number; nombre: string; codigo: string }[];
+      productos: { idProducto: number; nombre: string; codigo: string; unidadMedida: string }[];
+    }
+  }> {
     let params = new HttpParams();
     if (filtros.idProducto && filtros.idProducto !== 'todos') {
       params = params.set('idProducto', filtros.idProducto.toString());
@@ -163,8 +189,19 @@ export class AlmacenService {
     if (filtros.fechaFin) {
       params = params.set('fechaFin', filtros.fechaFin);
     }
+    if (filtros.search) {
+      params = params.set('search', filtros.search);
+    }
 
-    return this.http.get<{ code: number; data: MovimientoAlmacen[] }>(`${this.baseUrl}/movimientos`, { params });
+    return this.http.get<{ 
+      code: number; 
+      data: MovimientoAlmacen[];
+      kpis?: KpisKardex;
+      catalogos?: {
+        almacenes: { id: number; nombre: string; codigo: string }[];
+        productos: { idProducto: number; nombre: string; codigo: string; unidadMedida: string }[];
+      }
+    }>(`${this.baseUrl}/movimientos`, { params });
   }
 
   registrarMovimiento(payload: {

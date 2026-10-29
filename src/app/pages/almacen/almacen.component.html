@@ -31,10 +31,10 @@
         <span>Traspaso entre Almacenes</span>
       </button>
 
-      <button type="button" class="btn-hero-kardex" (click)="abrirKardex()" matTooltip="Ver historial completo de movimientos">
+      <!-- <button type="button" class="btn-hero-kardex" (click)="abrirKardex()" matTooltip="Ver historial completo de movimientos">
         <mat-icon>history_edu</mat-icon>
         <span>Ver Kardex</span>
-      </button>
+      </button> -->
 
       <button type="button" class="btn-hero-primary" (click)="abrirNuevoMovimiento()" matTooltip="Registrar entrada, salida o ajuste">
         <mat-icon>add_box</mat-icon>
@@ -207,10 +207,10 @@
               </div>
             </th>
             <th class="text-center">Stock Total</th>
-            <th class="text-end">Costo (S/)</th>
-            <th class="text-end">Precio (S/)</th>
+            <!-- <th class="text-end">Costo (S/)</th>
+            <th class="text-end">Precio (S/)</th> -->
             <th class="text-center">Mínimo</th>
-            <th class="text-end">Valor Total (S/)</th>
+            <!-- <th class="text-end">Valor Total (S/)</th> -->
             <th class="text-center">Acciones ERP</th>
           </tr>
         </thead>
@@ -267,14 +267,14 @@
             </td>
 
             <!-- Costo -->
-            <td class="text-end font-mono">
+            <!-- <td class="text-end font-mono">
               S/ {{ prod.costo | number:'1.2-2' }}
-            </td>
+            </td> -->
 
             <!-- Precio -->
-            <td class="text-end font-mono text-muted">
+            <!-- <td class="text-end font-mono text-muted">
               S/ {{ prod.precio | number:'1.2-2' }}
-            </td>
+            </td> -->
 
             <!-- Stock Mínimo -->
             <td class="text-center">
@@ -282,9 +282,9 @@
             </td>
 
             <!-- Valor Total -->
-            <td class="text-end valor-cell">
+            <!-- <td class="text-end valor-cell">
               S/ {{ prod.valor_total | number:'1.2-2' }}
-            </td>
+            </td> -->
 
             <!-- Acciones ERP -->
             <td class="text-center">

@@ -1,0 +1,369 @@
+<div class="kardex-page-wrapper">
+
+  <!-- CABECERA HERO -->
+  <header class="kardex-hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>history_edu</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Kardex de Almacén & Inventario</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">fact_check</mat-icon>
+          <span>Auditoría física valorizada de entradas, salidas, traslados y ajustes de stock en tiempo real</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="irAlmacenStock()" matTooltip="Ir a la vista de stock por almacén">
+        <mat-icon>warehouse</mat-icon>
+        <span>Stock Almacén</span>
+      </button>
+
+      <button type="button" class="btn-hero-secondary" (click)="cargarMovimientos()" matTooltip="Refrescar lista de movimientos">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span>Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-traspaso" (click)="abrirTraspaso()" matTooltip="Transferir existencias entre almacenes">
+        <mat-icon>sync_alt</mat-icon>
+        <span>+ Traspaso</span>
+      </button>
+
+      <button type="button" class="btn-hero-movimiento" (click)="abrirNuevoMovimiento('E')" matTooltip="Registrar una entrada, salida o ajuste manual">
+        <mat-icon>add_circle</mat-icon>
+        <span>+ Movimiento</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TARJETAS DE KPIS DE KARDEX -->
+  <div class="row g-3 mb-4">
+    <!-- Total Movimientos -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-total" (click)="filtrarPorTipo('todos')" [class.kpi-active]="filtros.tipo === 'todos'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Movimientos Totales</span>
+          <div class="kpi-icon-circle total-circle">
+            <mat-icon>format_list_bulleted</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-primary">{{ kpis.totalMovimientos }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-blue">
+            <mat-icon>receipt_long</mat-icon> Transacciones
+          </span>
+          <span class="kpi-hint">{{ esFiltroHoy ? 'Hoy' : 'En filtro' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Entradas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-entrada" (click)="filtrarPorTipo('E')" [class.kpi-active]="filtros.tipo === 'E'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Entradas / Ingresos</span>
+          <div class="kpi-icon-circle entrada-circle">
+            <mat-icon>arrow_downward</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-success">+{{ kpis.totalEntradas | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-emerald">
+            <mat-icon>add</mat-icon> Unidades 
+          </span>
+          <span class="kpi-hint">Compras & traspasos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Salidas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-salida" (click)="filtrarPorTipo('S')" [class.kpi-active]="filtros.tipo === 'S'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Salidas / Despachos</span>
+          <div class="kpi-icon-circle salida-circle">
+            <mat-icon>arrow_upward</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-danger">-{{ kpis.totalSalidas | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-rose">
+            <mat-icon>remove</mat-icon> Unidades  
+          </span>
+          <span class="kpi-hint">Ventas & mermas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Valor Total Entradas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-valor">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Valorizado Entradas</span>
+          <div class="kpi-icon-circle valor-circle">
+            <mat-icon>monetization_on</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-slate">S/ {{ kpis.valorTotalEntradas | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-slate">
+            <mat-icon>payments</mat-icon> Inversión  
+          </span>
+          <span class="kpi-hint">Costo de reposición</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS AVANZADOS -->
+  <div class="kardex-filters-card mb-4">
+    <div class="filters-grid">
+      <!-- Búsqueda rápida -->
+      <div class="filter-item filter-search">
+        <label class="filter-label">Buscar Producto / SKU / Doc / Glosa:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput [(ngModel)]="filtros.search" (keyup.enter)="cargarMovimientos()" placeholder="Ej: Hamburguesa, PRD-001, Factura 102, Traspaso...">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <button *ngIf="filtros.search" matSuffix mat-icon-button (click)="filtros.search = ''; cargarMovimientos()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <!-- Almacén -->
+      <div class="filter-item">
+        <label class="filter-label">Almacén:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idAlmacen" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">-- Todos los almacenes --</mat-option>
+            <mat-option *ngFor="let alm of almacenes" [value]="alm.id">
+              {{ alm.nombre }} ({{ alm.codigo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Producto -->
+      <div class="filter-item">
+        <label class="filter-label">Producto:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idProducto" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">-- Todos los productos --</mat-option>
+            <mat-option *ngFor="let p of productos" [value]="p.idProducto">
+              [{{ p.codigo }}] {{ p.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Tipo de Movimiento -->
+      <div class="filter-item">
+        <label class="filter-label">Tipo Movimiento:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.tipo" (selectionChange)="cargarMovimientos()">
+            <mat-option value="todos">Todos los movimientos</mat-option>
+            <mat-option value="E">Solo Entradas (E)</mat-option>
+            <mat-option value="S">Solo Salidas (S)</mat-option>
+            <mat-option value="A">Solo Ajustes (A)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Desde -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Desde:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="esFiltroHoy = false; cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha Hasta -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Hasta:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="esFiltroHoy = false; cargarMovimientos()">
+        </mat-form-field>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="filter-actions-inline">
+        <button type="button" class="btn-filter-today" [class.btn-today-active]="esFiltroHoy" (click)="aplicarFiltroHoy()" matTooltip="Filtrar movimientos de hoy">
+          <mat-icon>today</mat-icon>
+          <span>Hoy</span>
+        </button>
+
+        <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
+          <mat-icon>tune</mat-icon>
+          <span>Filtrar</span>
+        </button>
+
+        <button type="button" class="btn-action-reset" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA PRINCIPAL DE KARDEX -->
+  <div class="kardex-table-card">
+    <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="table-loader"></mat-progress-bar>
+
+    <div class="table-responsive">
+      <table class="kardex-table">
+        <thead>
+          <tr>
+            <th>Fecha & Hora</th>
+            <th>Tipo</th>
+            <th>Almacén</th>
+            <th>Producto</th>
+            <th>Motivo / Referencia</th>
+            <th class="text-end">Cantidad</th>
+            <th class="text-center">Stock: Ant. → Result.</th>
+            <th class="text-end">Costo Unit.</th>
+            <th class="text-end">Total Val.</th>
+            <th>Usuario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of movimientosPaginados" class="kardex-row" [ngClass]="{
+            'row-entrada': m.tipo === 'E',
+            'row-salida': m.tipo === 'S',
+            'row-ajuste': m.tipo === 'A'
+          }">
+            <!-- Fecha & Hora -->
+            <td class="cell-date">
+              <span class="date-main">{{ m.created_at | date:'dd/MM/yyyy' }}</span>
+              <span class="date-hour">{{ m.created_at | date:'HH:mm' }}</span>
+            </td>
+
+            <!-- Tipo Badge -->
+            <td>
+              <span *ngIf="m.tipo === 'E'" class="badge-tipo badge-entrada">
+                <mat-icon>arrow_downward</mat-icon> ENTRADA
+              </span>
+              <span *ngIf="m.tipo === 'S'" class="badge-tipo badge-salida">
+                <mat-icon>arrow_upward</mat-icon> SALIDA
+              </span>
+              <span *ngIf="m.tipo === 'A'" class="badge-tipo badge-ajuste">
+                <mat-icon>sync</mat-icon> AJUSTE
+              </span>
+            </td>
+
+            <!-- Almacén -->
+            <td>
+              <div class="almacen-cell">
+                <span class="alm-code">{{ m.almacen_codigo || 'ALM-01' }}</span>
+                <span class="alm-name">{{ m.almacen_nombre }}</span>
+              </div>
+            </td>
+
+            <!-- Producto -->
+            <td>
+              <div class="prod-cell">
+                <div class="prod-head">
+                  <span class="prod-sku">{{ m.producto_codigo }}</span>
+                  <span class="prod-cat" *ngIf="m.categoria_nombre">{{ m.categoria_nombre }}</span>
+                </div>
+                <span class="prod-name" [title]="m.producto_nombre">{{ m.producto_nombre }}</span>
+              </div>
+            </td>
+
+            <!-- Motivo / Documento / Observación -->
+            <td>
+              <div class="motivo-cell">
+                <span class="motivo-text">{{ m.motivo }}</span>
+                <div class="motivo-sub" *ngIf="m.documento || m.observacion">
+                  <span *ngIf="m.documento" class="doc-badge">
+                    <mat-icon>receipt</mat-icon> {{ m.documento }}
+                  </span>
+                  <span *ngIf="m.observacion" class="obs-badge" [title]="m.observacion">
+                    {{ m.observacion }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Cantidad & Unidad -->
+            <td class="text-end font-mono">
+              <span class="cant-badge" [ngClass]="{
+                'cant-entrada': m.tipo === 'E',
+                'cant-salida': m.tipo === 'S',
+                'cant-ajuste': m.tipo === 'A'
+              }">
+                {{ m.tipo === 'E' ? '+' : (m.tipo === 'S' ? '-' : '') }}{{ m.cantidad | number:'1.2-2' }}
+              </span>
+              <span class="cant-unit">{{ m.unidadMedida }}</span>
+            </td>
+
+            <!-- Stock Anterior -> Stock Resultante -->
+            <td class="text-center">
+              <div class="stock-trans-box">
+                <span class="stock-prev">{{ m.stockAnterior | number:'1.2-2' }}</span>
+                <mat-icon class="stock-arrow">trending_flat</mat-icon>
+                <span class="stock-curr">{{ m.stockActual | number:'1.2-2' }}</span>
+              </div>
+            </td>
+
+            <!-- Costo Unitario -->
+            <td class="text-end font-mono">
+              <span class="costo-val">S/ {{ m.costoUnitario | number:'1.2-2' }}</span>
+            </td>
+
+            <!-- Total Valorizado -->
+            <td class="text-end font-mono">
+              <span class="total-val" [ngClass]="m.tipo === 'E' ? 'text-success' : (m.tipo === 'S' ? 'text-danger' : 'text-slate')">
+                S/ {{ (m.totalValorizado || (m.cantidad * m.costoUnitario)) | number:'1.2-2' }}
+              </span>
+            </td>
+
+            <!-- Usuario Responsable -->
+            <td>
+              <span class="user-pill">
+                <mat-icon>person</mat-icon>
+                <span>{{ m.usuario_nombre }}</span>
+              </span>
+            </td>
+          </tr>
+
+          <!-- Vacío -->
+          <tr *ngIf="movimientos.length === 0 && !cargando">
+            <td colspan="10" class="text-center py-5">
+              <div class="empty-state">
+                <mat-icon class="empty-icon">history_edu</mat-icon>
+                <h4 class="empty-title">No hay movimientos en el Kardex</h4>
+                <p class="empty-desc">No se encontraron registros de inventario con los criterios o rango de fechas seleccionados.</p>
+                <button type="button" class="btn-clear-empty" (click)="limpiarFiltros()">
+                  Limpiar Filtros
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PIE DE PAGINACIÓN -->
+    <div class="kardex-footer" *ngIf="movimientos.length > 0">
+      <div class="footer-left">
+        <span class="footer-info">
+          Mostrando {{ (paginaActual - 1) * registrosPorPagina + 1 }} - 
+          {{ (paginaActual * registrosPorPagina > movimientos.length ? movimientos.length : paginaActual * registrosPorPagina) }} 
+          de {{ movimientos.length }} transacciones
+        </span>
+      </div>
+
+      <div class="footer-right">
+        <button type="button" class="btn-page" (click)="cambiarPagina(-1)" [disabled]="paginaActual === 1">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-indicator">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn-page" (click)="cambiarPagina(1)" [disabled]="paginaActual === totalPaginas">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
