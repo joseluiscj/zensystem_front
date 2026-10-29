@@ -110,6 +110,21 @@ export class CajaMovimientoService {
     return this.http.post<{ code: number; message: string; data?: any }>(this.baseUrl, payload);
   }
 
+  actualizarMovimiento(id: number, payload: {
+    idCaja: number;
+    tipo: 'I' | 'E';
+    monto: number;
+    descripcion: string;
+    categoria?: string;
+    beneficiario?: string;
+    tipoComprobante?: string;
+    nroComprobante?: string;
+    metodoPago: string;
+    fecha?: string;
+  }): Observable<{ code: number; message: string; data?: any }> {
+    return this.http.put<{ code: number; message: string; data?: any }>(`${this.baseUrl}/${id}`, payload);
+  }
+
   anularMovimiento(id: number): Observable<{ code: number; message: string }> {
     return this.http.post<{ code: number; message: string }>(`${this.baseUrl}/${id}/anular`, {});
   }

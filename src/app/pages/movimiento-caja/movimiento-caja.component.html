@@ -7,10 +7,10 @@
         <mat-icon>currency_exchange</mat-icon>
       </div>
       <div>
-        <h2 class="hero-title">Movimientos de Caja: Gastos & Ingresos</h2>
+        <h2 class="hero-title">Movimientos de Caja</h2>
         <p class="hero-subtitle">
           <mat-icon class="sub-icon">account_balance</mat-icon>
-          <span>Registro y control financiero de gastos operativos, pagos a proveedores e ingresos directos</span>
+          <span>Control de movimientos financieros</span>
         </p>
       </div>
     </div>
@@ -233,7 +233,7 @@
             <!-- Fecha -->
             <td class="cell-date">
               <span class="date-main">{{ m.fecha | date:'dd/MM/yyyy' }}</span>
-              <span class="date-hour">{{ m.fecha | date:'HH:mm' }}</span>
+              <!-- <span class="date-hour">{{ m.fecha | date:'HH:mm' }}</span> -->
             </td>
 
             <!-- Tipo Badge -->
@@ -311,11 +311,18 @@
 
             <!-- Acciones -->
             <td class="text-center">
-              <button type="button" class="btn-action-anular" 
-                matTooltip="Anular movimiento y revertir saldo"
-                (click)="anularMovimiento(m)">
-                <mat-icon>delete_outline</mat-icon>
-              </button>
+              <div class="action-buttons-group">
+                <button type="button" class="btn-action-edit" 
+                  matTooltip="Editar / Actualizar movimiento"
+                  (click)="abrirEditarMovimiento(m)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button type="button" class="btn-action-anular" 
+                  matTooltip="Anular movimiento y revertir saldo"
+                  (click)="anularMovimiento(m)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
             </td>
           </tr>
 

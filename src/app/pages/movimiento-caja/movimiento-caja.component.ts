@@ -60,7 +60,8 @@ export class MovimientoCajaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cargarMovimientos();
+    // this.cargarMovimientos();
+    this.aplicarFiltroHoy();
   }
 
   cargarMovimientos(): void {
@@ -141,6 +142,26 @@ export class MovimientoCajaComponent implements OnInit {
         cajas: this.cajas,
         categoriasGastos: this.categoriasGastos,
         categoriasIngresos: this.categoriasIngresos
+      }
+    });
+
+    ref.afterClosed().subscribe((guardado) => {
+      if (guardado) {
+        this.cargarMovimientos();
+      }
+    });
+  }
+
+  abrirEditarMovimiento(m: CajaMovimientoItem): void {
+    const ref = this.dialog.open(MovimientoCajaDialogComponent, {
+      disableClose: true,
+      panelClass: 'modal-dialog-right',
+      data: {
+        tipoInicial: m.tipo,
+        cajas: this.cajas,
+        categoriasGastos: this.categoriasGastos,
+        categoriasIngresos: this.categoriasIngresos,
+        movimiento: m
       }
     });
 

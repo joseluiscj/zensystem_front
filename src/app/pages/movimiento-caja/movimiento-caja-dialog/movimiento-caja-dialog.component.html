@@ -11,10 +11,17 @@
       </div>
       <div class="drawer-header-text">
         <h3 class="drawer-title">
-          {{ tipoActual === 'I' ? 'Ingreso Extraordinario' : 'Registrar Gasto / Egreso' }}
+          <ng-container *ngIf="esEdicion">
+            {{ tipoActual === 'I' ? 'Actualizar Ingreso Extra' : 'Actualizar Gasto / Egreso' }}
+          </ng-container>
+          <ng-container *ngIf="!esEdicion">
+            {{ tipoActual === 'I' ? 'Ingreso Extraordinario' : 'Registrar Gasto / Egreso' }}
+          </ng-container>
         </h3>
         <div class="drawer-subtitle-row">
-          <span class="drawer-subtitle">Control de flujos y caja en tiempo real</span>
+          <span class="drawer-subtitle">
+            {{ esEdicion ? 'Modificación de registro contable en caja' : 'Control de flujos y caja en tiempo real' }}
+          </span>
         </div>
       </div>
     </div>
@@ -31,7 +38,7 @@
     <div class="drawer-body">
 
       <!-- 1. SELECTOR DE TIPO (Segmented Toggle) -->
-      <div class="form-group-custom" >
+      <div class="form-group-custom">
         <label class="form-label-custom">Naturaleza de la Transacción</label>
         <div class="segmented-type-toggle">
           <button 
@@ -66,8 +73,21 @@
         </mat-form-field>
       </div>
 
-      <!-- 3. MONTO E IMPORTE (S/) Y MEDIO DE PAGO -->
-      <div class="row g-2"  style="margin-bottom: -25px;">
+      <!-- 3. FECHA DE OPERACIÓN Y MONTO (S/) -->
+      <div class="row g-2" style="margin-bottom: -25px;">
+        <!-- Fecha -->
+        <div class="col-6">
+          <label class="form-label-custom">Fecha *</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <input 
+              matInput 
+              type="date" 
+              formControlName="fecha" 
+              required>
+            <mat-icon matPrefix class="field-icon-prefix">calendar_today</mat-icon>
+          </mat-form-field>
+        </div>
+
         <!-- Monto -->
         <div class="col-6">
           <label class="form-label-custom">Importe / Monto (S/) *</label>
@@ -83,7 +103,10 @@
             <span matPrefix class="currency-prefix">S/&nbsp;</span>
           </mat-form-field>
         </div>
+      </div>
 
+      <!-- 4. MEDIO DE PAGO Y CATEGORÍA / CONCEPTO -->
+      <div class="row g-2" style="margin-bottom: -25px;">
         <!-- Medio de Pago -->
         <div class="col-6">
           <label class="form-label-custom">Medio de Pago *</label>
@@ -93,31 +116,32 @@
                 {{ m.nombre }}
               </mat-option>
             </mat-select>
+            <mat-icon matPrefix class="field-icon-prefix">payments</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Categoría -->
+        <div class="col-6">
+          <label class="form-label-custom">Categoría / Concepto *</label>
+          <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <mat-select formControlName="categoria" placeholder="Seleccione">
+              <mat-option *ngFor="let cat of categoriasActuales" [value]="cat">
+                {{ cat }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix class="field-icon-prefix">category</mat-icon>
           </mat-form-field>
         </div>
       </div>
 
-      <!-- 4. CATEGORÍA / CONCEPTO -->
-      <div class="form-group-custom" style="margin-bottom: -25px;">
-        <label class="form-label-custom">Categoría / Concepto *</label>
-        <mat-form-field appearance="outline" class="w-100 drawer-field">
-          <mat-select formControlName="categoria" placeholder="Seleccione concepto">
-            <mat-option *ngFor="let cat of categoriasActuales" [value]="cat">
-              {{ cat }}
-            </mat-option>
-          </mat-select>
-          <mat-icon matPrefix class="field-icon-prefix">category</mat-icon>
-        </mat-form-field>
-      </div>
-
       <!-- 5. DESCRIPCIÓN Y SUGERENCIAS RÁPIDAS -->
-      <div class="form-group-custom" >
+      <div class="form-group-custom">
         <label class="form-label-custom">Descripción / Glosa *</label>
         <mat-form-field appearance="outline" class="w-100 drawer-field">
           <input 
             matInput 
             formControlName="descripcion" 
-            placeholder="Ej: Pago de recibo de luz, compra urgente de hielo..."
+            placeholder="Ej: Pago de recibo de luz, compra urgente de insumos..."
             required>
           <mat-icon matPrefix class="field-icon-prefix">edit_note</mat-icon>
         </mat-form-field>
@@ -152,23 +176,15 @@
         </button>
 
         <div class="advanced-fields-box mt-2" *ngIf="mostrarDetallesAvanzados">
-          <!-- Beneficiario y Fecha -->
-          <div class="row g-2 mb-2">
-            <div class="col-7">
-              <label class="form-label-custom">
-                {{ tipoActual === 'E' ? 'Pagado a (Proveedor / Persona)' : 'Recibido de (Cliente / Persona)' }}
-              </label>
-              <mat-form-field appearance="outline" class="w-100 drawer-field">
-                <input matInput formControlName="beneficiario" placeholder="Ej: Luz del Sur, Insumos S.A.">
-                <mat-icon matPrefix class="field-icon-prefix">person_outline</mat-icon>
-              </mat-form-field>
-            </div>
-            <div class="col-5">
-              <label class="form-label-custom">Fecha *</label>
-              <mat-form-field appearance="outline" class="w-100 drawer-field">
-                <input matInput type="date" formControlName="fecha">
-              </mat-form-field>
-            </div>
+          <!-- Beneficiario -->
+          <div class="form-group-custom mb-2">
+            <label class="form-label-custom">
+              {{ tipoActual === 'E' ? 'Pagado a (Proveedor / Persona)' : 'Recibido de (Cliente / Persona)' }}
+            </label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <input matInput formControlName="beneficiario" placeholder="Ej: Luz del Sur, Insumos S.A., Carlos Mendoza">
+              <mat-icon matPrefix class="field-icon-prefix">person_outline</mat-icon>
+            </mat-form-field>
           </div>
 
           <!-- Tipo y Número de Comprobante -->
@@ -252,7 +268,9 @@
         [disabled]="cargando || movimientoForm.invalid">
         <mat-icon *ngIf="!cargando">check_circle</mat-icon>
         <i class="fas fa-spinner fa-spin" *ngIf="cargando"></i>
-        <span>{{ cargando ? 'Guardando...' : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto') }}</span>
+        <span>
+          {{ cargando ? 'Guardando...' : (esEdicion ? (tipoActual === 'I' ? 'Actualizar Ingreso' : 'Actualizar Gasto') : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto')) }}
+        </span>
       </button>
     </div>
   </form>
