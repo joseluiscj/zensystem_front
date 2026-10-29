@@ -40,8 +40,8 @@
           <span class="meta-val font-bold">#{{ pedido.id }}</span>
         </div>
         <div class="meta-row">
-          <span class="meta-label">Mesa:</span>
-          <span class="meta-val badge-mesa">{{ pedido.mesa_nombre }}</span>
+          <span class="meta-label">Mesa / Canal:</span>
+          <span class="meta-val badge-mesa">{{ (!pedido.f_idMesa || pedido.mesa_nombre === 'Sin Mesa') ? 'Venta Directa (POS)' : pedido.mesa_nombre }}</span>
         </div>
         <div class="meta-row">
           <span class="meta-label">Cliente:</span>

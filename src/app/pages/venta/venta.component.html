@@ -29,6 +29,10 @@
           <mat-icon>table_restaurant</mat-icon>
           <span>Salón Restaurante</span>
         </button>
+        <button type="button" class="btn-hero-pos" (click)="abrirNuevaVenta()" matTooltip="Registrar venta directa al mostrador (POS)">
+          <mat-icon>point_of_sale</mat-icon>
+          <span>Nueva Venta</span>
+        </button>
       </div>
     </header>
 
@@ -241,9 +245,13 @@
 
               <!-- Mesa -->
               <td class="td-mesa">
-                <span class="badge-table-name">
+                <span *ngIf="v.idMesa && v.mesa_nombre !== 'Sin Mesa'" class="badge-table-name">
                   <mat-icon>table_restaurant</mat-icon>
                   {{ v.mesa_nombre }}
+                </span>
+                <span *ngIf="!v.idMesa || v.mesa_nombre === 'Sin Mesa'" class="badge-table-pos">
+                  <mat-icon>point_of_sale</mat-icon>
+                  Venta Directa
                 </span>
               </td>
 
@@ -341,7 +349,15 @@
 
 
   <!-- ============================================================
-       MODO 2: EDICIÓN COMPLETA DE COMANDA / PEDIDO
+       MODO 2: PUNTO DE VENTA DIRECTA (PANTALLA COMPLETA)
+       ============================================================ -->
+  <ng-container *ngIf="modo === 'pos'">
+    <app-venta-pos (volver)="cerrarPos($event)"></app-venta-pos>
+  </ng-container>
+
+
+  <!-- ============================================================
+       MODO 3: EDICIÓN COMPLETA DE COMANDA / PEDIDO
        ============================================================ -->
   <ng-container *ngIf="modo === 'editar'">
 

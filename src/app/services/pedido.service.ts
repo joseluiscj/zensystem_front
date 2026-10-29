@@ -89,6 +89,37 @@ export class PedidoService extends GenericService<Pedido> {
     return this.http.get<PedidoCompletoResponse>(`${this.url}/${id}`);
   }
 
+  getPosCatalogo(): Observable<{
+    code: number;
+    data: {
+      productos: any[];
+      categorias: any[];
+      cajas: any[];
+      cajeros: any[];
+      almacenes: any[];
+    };
+  }> {
+    return this.http.get<any>(`${this.url}/pos-catalogo`);
+  }
+
+  registrarVentaDirecta(payload: {
+    montoTotal: number;
+    pagoCon: string;
+    montoEfectivo?: number;
+    montoVuelto?: number;
+    nombreCliente?: string;
+    idCaja?: number;
+    idAlmacen?: number;
+    detalle: Array<{
+      idProducto: number;
+      cantidad: number;
+      precio: number;
+      observacion?: string;
+    }>;
+  }): Observable<{ code: number; message: string; data?: any }> {
+    return this.http.post<{ code: number; message: string; data?: any }>(`${this.url}/venta-directa`, payload);
+  }
+
   anularPedido(id: number): Observable<{ code: number; message: string }> {
     return this.http.delete<{ code: number; message: string }>(`${this.url}/${id}`);
   }

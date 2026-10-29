@@ -11,6 +11,7 @@ import { VentaDetalleDialogComponent } from './venta-detalle-dialog/venta-detall
 import { RestauranteDialogDetalleComponent } from '../restaurante/restaurante-pedido/restaurante-dialog-detalle/restaurante-dialog-detalle.component';
 import { AlertMsjComponent } from '../alert-msj/alert-msj.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { VentaPosComponent } from './venta-pos/venta-pos.component';
 
 @Component({
   selector: 'app-venta',
@@ -24,14 +25,15 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     NgFor,
     DecimalPipe,
     DatePipe,
-    MatProgressBarModule
+    MatProgressBarModule,
+    VentaPosComponent
   ],
   templateUrl: './venta.component.html',
   styleUrl: './venta.component.css'
 })
 export class VentaComponent implements OnInit {
-  // Modo de visualización: 'lista' o 'editar'
-  modo: 'lista' | 'editar' = 'lista';
+  // Modo de visualización: 'lista', 'editar' o 'pos' (Punto de Venta pantalla completa)
+  modo: 'lista' | 'editar' | 'pos' = 'lista';
   cargando: boolean = false;
 
   // Listado de ventas
@@ -185,6 +187,17 @@ export class VentaComponent implements OnInit {
   }
 
   // --- ACCIONES DEL LISTADO ---
+
+  abrirNuevaVenta(): void {
+    this.modo = 'pos';
+  }
+
+  cerrarPos(registrado: boolean): void {
+    this.modo = 'lista';
+    if (registrado) {
+      this.cargarVentas();
+    }
+  }
 
   verDetalle(idPedido: number): void {
     const dialogRef = this.dialog.open(VentaDetalleDialogComponent, {

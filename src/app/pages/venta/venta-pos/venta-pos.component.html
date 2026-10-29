@@ -1,0 +1,424 @@
+<div class="pos-full-wrapper">
+
+  <!-- ============================================================
+       TOPBAR / CABECERA PRINCIPAL DEL PUNTO DE VENTA
+       ============================================================ -->
+  <header class="pos-topbar">
+    <div class="pos-topbar-left">
+      <button type="button" class="btn-topbar-back" (click)="regresar(false)" matTooltip="Regresar al listado de ventas">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Volver a Ventas</span>
+      </button>
+
+      <div class="pos-indicator">
+        <div class="pos-icon-box">
+          <mat-icon>point_of_sale</mat-icon>
+        </div>
+        <div class="pos-indicator-details">
+          <h2 class="pos-main-title">Punto de Venta / Mostrador</h2>
+          <div class="pos-badge-status">
+            <span class="status-indicator-dot"></span>
+            <span>Venta Directa sin Mesa &bull; Despacho y Cobro Inmediato</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pos-topbar-actions">
+      <!-- Botón Vaciar Ticket -->
+      <button 
+        *ngIf="carrito.length > 0" 
+        type="button" 
+        class="btn-topbar-danger" 
+        (click)="limpiarCarrito()"
+        matTooltip="Eliminar todos los productos del ticket">
+        <mat-icon>delete_sweep</mat-icon>
+        <span class="d-none d-sm-inline">Vaciar Ticket</span>
+      </button>
+
+      <!-- Indicador de Total Rápido -->
+      <div class="topbar-total-pill">
+        <span class="pill-label">Total:</span>
+        <span class="pill-val">S/ {{ totalVenta | number:'1.2-2' }}</span>
+      </div>
+
+      <!-- Botón de Cobro Directo en Cabecera -->
+      <button 
+        type="button" 
+        class="btn-topbar-primary" 
+        (click)="guardarVenta()" 
+        [disabled]="!esValidoParaCobrar || guardando"
+        matTooltip="Confirmar y procesar venta">
+        <mat-icon>check_circle</mat-icon>
+        <span>Cobrar (S/ {{ totalVenta | number:'1.2-2' }})</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Barra de progreso si está procesando -->
+  <mat-progress-bar *ngIf="cargando || guardando" mode="indeterminate" class="pos-loading-bar"></mat-progress-bar>
+
+  <!-- ============================================================
+       CONTENIDO PRINCIPAL EN 2 COLUMNAS (CATÁLOGO vs TICKET/COBRO)
+       ============================================================ -->
+  <div class="pos-main-layout">
+    <div class="row g-3">
+
+      <!-- ==========================================
+           COLUMNA IZQUIERDA: CATÁLOGO DE PRODUCTOS (7 u 8 cols)
+           ========================================== -->
+      <div class="col-12 col-xl-7 col-xxl-8">
+        <div class="pos-card catalog-panel">
+
+          <!-- Buscador y Filtros -->
+          <div class="catalog-header">
+            <!-- Buscador -->
+            <div class="pos-search-wrapper">
+              <mat-icon class="search-icon">search</mat-icon>
+              <input 
+                type="text" 
+                class="form-control pos-search-input" 
+                placeholder="Buscar por nombre de producto o código..."
+                [(ngModel)]="searchProducto"
+                (input)="filtrarProductos()"
+              />
+              <button 
+                *ngIf="searchProducto" 
+                type="button" 
+                class="btn-clear-search" 
+                (click)="searchProducto = ''; filtrarProductos()"
+                matTooltip="Limpiar búsqueda">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </div>
+
+            <!-- Chips de Categorías -->
+            <div class="pos-categories-scroll">
+              <button 
+                type="button" 
+                class="cat-chip" 
+                [class.active]="categoriaSeleccionada === 'todas'"
+                (click)="setCategoria('todas')">
+                <mat-icon>apps</mat-icon>
+                <span>Todas</span>
+                <span class="cat-count">{{ productos.length }}</span>
+              </button>
+              <button 
+                *ngFor="let cat of categorias" 
+                type="button" 
+                class="cat-chip" 
+                [class.active]="categoriaSeleccionada === cat.id"
+                (click)="setCategoria(cat.id)">
+                <mat-icon>category</mat-icon>
+                <span>{{ cat.nombre }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cabecera de estado del catálogo -->
+          <div class="catalog-subbar">
+            <span class="catalog-results-text">
+              <mat-icon>inventory_2</mat-icon>
+              <span>{{ productosFiltrados.length }} productos encontrados</span>
+            </span>
+            <span class="catalog-hint text-muted">Haga clic en un producto para agregarlo al ticket</span>
+          </div>
+
+          <!-- Loading state -->
+          <div *ngIf="cargando" class="text-center py-5">
+            <mat-progress-bar mode="query" style="max-width: 280px; margin: 0 auto;"></mat-progress-bar>
+            <p class="text-muted mt-3 small">Cargando catálogo de productos...</p>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="!cargando && productosFiltrados.length === 0" class="empty-catalog-box">
+            <mat-icon>search_off</mat-icon>
+            <h4>No se encontraron productos</h4>
+            <p>Pruebe con otro término de búsqueda o seleccione otra categoría.</p>
+          </div>
+
+          <!-- Grilla de Productos -->
+          <div *ngIf="!cargando && productosFiltrados.length > 0" class="products-grid">
+            <div 
+              *ngFor="let prod of productosFiltrados" 
+              class="product-card"
+              (click)="agregarAlCarrito(prod)"
+              matRipple>
+
+              <!-- Imagen o Placeholder -->
+              <div class="product-thumb-container">
+                <img *ngIf="prod.imgId" [src]="prod.imgId" [alt]="prod.nombre" class="product-img" />
+                <div *ngIf="!prod.imgId" class="product-img-placeholder">
+                  <mat-icon>fastfood</mat-icon>
+                </div>
+
+                <!-- Badge de Categoría -->
+                <span class="category-tag">{{ prod.categoria_nombre || 'General' }}</span>
+
+                <!-- Badge de Stock -->
+                <span 
+                  *ngIf="prod.controlStock" 
+                  class="stock-tag"
+                  [ngClass]="prod.stock > 0 ? 'stock-ok' : 'stock-out'">
+                  Stock: {{ prod.stock }}
+                </span>
+                <span *ngIf="!prod.controlStock" class="stock-tag stock-unlimited">
+                  Libre
+                </span>
+              </div>
+
+              <!-- Info del Producto -->
+              <div class="product-info-box">
+                <h4 class="product-title" [title]="prod.nombre">{{ prod.nombre }}</h4>
+                <div class="product-code text-muted" *ngIf="prod.codigo">{{ prod.codigo }}</div>
+                
+                <div class="product-footer">
+                  <div class="product-price">S/ {{ prod.precio | number:'1.2-2' }}</div>
+                  <button type="button" class="btn-add-circle" matTooltip="Agregar al ticket">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==========================================
+           COLUMNA DERECHA: TICKET DE VENTA & COBRANZA (5 o 4 cols)
+           ========================================== -->
+      <div class="col-12 col-xl-5 col-xxl-4">
+        <div class="pos-card ticket-checkout-panel">
+
+          <!-- 1. Cabecera del Ticket -->
+          <div class="ticket-header">
+            <div class="d-flex align-items-center gap-2">
+              <div class="ticket-icon-box">
+                <mat-icon>receipt</mat-icon>
+              </div>
+              <div>
+                <h3 class="ticket-title">Ticket de Venta</h3>
+                <span class="ticket-items-count">{{ totalItems }} artículo(s)</span>
+              </div>
+            </div>
+
+            <button 
+              *ngIf="carrito.length > 0" 
+              type="button" 
+              class="btn-vaciar-link" 
+              (click)="limpiarCarrito()"
+              matTooltip="Vaciar ticket">
+              <mat-icon>delete_sweep</mat-icon> Vaciar
+            </button>
+          </div>
+
+          <!-- 2. Lista de Items en el Ticket -->
+          <div *ngIf="carrito.length === 0" class="ticket-empty-card">
+            <div class="empty-cart-icon">
+              <mat-icon>shopping_cart</mat-icon>
+            </div>
+            <h4>Ticket sin productos</h4>
+            <p>Seleccione productos del catálogo a la izquierda para armar la venta de mostrador.</p>
+          </div>
+
+          <div *ngIf="carrito.length > 0" class="ticket-items-container">
+            <div *ngFor="let item of carrito; let i = index" class="ticket-row-card">
+              <div class="ticket-row-main">
+                <div class="ticket-row-title">{{ item.nombre }}</div>
+                <div class="ticket-row-meta">
+                  <span class="ticket-unit-price">S/ {{ item.precio | number:'1.2-2' }} c/u</span>
+                  <span *ngIf="item.controlStock" class="text-muted">&bull; Disp: {{ item.stock }}</span>
+                </div>
+              </div>
+
+              <!-- Stepper -->
+              <div class="ticket-stepper">
+                <button type="button" class="btn-stepper minus" (click)="cambiarCantidad(item, -1)" matTooltip="Reducir">
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <input 
+                  type="number" 
+                  class="stepper-input" 
+                  [value]="item.cantidad" 
+                  min="1"
+                  (change)="actualizarCantidadInput(item, $event)"
+                />
+                <button type="button" class="btn-stepper plus" (click)="cambiarCantidad(item, 1)" matTooltip="Aumentar">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="ticket-subtotal">
+                S/ {{ item.subtotal | number:'1.2-2' }}
+              </div>
+
+              <!-- Botón Eliminar -->
+              <button type="button" class="btn-remove-row" (click)="eliminarDelCarrito(item)" matTooltip="Eliminar del ticket">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <mat-divider class="my-3"></mat-divider>
+
+          <!-- 3. Formulario de Cliente, Comprobante y Cajas -->
+          <div class="checkout-form-section">
+            <h4 class="checkout-section-title">
+              <mat-icon>badge</mat-icon> Datos de Facturación & Despacho
+            </h4>
+
+            <div class="row g-2 mb-3">
+              <!-- Cliente -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label-pos">Cliente</label>
+                <div class="pos-input-group">
+                  <mat-icon class="input-icon">person</mat-icon>
+                  <input 
+                    type="text" 
+                    class="form-control pos-form-control" 
+                    placeholder="Nombre o Razón Social"
+                    [(ngModel)]="nombreCliente"
+                  />
+                </div>
+              </div>
+
+              <!-- Tipo de Comprobante -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label-pos">Comprobante</label>
+                <div class="pos-input-group">
+                  <mat-icon class="input-icon">description</mat-icon>
+                  <select class="form-select pos-form-control" [(ngModel)]="tipoComprobante">
+                    <option *ngFor="let t of tiposComprobante" [value]="t">{{ t }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Caja a Afectar -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label-pos">Caja de Cobro *</label>
+                <div class="pos-input-group">
+                  <mat-icon class="input-icon">point_of_sale</mat-icon>
+                  <select class="form-select pos-form-control" [(ngModel)]="idCajaSeleccionada">
+                    <option *ngFor="let c of cajas" [value]="c.id">
+                      {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Almacén de Salida -->
+              <div class="col-12 col-sm-6">
+                <label class="form-label-pos">Almacén de Salida</label>
+                <div class="pos-input-group">
+                  <mat-icon class="input-icon">warehouse</mat-icon>
+                  <select class="form-select pos-form-control" [(ngModel)]="idAlmacenSeleccionado">
+                    <option *ngFor="let a of almacenes" [value]="a.id">
+                      {{ a.nombre }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Métodos de Pago -->
+            <h4 class="checkout-section-title">
+              <mat-icon>payments</mat-icon> Método de Cobro
+            </h4>
+
+            <div class="payment-methods-grid mb-3">
+              <button 
+                *ngFor="let m of mediosPago" 
+                type="button" 
+                class="btn-payment-method"
+                [class.active]="pagoCon === m.codigo"
+                (click)="setMedioPago(m.codigo)">
+                <mat-icon>{{ m.icon }}</mat-icon>
+                <span>{{ m.nombre }}</span>
+              </button>
+            </div>
+
+            <!-- Panel de Efectivo y Vuelto -->
+            <div *ngIf="pagoCon === 'EF'" class="cash-calculator-card mb-3">
+              <label class="form-label-pos">Monto Recibido en Efectivo (S/)</label>
+
+              <!-- Botones sugeridos -->
+              <div class="quick-cash-buttons mb-2">
+                <button type="button" class="btn-quick-cash exact" (click)="setMontoSugerido(totalVenta)">
+                  Exacto (S/ {{ totalVenta | number:'1.2-2' }})
+                </button>
+                <button *ngIf="totalVenta <= 20" type="button" class="btn-quick-cash" (click)="setMontoSugerido(20)">
+                  S/ 20
+                </button>
+                <button *ngIf="totalVenta <= 50" type="button" class="btn-quick-cash" (click)="setMontoSugerido(50)">
+                  S/ 50
+                </button>
+                <button *ngIf="totalVenta <= 100" type="button" class="btn-quick-cash" (click)="setMontoSugerido(100)">
+                  S/ 100
+                </button>
+                <button type="button" class="btn-quick-cash" (click)="setMontoSugerido(200)">
+                  S/ 200
+                </button>
+              </div>
+
+              <!-- Input y Vuelto -->
+              <div class="row g-2 align-items-center">
+                <div class="col-6">
+                  <div class="pos-input-group">
+                    <mat-icon class="input-icon">attach_money</mat-icon>
+                    <input 
+                      type="number" 
+                      step="0.10"
+                      min="0"
+                      class="form-control pos-form-control text-end fs-5 fw-bold" 
+                      placeholder="0.00"
+                      [(ngModel)]="montoEfectivo"
+                    />
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="change-display-box" [class.change-positive]="vuelto > 0" [class.change-negative]="montoEfectivo !== null && montoEfectivo < totalVenta">
+                    <span class="change-label">Vuelto a entregar:</span>
+                    <span class="change-amount">
+                      S/ {{ (montoEfectivo !== null && montoEfectivo >= totalVenta ? vuelto : 0) | number:'1.2-2' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="montoEfectivo !== null && montoEfectivo < totalVenta" class="alert-insufficient-cash mt-2">
+                <mat-icon>warning</mat-icon>
+                <span>Faltan S/ {{ (totalVenta - montoEfectivo) | number:'1.2-2' }} para cubrir el total</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 5. Resumen Total y Botón de Finalización -->
+          <div class="checkout-footer-card">
+            <div class="checkout-total-row">
+              <span class="label">TOTAL A COBRAR</span>
+              <span class="val">S/ {{ totalVenta | number:'1.2-2' }}</span>
+            </div>
+
+            <button 
+              type="button" 
+              class="btn-complete-sale" 
+              (click)="guardarVenta()" 
+              [disabled]="!esValidoParaCobrar || guardando">
+              <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+              <mat-icon *ngIf="guardando" class="spin-icon">refresh</mat-icon>
+              <span *ngIf="!guardando">COBRAR Y REGISTRAR VENTA (S/ {{ totalVenta | number:'1.2-2' }})</span>
+              <span *ngIf="guardando">PROCESANDO COBRO...</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

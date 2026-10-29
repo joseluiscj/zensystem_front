@@ -79,7 +79,8 @@
 }
 
 .btn-hero-primary,
-.btn-hero-secondary {
+.btn-hero-secondary,
+.btn-hero-pos {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -90,6 +91,19 @@
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
+}
+
+.btn-hero-pos {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-hero-pos:hover {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.38);
+  transform: translateY(-1px);
 }
 
 .btn-hero-primary {
@@ -522,6 +536,25 @@
 }
 
 .badge-table-name mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.badge-table-pos {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-table-pos mat-icon {
   font-size: 14px;
   width: 14px;
   height: 14px;
