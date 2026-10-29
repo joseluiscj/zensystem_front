@@ -125,12 +125,28 @@
                 </td>
               </ng-container>
 
+              <!-- Control Stock -->
+              <ng-container matColumnDef="controlStock">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Control Stock </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                  <span *ngIf="row.controlStock != 0" style="background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;">
+                    <mat-icon style="font-size: 13px; width: 13px; height: 13px;">check_circle</mat-icon> Almacén
+                  </span>
+                  <span *ngIf="row.controlStock == 0" style="background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;">
+                    <mat-icon style="font-size: 13px; width: 13px; height: 13px;">block</mat-icon> Sin Stock
+                  </span>
+                </td>
+              </ng-container>
+
               <!-- Stock Minimo -->
               <ng-container matColumnDef="stockMinimo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Stock Mínimo </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Stock Mínimo </th>
                 <td mat-cell *matCellDef="let row" style="text-align: center;">
-                  <span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
+                  <span *ngIf="row.controlStock != 0" style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
                     {{row.stockMinimo}}
+                  </span>
+                  <span *ngIf="row.controlStock == 0" style="color: #94a3b8; font-size: 11px;">
+                    -
                   </span>
                 </td>
               </ng-container>

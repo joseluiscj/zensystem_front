@@ -66,7 +66,7 @@ export class AlmacenMovimientoDialogComponent implements OnInit {
     private almacenService: AlmacenService,
     private snackBar: MatSnackBar
   ) {
-    this.productos = data?.productosList || [];
+    this.productos = (data?.productosList || []).filter(p => p.controlStock === undefined || p.controlStock == 1 || p.controlStock === true);
     this.almacenes = data?.almacenes || [];
     if (data?.producto) {
       this.productoSeleccionado = data.producto;

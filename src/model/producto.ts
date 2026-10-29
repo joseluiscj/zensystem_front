@@ -9,6 +9,7 @@ export class Producto {
     costo: number;
     stock: number;
     stockMinimo: number;
+    controlStock?: boolean | number;
     unidadMedida: string;
     categoria: string;
     estado: string;
@@ -19,6 +20,7 @@ export class Producto {
     f_precio: number;
     f_costo: number;
     f_stockMinimo: number;
+    f_controlStock?: boolean | number;
     f_unidadMedida: string;
     f_codigo: string;
     f_descripcion: string;

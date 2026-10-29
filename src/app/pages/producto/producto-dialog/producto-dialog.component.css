@@ -338,6 +338,79 @@
   color: #be123c !important;
 }
 
+/* CONTROL DE STOCK CARD */
+.control-stock-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.control-stock-card:hover {
+  border-color: #cbd5e1;
+}
+
+.control-stock-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.control-stock-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.icon-stock-on {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.icon-stock-off {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.control-stock-icon mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.control-stock-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.control-stock-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.control-stock-desc {
+  font-size: 0.68rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+.stock-toggle {
+  transform: scale(0.9);
+}
+
 /* PIE FIJO DEL DRAWER */
 .drawer-footer {
   display: flex;

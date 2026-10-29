@@ -59,6 +59,7 @@ export class ProductoComponent {
     'nombre', 
     'costo',
     'precio',
+    'controlStock',
     'stockMinimo',
     'unidadMedida',
     'actions',

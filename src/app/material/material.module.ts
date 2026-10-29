@@ -25,6 +25,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {MatListModule} from '@angular/material/list';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { CustomDateAdapter } from './custom-adapter';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
@@ -59,6 +60,7 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     MatGridListModule,
     MatListModule,
     MatTabsModule,
+    MatSlideToggleModule,
     
   ],
   providers: [

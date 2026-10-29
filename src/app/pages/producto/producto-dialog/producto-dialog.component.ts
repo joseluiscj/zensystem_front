@@ -96,7 +96,15 @@ export class ProductoDialogComponent implements OnInit {
     return Math.round((precio - costo) * 100) / 100;
   }
 
+  get controlStockActivo(): boolean {
+    return !!this.basicForm?.get('controlStock')?.value;
+  }
+
   private initialFrm() {
+    const controlStockVal = (this.producto?.f_controlStock !== undefined && this.producto?.f_controlStock !== null)
+      ? (this.producto.f_controlStock == 1 || this.producto.f_controlStock === true)
+      : true;
+
     this.basicForm = new UntypedFormGroup({
       id: new UntypedFormControl(this.producto?.id),
       codigo: new UntypedFormControl(this.producto?.f_codigo || ''),
@@ -104,6 +112,7 @@ export class ProductoDialogComponent implements OnInit {
       nombre: new UntypedFormControl(this.producto?.f_nombre, [Validators.required]),
       precio: new UntypedFormControl(this.producto?.f_precio || 0, [Validators.required, Validators.min(0)]),
       costo: new UntypedFormControl(this.producto?.f_costo || 0, [Validators.min(0)]),
+      controlStock: new UntypedFormControl(controlStockVal),
       stockMinimo: new UntypedFormControl(this.producto?.f_stockMinimo !== undefined ? this.producto?.f_stockMinimo : 5, [Validators.min(0)]),
       unidadMedida: new UntypedFormControl(this.producto?.f_unidadMedida || 'UNIDAD', [Validators.required]),
       descripcion: new UntypedFormControl(this.producto?.f_descripcion || ''),
@@ -138,6 +147,7 @@ export class ProductoDialogComponent implements OnInit {
       ObjP.f_nombre = this.basicForm.controls["nombre"].value;
       ObjP.f_precio = parseFloat(this.basicForm.controls["precio"].value || 0);
       ObjP.f_costo = parseFloat(this.basicForm.controls["costo"].value || 0);
+      ObjP.f_controlStock = this.basicForm.controls["controlStock"].value ? 1 : 0;
       ObjP.f_stockMinimo = parseFloat(this.basicForm.controls["stockMinimo"].value || 5);
       ObjP.f_unidadMedida = this.basicForm.controls["unidadMedida"].value;
       ObjP.f_descripcion = this.basicForm.controls["descripcion"].value;

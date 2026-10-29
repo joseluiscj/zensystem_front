@@ -300,14 +300,14 @@
                 <mat-icon>military_tech</mat-icon>
               </div>
               <div>
-                <h3 class="dash-card-title">Platos Más Vendidos</h3>
-                <p class="dash-card-subtitle">Platos y bebidas más solicitados {{ filtroActivo === 'hoy' ? 'hoy' : (filtroActivo === 'rango' ? 'en el período' : '') }}</p>
+                <h3 class="dash-card-title">Más Vendidos</h3>
+                <p class="dash-card-subtitle">Más solicitados {{ filtroActivo === 'hoy' ? 'hoy' : (filtroActivo === 'rango' ? 'en el período' : '') }}</p>
               </div>
             </div>
-            <button type="button" class="dash-btn-link" (click)="irProductos()">
+            <!-- <button type="button" class="dash-btn-link" (click)="irProductos()">
               <span>Menú</span>
               <mat-icon>arrow_forward</mat-icon>
-            </button>
+            </button> -->
           </div>
 
           <div *ngIf="dashboard.topProductos && dashboard.topProductos.length > 0" class="top-products-list">

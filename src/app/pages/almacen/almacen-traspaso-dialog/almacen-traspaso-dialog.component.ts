@@ -49,7 +49,7 @@ export class AlmacenTraspasoDialogComponent implements OnInit {
     private almacenService: AlmacenService,
     private snackBar: MatSnackBar
   ) {
-    this.productos = data?.productosList || [];
+    this.productos = (data?.productosList || []).filter(p => p.controlStock === undefined || p.controlStock == 1 || p.controlStock === true);
     this.almacenes = data?.almacenes || [];
     this.productoSeleccionado = data?.producto || (this.productos.length > 0 ? this.productos[0] : null);
   }

@@ -25,6 +25,7 @@ export interface ProductoAlmacen {
   costo: number;
   stock: number;
   stockMinimo: number;
+  controlStock?: number | boolean;
   unidadMedida: string;
   ubicacion: string;
   valor_total: number;

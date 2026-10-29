@@ -158,10 +158,30 @@
           </div>
         </div>
 
-        <!-- 5. STOCK MÍNIMO Y UNIDAD DE MEDIDA -->
-        <div class="row g-2"  style="margin-bottom: -25px !important;">
-          <!-- Stock Mínimo -->
-          <div class="col-6">
+        <!-- 5. CONTROL DE STOCK / INVENTARIO EN ALMACÉN -->
+        <div class="control-stock-card mb-3">
+          <div class="control-stock-info">
+            <div class="control-stock-icon" [ngClass]="controlStockActivo ? 'icon-stock-on' : 'icon-stock-off'">
+              <mat-icon>{{ controlStockActivo ? 'inventory' : 'inventory_2' }}</mat-icon>
+            </div>
+            <div class="control-stock-text">
+              <span class="control-stock-title">Control de Stock & Kardex</span>
+              <span class="control-stock-desc">
+                {{ controlStockActivo ? 'Gestionar en Almacén, Kardex y alertas' : 'Sin inventario (servicios o no inventariable)' }}
+              </span>
+            </div>
+          </div>
+          <mat-slide-toggle 
+            color="primary" 
+            formControlName="controlStock"
+            class="stock-toggle">
+          </mat-slide-toggle>
+        </div>
+
+        <!-- 6. STOCK MÍNIMO Y UNIDAD DE MEDIDA -->
+        <div class="row g-2" style="margin-bottom: -25px !important;">
+          <!-- Stock Mínimo (visible solo si controla stock) -->
+          <div class="col-6" *ngIf="controlStockActivo">
             <label class="form-label-custom">Stock Mínimo (Alerta)</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <input 
@@ -177,7 +197,7 @@
           </div>
 
           <!-- Unidad de Medida -->
-          <div class="col-6">
+          <div [ngClass]="controlStockActivo ? 'col-6' : 'col-12'">
             <label class="form-label-custom">Unidad de Medida *</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <mat-select formControlName="unidadMedida" required>
