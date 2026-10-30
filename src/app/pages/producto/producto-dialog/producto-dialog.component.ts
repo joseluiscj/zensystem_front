@@ -141,6 +141,7 @@ export class ProductoDialogComponent implements OnInit {
 
   save() {
     if (!this.validateFrm()) {
+      this.isButtonDisabled = false;
       const ObjP = new Producto();
       ObjP.id = this.idProductoSelected;
       ObjP.f_categoria = this.ValueCategoria.value;
