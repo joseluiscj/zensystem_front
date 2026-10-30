@@ -24,13 +24,15 @@ export class ThemeService {
   }
 
   public initTheme(): void {
-    const savedTheme = localStorage.getItem(this.THEME_STORAGE_KEY) as AppTheme | null;
+    // Por defecto el sistema inicia en Modo Claro.
+    // Como segunda opción se permite el Modo Oscuro si el usuario guardó esa preferencia.
     let isDark = false;
 
-    if (savedTheme) {
-      isDark = savedTheme === 'dark';
-    } else if (typeof window !== 'undefined' && window.matchMedia) {
-      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (typeof localStorage !== 'undefined') {
+      const savedTheme = localStorage.getItem(this.THEME_STORAGE_KEY) as AppTheme | null;
+      if (savedTheme) {
+        isDark = savedTheme === 'dark';
+      }
     }
 
     this.applyTheme(isDark);

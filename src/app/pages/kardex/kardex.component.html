@@ -106,7 +106,7 @@
             <mat-icon>monetization_on</mat-icon>
           </div>
         </div>
-        <div class="kpi-card-value text-slate">S/ {{ kpis.valorTotalEntradas | number:'1.2-2' }}</div>
+        <div class="kpi-card-value text-slate">$/ {{ kpis.valorTotalEntradas | number:'1.2-2' }}</div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-slate">
             <mat-icon>payments</mat-icon> Inversión  
@@ -308,13 +308,13 @@
 
             <!-- Costo Unitario -->
             <td class="text-end font-mono">
-              <span class="costo-val">S/ {{ m.costoUnitario | number:'1.2-2' }}</span>
+              <span class="costo-val">$/ {{ m.costoUnitario | number:'1.2-2' }}</span>
             </td>
 
             <!-- Total Valorizado -->
             <td class="text-end font-mono">
               <span class="total-val" [ngClass]="m.tipo === 'E' ? 'text-success' : (m.tipo === 'S' ? 'text-danger' : 'text-slate')">
-                S/ {{ (m.totalValorizado || (m.cantidad * m.costoUnitario)) | number:'1.2-2' }}
+                $/ {{ (m.totalValorizado || (m.cantidad * m.costoUnitario)) | number:'1.2-2' }}
               </span>
             </td>
 

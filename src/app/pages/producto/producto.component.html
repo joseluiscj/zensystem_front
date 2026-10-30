@@ -236,7 +236,7 @@
         <ng-container matColumnDef="costo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Costo Compra </th>
           <td mat-cell *matCellDef="let row" class="text-costo text-end">
-            S/ {{ (row.costo || 0) | number:'1.2-2' }}
+            $/ {{ (row.costo || 0) | number:'1.2-2' }}
           </td>
         </ng-container>
 
@@ -244,7 +244,7 @@
         <ng-container matColumnDef="precio">
           <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Precio Venta </th>
           <td mat-cell *matCellDef="let row" class="text-precio text-end">
-            S/ {{ (row.precio || 0) | number:'1.2-2' }}
+            $/ {{ (row.precio || 0) | number:'1.2-2' }}
           </td>
         </ng-container>
 

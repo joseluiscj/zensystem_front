@@ -131,7 +131,7 @@
                   formControlName="precio" 
                   autocomplete="off"
                   required>
-                <span matPrefix class="currency-prefix">S/&nbsp;</span>
+                <span matPrefix class="currency-prefix">$/&nbsp;</span>
                 <mat-error *ngIf="basicForm.controls['precio']?.hasError('required')">
                   Ingrese precio.
                 </mat-error>
@@ -150,7 +150,7 @@
                   placeholder="0.00" 
                   formControlName="costo" 
                   autocomplete="off">
-                <span matPrefix class="currency-prefix text-muted">S/&nbsp;</span>
+                <span matPrefix class="currency-prefix text-muted">$/&nbsp;</span>
               </mat-form-field>
             </div>
           </div>
@@ -159,7 +159,7 @@
           <div class="margin-preview-box">
             <span class="margin-label">Margen estimado por unidad:</span>
             <strong class="margin-val font-monospace" [ngClass]="margenEstimado >= 0 ? 'text-success' : 'text-danger'">
-              S/ {{ margenEstimado | number:'1.2-2' }}
+              $/ {{ margenEstimado | number:'1.2-2' }}
             </strong>
           </div>
         </div>
