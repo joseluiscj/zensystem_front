@@ -5,18 +5,18 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, UntypedFormGroup, Valida
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoginService } from '../services/login.service';
-import { environment } from '../../environments/environment.development';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MaterialModule, NgIf, ReactiveFormsModule,FormsModule],
+  imports: [MaterialModule, NgIf, ReactiveFormsModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
   loginForm: UntypedFormGroup;
   ocultar: String = 'd-none';
+
   constructor(
     private loginService: LoginService,
     private fb: FormBuilder,
@@ -28,28 +28,28 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(80)]],
     });
   }
+
   ngOnInit(): void {
-    this.loginService.logout();
+    this.loginService.logout(false);
   }
+
   onSubmit(): void {
     if (this.loginForm.valid) {
-      //const { user, password } = this.loginForm.value;
       const v_usuario = this.loginForm.get('user')?.value;
       const v_password = this.loginForm.get('password')?.value;
-      var error = false;
-      // this._snackbar.open("Verificar datos en el formulario", "Aviso!",{duration:3000,panelClass: 'custom-snackbar'});
+      let error = false;
 
-      if(!v_usuario || v_usuario.trim() == 0 || !v_password || v_password.trim() == 0){
+      if (!v_usuario || v_usuario.trim() === '' || !v_password || v_password.trim() === '') {
         error = true;
-        this._snackbar.open("Verificar datos en el formulario", "Aviso!",{duration:3000,panelClass: 'custom-snackbar'});
-      }else{
+        this._snackbar.open("Verificar datos en el formulario", "Aviso!", { duration: 3000, panelClass: 'custom-snackbar' });
+      } else {
         setTimeout(() => {
-          this.ocultar = "d-none"
+          this.ocultar = "d-none";
         }, 3000);
-        this.ocultar = ""
+        this.ocultar = "";
         this.loginService.login(v_usuario, v_password).subscribe(data => {
-          sessionStorage.setItem(environment.TOKEN_NAME, data.access_token)
-          this.router.navigate(["pages/inicio"])
+          this.loginService.setToken(data.access_token);
+          this.router.navigate(["pages/inicio"]);
         });
       }
     }

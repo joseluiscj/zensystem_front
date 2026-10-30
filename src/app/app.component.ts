@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './services/theme.service';
+import { LoginService } from './services/login.service';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +13,13 @@ import { ThemeService } from './services/theme.service';
 export class AppComponent implements OnInit {
   title = 'restaurapp_front';
 
-  constructor(private themeService: ThemeService) {}
+  constructor(
+    private themeService: ThemeService,
+    private loginService: LoginService
+  ) {}
 
   ngOnInit(): void {
     this.themeService.initTheme();
+    this.loginService.initSessionMonitor();
   }
 }
