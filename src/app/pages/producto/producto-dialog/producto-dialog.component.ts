@@ -53,10 +53,13 @@ export class ProductoDialogComponent implements OnInit {
   ];
 
   // Categoria
-  ValueCategoria = new FormControl();
-  filterCategoria = new FormControl();
-  filteredCategoria!: Observable<any[]>;
+  ValueCategoria = new FormControl<any>(null);
+  filterCategoria = new FormControl<string>('');
   lst_categoria: Categoria[] = [];
+  filteredCategoria: Observable<any[]> = this.filterCategoria.valueChanges.pipe(
+    startWith(''),
+    map(value => this._filterCategoria(value || ''))
+  );
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public idProductoSelected: number,
@@ -72,22 +75,28 @@ export class ProductoDialogComponent implements OnInit {
     this.fnCargaCboCategoria();
     if (this.idProductoSelected) {
       this.ocultar = "";
-      this.productoService.findById(this.idProductoSelected).subscribe(data => {
-        if (data['code'] == 200) {
-          this.producto = data['data'];
-          this.ValueCategoria.setValue(this.producto.f_categoria); 
-          this.initialFrm();
+      this.productoService.findById(this.idProductoSelected).subscribe({
+        next: (data) => {
+          if (data['code'] == 200) {
+            this.producto = data['data'];
+            this.initialFrm();
+            this.ocultar = "d-none";
+          } else {
+            this._snackbar.open(data['message'] || 'No se pudo cargar el producto', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+            this.ocultar = "d-none";
+          }
+        },
+        error: () => {
+          this._snackbar.open("Error al comunicarse con el servidor", "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           this.ocultar = "d-none";
-        } else {
-          this._snackbar.open(data['message'], "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
         }
       });
     } 
   }
 
   private _filterCategoria(value: string): any[] {
-    if (!this.lst_categoria) return [];
-    const filterValue = (value || '').toLowerCase();
+    if (!this.lst_categoria || this.lst_categoria.length === 0) return [];
+    const filterValue = (value || '').toString().toLowerCase();
     return this.lst_categoria.filter(option => (option.nombre || '').toLowerCase().includes(filterValue));
   }
 
@@ -106,17 +115,36 @@ export class ProductoDialogComponent implements OnInit {
       ? (this.producto.f_controlStock == 1 || this.producto.f_controlStock === true)
       : true;
 
+    const initialCategoria = this.producto?.f_categoria || this.ValueCategoria.value || null;
+
     this.basicForm = new UntypedFormGroup({
       id: new UntypedFormControl(this.producto?.id),
       codigo: new UntypedFormControl(this.producto?.f_codigo || ''),
-      categoria: new UntypedFormControl(this.producto?.f_categoria, [Validators.required]),
-      nombre: new UntypedFormControl(this.producto?.f_nombre, [Validators.required]),
-      precio: new UntypedFormControl(this.producto?.f_precio || 0, [Validators.required, Validators.min(0)]),
+      categoria: new UntypedFormControl(initialCategoria, [Validators.required]),
+      nombre: new UntypedFormControl(this.producto?.f_nombre || '', [Validators.required]),
+      precio: new UntypedFormControl(
+        (this.producto?.f_precio !== undefined && this.producto?.f_precio !== null) ? this.producto.f_precio : null,
+        [Validators.required, Validators.min(0)]
+      ),
       costo: new UntypedFormControl(this.producto?.f_costo || 0, [Validators.min(0)]),
       controlStock: new UntypedFormControl(controlStockVal),
-      stockMinimo: new UntypedFormControl(this.producto?.f_stockMinimo !== undefined ? this.producto?.f_stockMinimo : 5, [Validators.min(0)]),
+      stockMinimo: new UntypedFormControl(
+        this.producto?.f_stockMinimo !== undefined && this.producto?.f_stockMinimo !== null ? this.producto.f_stockMinimo : 5,
+        [Validators.min(0)]
+      ),
       unidadMedida: new UntypedFormControl(this.producto?.f_unidadMedida || 'UNIDAD', [Validators.required]),
       descripcion: new UntypedFormControl(this.producto?.f_descripcion || ''),
+    });
+
+    if (initialCategoria) {
+      this.ValueCategoria.setValue(initialCategoria, { emitEvent: false });
+    }
+
+    // Sincronizar cambios entre el control del formulario y ValueCategoria
+    this.basicForm.get('categoria')?.valueChanges.subscribe(val => {
+      if (this.ValueCategoria.value !== val) {
+        this.ValueCategoria.setValue(val, { emitEvent: false });
+      }
     });
 
     if (this.producto?.f_img != "" && this.producto?.f_img != null) {
@@ -127,10 +155,10 @@ export class ProductoDialogComponent implements OnInit {
 
   fnCargaCboCategoria() {
     this.globalService.getCategoria().subscribe((data) => {
-      this.lst_categoria = data;
+      this.lst_categoria = data || [];
       this.filteredCategoria = this.filterCategoria.valueChanges.pipe(
         startWith(''),
-        map(value => this._filterCategoria(value))
+        map(value => this._filterCategoria(value || ''))
       );
     });
   }
@@ -140,44 +168,64 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   save() {
+    if (this.basicForm.invalid) {
+      this.basicForm.markAllAsTouched();
+      this.validateFrm();
+      return;
+    }
+
     if (!this.validateFrm()) {
-      this.isButtonDisabled = false;
+      this.isButtonDisabled = true;
       const ObjP = new Producto();
       ObjP.id = this.idProductoSelected;
-      ObjP.f_categoria = this.ValueCategoria.value;
+      ObjP.f_categoria = this.basicForm.controls["categoria"].value || this.ValueCategoria.value;
       ObjP.f_codigo = this.basicForm.controls["codigo"].value;
-      ObjP.f_nombre = this.basicForm.controls["nombre"].value;
+      ObjP.f_nombre = (this.basicForm.controls["nombre"].value || '').toString().trim();
       ObjP.f_precio = parseFloat(this.basicForm.controls["precio"].value || 0);
       ObjP.f_costo = parseFloat(this.basicForm.controls["costo"].value || 0);
       ObjP.f_controlStock = this.basicForm.controls["controlStock"].value ? 1 : 0;
-      ObjP.f_stockMinimo = parseFloat(this.basicForm.controls["stockMinimo"].value || 5);
+      ObjP.f_stockMinimo = parseFloat(this.basicForm.controls["stockMinimo"].value || 0);
       ObjP.f_unidadMedida = this.basicForm.controls["unidadMedida"].value;
       ObjP.f_descripcion = this.basicForm.controls["descripcion"].value;
       ObjP.f_img = this.file_txt;
       ObjP.f_imgId = this.download_link;
 
       if (!ObjP.id) { // create
-        this.productoService.save(ObjP).subscribe((data) => {
-          if (data['code'] == 200) {
-            this._snackbar.open("Producto registrado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
-            this.productoService.findAll().subscribe((data) => {
-              this.productoService.setDataChange(data);
-              this.close();
-            });
-          } else {
-            this._snackbar.open(data['message'] || 'Error al guardar', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+        this.productoService.save(ObjP).subscribe({
+          next: (data) => {
+            this.isButtonDisabled = false;
+            if (data['code'] == 200) {
+              this._snackbar.open("Producto registrado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
+              this.productoService.findAll().subscribe((data) => {
+                this.productoService.setDataChange(data);
+                this.close();
+              });
+            } else {
+              this._snackbar.open(data['message'] || 'Error al guardar producto', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+            }
+          },
+          error: (err) => {
+            this.isButtonDisabled = false;
+            this._snackbar.open(err?.error?.message || "Error al registrar producto", "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           }
         });
       } else { // update
-        this.productoService.update(ObjP.id, ObjP).subscribe(data => {
-          if (data['code'] == 200) {
-            this._snackbar.open("Producto actualizado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
-            this.productoService.findAll().subscribe((data) => {
-              this.productoService.setDataChange(data);
-              this.close();
-            });
-          } else {
-            this._snackbar.open(data['message'] || 'Error al actualizar', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+        this.productoService.update(ObjP.id, ObjP).subscribe({
+          next: (data) => {
+            this.isButtonDisabled = false;
+            if (data['code'] == 200) {
+              this._snackbar.open("Producto actualizado correctamente", "Correcto!", { duration: 3000, panelClass: 'custom-snackbar' });
+              this.productoService.findAll().subscribe((data) => {
+                this.productoService.setDataChange(data);
+                this.close();
+              });
+            } else {
+              this._snackbar.open(data['message'] || 'Error al actualizar', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+            }
+          },
+          error: (err) => {
+            this.isButtonDisabled = false;
+            this._snackbar.open(err?.error?.message || "Error al actualizar producto", "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           }
         });
       }
@@ -186,13 +234,21 @@ export class ProductoDialogComponent implements OnInit {
 
   validateFrm(): boolean {
     this.error = false;
-    if ((this.basicForm.controls["nombre"].value)?.trim() == "" || (this.basicForm.controls["nombre"].value) == null) {
-      this._snackbar.open("Debe ingresar Nombre del producto", "Aviso!", { duration: 3000 });
+    const nombre = this.basicForm.controls["nombre"]?.value;
+    if (!nombre || nombre.toString().trim() === "") {
+      this._snackbar.open("Debe ingresar el Nombre del producto", "Aviso!", { duration: 3000 });
       this.error = true;
       return true;
     }
-    if (!this.ValueCategoria.value) {
-      this._snackbar.open("Debe seleccionar Categoría", "Aviso!", { duration: 3000 });
+    const cat = this.basicForm.controls["categoria"]?.value || this.ValueCategoria.value;
+    if (!cat) {
+      this._snackbar.open("Debe seleccionar una Categoría", "Aviso!", { duration: 3000 });
+      this.error = true;
+      return true;
+    }
+    const precio = this.basicForm.controls["precio"]?.value;
+    if (precio === null || precio === undefined || precio === '' || isNaN(precio) || Number(precio) < 0) {
+      this._snackbar.open("Debe ingresar un Precio de venta válido (>= 0)", "Aviso!", { duration: 3000 });
       this.error = true;
       return true;
     }
@@ -207,11 +263,20 @@ export class ProductoDialogComponent implements OnInit {
       this.textFile = this.selectedFile.name;
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
-      this.productoService.saveFile(formData).subscribe((data) => {
-        if (data.code == 200) {
+      this.productoService.saveFile(formData).subscribe({
+        next: (data) => {
+          if (data.code == 200) {
+            this.ocultar_carga = 'd-none';
+            this.download_link = data.download_link;
+            this.file_txt = data.file_name;
+          } else {
+            this.ocultar_carga = 'd-none';
+            this._snackbar.open("Error al subir archivo", "Aviso!", { duration: 3000 });
+          }
+        },
+        error: () => {
           this.ocultar_carga = 'd-none';
-          this.download_link = data.download_link;
-          this.file_txt = data.file_name;
+          this._snackbar.open("Error al subir archivo", "Aviso!", { duration: 3000 });
         }
       });
     }
@@ -227,5 +292,7 @@ export class ProductoDialogComponent implements OnInit {
   delteFile() {
     this.download_link = "";
     this.file_txt = "";
+    this.textFile = 'Seleccionar foto';
+    this.selectedFile = null;
   }
 }

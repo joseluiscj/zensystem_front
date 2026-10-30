@@ -271,8 +271,10 @@
   font-size: 13px;
 }
 
-.drawer-field .mat-mdc-form-field-subscript-wrapper {
-  display: none !important;
+.drawer-field mat-error {
+  font-size: 0.72rem;
+  color: #dc2626;
+  margin-top: 2px;
 }
 
 .field-icon-prefix {

@@ -54,7 +54,7 @@
             <div class="upload-dropzone" (click)="triggerFileInput()">
               <mat-icon class="upload-icon">add_a_photo</mat-icon>
               <span class="upload-label">{{ textFile }}</span>
-              <span class="upload-hint">Formatos: PNG, JPG (Máx 5MB)</span>
+              <span class="upload-hint">Formatos: PNG, JPG, WEBP (Máx 5MB)</span>
             </div>
           </div>
 
@@ -64,11 +64,11 @@
         </div>
 
         <!-- 2. CÓDIGO SKU Y CATEGORÍA -->
-        <div class="row g-2" style="margin-bottom: -25px;">
+        <div class="row g-2">
           <!-- Código SKU -->
           <div class="col-6">
             <label class="form-label-custom">Código SKU / Barra</label>
-            <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
               <input 
                 matInput 
                 placeholder="Ej: PROD-001" 
@@ -81,8 +81,8 @@
           <!-- Categoría -->
           <div class="col-6">
             <label class="form-label-custom">Categoría *</label>
-            <mat-form-field appearance="outline" class="w-100 drawer-field">
-              <mat-select required placeholder="Seleccione" [formControl]="ValueCategoria">
+            <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
+              <mat-select required placeholder="Seleccione" formControlName="categoria">
                 <mat-option>
                   <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar categoría..."></ngx-mat-select-search>
                 </mat-option>
@@ -90,35 +90,38 @@
                   {{ option.nombre }}
                 </mat-option>
               </mat-select>
+              <mat-error *ngIf="basicForm.controls['categoria']?.hasError('required')">
+                Seleccione categoría.
+              </mat-error>
             </mat-form-field>
           </div>
         </div>
 
         <!-- 3. NOMBRE DEL PRODUCTO -->
-        <div class="form-group-custom" style="margin-bottom: -25px;">
+        <div class="form-group-custom">
           <label class="form-label-custom">Nombre del Producto *</label>
-          <mat-form-field appearance="outline" class="w-100 drawer-field">
+          <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
             <input 
               matInput 
-              placeholder="Escribir..." 
+              placeholder="Escribir nombre del producto o plato..." 
               formControlName="nombre" 
               autocomplete="off" 
               class="uppercase"
               required>
             <mat-icon matPrefix class="field-icon-prefix">new_label</mat-icon>
-            <mat-hint *ngIf="basicForm.controls['nombre'].hasError('required') && basicForm.controls['nombre'].touched"
-              class="form-error-msg"> El campo es obligatorio.
-            </mat-hint>
+            <mat-error *ngIf="basicForm.controls['nombre']?.hasError('required')">
+              El nombre es obligatorio.
+            </mat-error>
           </mat-form-field>
         </div>
 
         <!-- 4. PRECIOS Y MARGEN (S/) -->
-        <div class="pricing-card" >
-          <div class="row g-2 mb-2" style="margin-bottom: -25px !important;">
+        <div class="pricing-card">
+          <div class="row g-2 mb-2">
             <!-- Precio de Venta -->
             <div class="col-6">
               <label class="form-label-custom">Precio Venta *</label>
-              <mat-form-field appearance="outline" class="w-100 drawer-field field-precio">
+              <mat-form-field appearance="outline" class="w-100 drawer-field field-precio" subscriptSizing="dynamic">
                 <input 
                   type="number" 
                   step="0.01" 
@@ -128,14 +131,17 @@
                   formControlName="precio" 
                   autocomplete="off"
                   required>
-                <span matPrefix class="currency-prefix">$/&nbsp;</span>
+                <span matPrefix class="currency-prefix">S/&nbsp;</span>
+                <mat-error *ngIf="basicForm.controls['precio']?.hasError('required')">
+                  Ingrese precio.
+                </mat-error>
               </mat-form-field>
             </div>
 
             <!-- Costo de Compra -->
             <div class="col-6">
-              <label class="form-label-custom">Costo Compra </label>
-              <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <label class="form-label-custom">Costo Compra</label>
+              <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
                 <input 
                   type="number" 
                   step="0.01" 
@@ -144,7 +150,7 @@
                   placeholder="0.00" 
                   formControlName="costo" 
                   autocomplete="off">
-                <span matPrefix class="currency-prefix text-muted">$/&nbsp;</span>
+                <span matPrefix class="currency-prefix text-muted">S/&nbsp;</span>
               </mat-form-field>
             </div>
           </div>
@@ -153,13 +159,13 @@
           <div class="margin-preview-box">
             <span class="margin-label">Margen estimado por unidad:</span>
             <strong class="margin-val font-monospace" [ngClass]="margenEstimado >= 0 ? 'text-success' : 'text-danger'">
-              $/ {{ margenEstimado | number:'1.2-2' }}
+              S/ {{ margenEstimado | number:'1.2-2' }}
             </strong>
           </div>
         </div>
 
         <!-- 5. CONTROL DE STOCK / INVENTARIO EN ALMACÉN -->
-        <div class="control-stock-card mb-3">
+        <div class="control-stock-card mb-1">
           <div class="control-stock-info">
             <div class="control-stock-icon" [ngClass]="controlStockActivo ? 'icon-stock-on' : 'icon-stock-off'">
               <mat-icon>{{ controlStockActivo ? 'inventory' : 'inventory_2' }}</mat-icon>
@@ -167,7 +173,7 @@
             <div class="control-stock-text">
               <span class="control-stock-title">Control de Stock & Kardex</span>
               <span class="control-stock-desc">
-                {{ controlStockActivo ? 'Gestionar en Almacén, Kardex y alertas' : 'Sin inventario (servicios o no inventariable)' }}
+                {{ controlStockActivo ? 'Gestionar existencias en Almacén, Kardex y alertas' : 'Sin inventario (servicios o venta libre no inventariable)' }}
               </span>
             </div>
           </div>
@@ -179,11 +185,11 @@
         </div>
 
         <!-- 6. STOCK MÍNIMO Y UNIDAD DE MEDIDA -->
-        <div class="row g-2" style="margin-bottom: -25px !important;">
+        <div class="row g-2">
           <!-- Stock Mínimo (visible solo si controla stock) -->
           <div class="col-6" *ngIf="controlStockActivo">
             <label class="form-label-custom">Stock Mínimo (Alerta)</label>
-            <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
               <input 
                 type="number" 
                 step="1" 
@@ -199,7 +205,7 @@
           <!-- Unidad de Medida -->
           <div [ngClass]="controlStockActivo ? 'col-6' : 'col-12'">
             <label class="form-label-custom">Unidad de Medida *</label>
-            <mat-form-field appearance="outline" class="w-100 drawer-field">
+            <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
               <mat-select formControlName="unidadMedida" required>
                 <mat-option *ngFor="let u of unidadesMedida" [value]="u">
                   {{ u }}
@@ -209,15 +215,15 @@
           </div>
         </div>
 
-        <!-- 6. DESCRIPCIÓN / NOTAS -->
+        <!-- 7. DESCRIPCIÓN / NOTAS -->
         <div class="form-group-custom">
           <label class="form-label-custom">Descripción / Especificaciones</label>
-          <mat-form-field appearance="outline" class="w-100 drawer-field">
+          <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
             <textarea 
               matInput 
               rows="2" 
               formControlName="descripcion" 
-              placeholder="Ingredientes, presentación o detalle opcional..."></textarea>
+              placeholder="Ingredientes, presentación o notas opcionales..."></textarea>
             <mat-icon matPrefix class="field-icon-prefix">notes</mat-icon>
           </mat-form-field>
         </div>
