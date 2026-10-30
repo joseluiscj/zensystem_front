@@ -83,6 +83,7 @@ export class VentaPosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.cargarCatalogo();
   }
 

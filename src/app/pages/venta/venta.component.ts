@@ -82,6 +82,7 @@ export class VentaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.filtrarHoy();
     // this.cargarMesasCatalogo();
     // this.cargarVentas();

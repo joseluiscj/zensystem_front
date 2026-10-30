@@ -55,6 +55,7 @@ export class AlmacenTraspasoDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     const prodId = this.productoSeleccionado ? this.productoSeleccionado.idProducto : '';
     const almOrigen = this.almacenes.length > 0 ? this.almacenes[0].id : 1;
     const almDestino = this.almacenes.length > 1 ? this.almacenes[1].id : (this.almacenes.length > 0 ? this.almacenes[0].id : 2);

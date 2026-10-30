@@ -74,6 +74,7 @@ export class AlmacenMovimientoDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     const tipo = this.data?.tipoInicial || 'E';
     const prodId = this.productoSeleccionado?.idProducto || (this.productos.length > 0 ? this.productos[0].idProducto : '');
     const idAlmInicial = this.almacenes.length > 0 ? this.almacenes[0].id : 1;

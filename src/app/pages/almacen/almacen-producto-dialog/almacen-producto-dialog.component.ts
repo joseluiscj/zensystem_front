@@ -53,6 +53,7 @@ export class AlmacenProductoDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.productoForm = this.fb.group({
       codigo: [this.producto.codigo || '', [Validators.required, Validators.maxLength(50)]],
       unidadMedida: [this.producto.unidadMedida || 'UNIDAD', [Validators.required]],

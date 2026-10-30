@@ -31,6 +31,7 @@ export class MesaDialogComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.initialFrm();
     if(this.idSelected){
       this.ocultar=true;

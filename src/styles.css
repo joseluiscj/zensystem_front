@@ -391,3 +391,488 @@ body:not(.layout-fixed) .main-sidebar {
 .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed {
     color:#000 !important;
 }
+
+
+/* ============================================================
+   SISTEMA DE MODO OSCURO (DARK MODE) GLOBAL
+   ============================================================ */
+
+/* Transición suave al alternar entre modo claro y oscuro */
+body,
+.content-wrapper,
+.card,
+.pos-card,
+.nav_top,
+.main-sidebar,
+.mat-mdc-table,
+.side-drawer-container,
+.dialog-detalle-container {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease !important;
+}
+
+/* 1. Fondo Global y Contenedores */
+body.dark-mode {
+    background-color: #0b1329 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .content-wrapper,
+body.dark-mode .section-body-contect-router {
+    background-color: #0b1329 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .dashboard-wrapper,
+body.dark-mode .ventas-wrapper,
+body.dark-mode .almacen-wrapper,
+body.dark-mode .kardex-page-wrapper,
+body.dark-mode .pos-full-wrapper,
+body.dark-mode .pos-wrapper,
+body.dark-mode .salon-container,
+body.dark-mode .mesa-container,
+body.dark-mode .caja-wrapper,
+body.dark-mode .apertura-wrapper,
+body.dark-mode .movimiento-wrapper,
+body.dark-mode .producto-wrapper,
+body.dark-mode .categoria-wrapper {
+    background-color: #0b1329 !important;
+    color: #f1f5f9 !important;
+}
+
+/* 2. Barra de Navegación y Sidebar */
+body.dark-mode .nav_top {
+    background: #071326 !important;
+    border-bottom: 1px solid #1e293b !important;
+}
+
+body.dark-mode .main-sidebar {
+    background: #071326 !important;
+    border-right: 1px solid #1e293b !important;
+}
+
+body.dark-mode .brand-link {
+    border-bottom: 1px solid #1e293b !important;
+}
+
+body.dark-mode mat-expansion-panel {
+    background: #071326 !important;
+}
+
+/* 3. Banners Principales (Hero) */
+body.dark-mode .ventas-hero-banner,
+body.dark-mode .almacen-hero-banner,
+body.dark-mode .dashboard-hero-banner,
+body.dark-mode .kardex-hero-banner,
+body.dark-mode .editor-hero-banner {
+    border: 1px solid #1e293b !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 4. Tarjetas, Paneles, Filtros y Cuadrículas */
+body.dark-mode .card,
+body.dark-mode .mat-card,
+body.dark-mode .mat-mdc-card,
+body.dark-mode .pos-card,
+body.dark-mode .order-panel,
+body.dark-mode .ticket-checkout-panel,
+body.dark-mode .catalog-panel,
+body.dark-mode .kpi-card,
+body.dark-mode .dashboard-filter-card,
+body.dark-mode .dashboard-chart-card,
+body.dark-mode .dashboard-table-card,
+body.dark-mode .table-card-container,
+body.dark-mode .data-table-container,
+body.dark-mode .almacen-table-card,
+body.dark-mode .kardex-card,
+body.dark-mode .filter-bar,
+body.dark-mode .filter-card,
+body.dark-mode .pos-section,
+body.dark-mode .mesa-card,
+body.dark-mode .kpi-stat-card,
+body.dark-mode .selected-product-card,
+body.dark-mode .button-container {
+    background-color: #111e38 !important;
+    color: #f8fafc !important;
+    border-color: #1e293b !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 5. Tablas y Paginación */
+body.dark-mode table,
+body.dark-mode .mat-mdc-table,
+body.dark-mode .mat-table,
+body.dark-mode .table {
+    background-color: #111e38 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode th,
+body.dark-mode .mat-mdc-header-cell,
+body.dark-mode .mat-header-cell,
+body.dark-mode .table thead th {
+    background-color: #0b1329 !important;
+    color: #94a3b8 !important;
+    border-bottom: 1px solid #1e293b !important;
+    border-top: none !important;
+}
+
+body.dark-mode td,
+body.dark-mode .mat-mdc-cell,
+body.dark-mode .mat-cell,
+body.dark-mode .table td {
+    background-color: transparent !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid #1e293b !important;
+}
+
+body.dark-mode tr.mat-mdc-row:hover,
+body.dark-mode tr.mat-row:hover,
+body.dark-mode .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-mode .mat-mdc-paginator,
+body.dark-mode .mat-paginator,
+body.dark-mode .table-pagination-footer {
+    background-color: #111e38 !important;
+    color: #94a3b8 !important;
+    border-top: 1px solid #1e293b !important;
+}
+
+body.dark-mode .mat-mdc-paginator-range-label,
+body.dark-mode .pagination-info,
+body.dark-mode .page-current {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .btn-page {
+    background-color: #0b1329 !important;
+    border-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+/* 6. Inputs, Selects, Textareas y Labels */
+body.dark-mode input.form-control,
+body.dark-mode select.form-select,
+body.dark-mode .pos-form-control,
+body.dark-mode .pos-search-input,
+body.dark-mode textarea.form-control,
+body.dark-mode .custom-input,
+body.dark-mode select,
+body.dark-mode input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]) {
+    background-color: #0b1329 !important;
+    color: #f8fafc !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #64748b !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+}
+
+body.dark-mode .form-label,
+body.dark-mode .field-label,
+body.dark-mode .form-label-pos,
+body.dark-mode .form-label-custom,
+body.dark-mode .section-field-label,
+body.dark-mode label {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background-color: #0b1329 !important;
+}
+
+body.dark-mode .mdc-text-field__input {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .mat-mdc-form-field-label,
+body.dark-mode .mdc-floating-label {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .mat-mdc-select-value-text,
+body.dark-mode .mat-mdc-select-arrow {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .mdc-notched-outline__leading,
+body.dark-mode .mdc-notched-outline__notch,
+body.dark-mode .mdc-notched-outline__trailing {
+    border-color: #1e293b !important;
+}
+
+/* 7. Menús Flotantes y Desplegables (Mat-Menu, Mat-Select Panel) */
+body.dark-mode .mat-mdc-menu-panel,
+body.dark-mode .mat-mdc-select-panel,
+body.dark-mode .mat-mdc-autocomplete-panel,
+body.dark-mode .dropdown-menu {
+    background-color: #111e38 !important;
+    border: 1px solid #1e293b !important;
+    color: #f8fafc !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .mat-mdc-menu-item,
+body.dark-mode .mat-mdc-option,
+body.dark-mode .dropdown-item {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .mat-mdc-menu-item:hover,
+body.dark-mode .mat-mdc-option:hover,
+body.dark-mode .mat-mdc-option.mdc-list-item--selected,
+body.dark-mode .dropdown-item:hover {
+    background-color: #1e293b !important;
+    color: #38bdf8 !important;
+}
+
+body.dark-mode .mat-mdc-menu-item mat-icon {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .mat-mdc-menu-item:hover mat-icon {
+    color: #38bdf8 !important;
+}
+
+body.dark-mode mat-divider {
+    border-top-color: #1e293b !important;
+}
+
+/* 8. Modales, Diálogos y Paneles Laterales (Drawers) */
+body.dark-mode .side-drawer-container,
+body.dark-mode .dialog-detalle-container,
+body.dark-mode .mat-mdc-dialog-container .mdc-dialog__surface,
+body.dark-mode .modal-content {
+    background-color: #111e38 !important;
+    color: #f8fafc !important;
+    border: 1px solid #1e293b !important;
+}
+
+body.dark-mode .drawer-header,
+body.dark-mode .drawer-footer,
+body.dark-mode .dialog-header,
+body.dark-mode .dialog-footer,
+body.dark-mode .pos-header,
+body.dark-mode .pos-footer,
+body.dark-mode .modal_div_cab_title {
+    background-color: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .btn-drawer-close,
+body.dark-mode .btn-close-dialog,
+body.dark-mode .btn-pos-close {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .btn-drawer-close:hover,
+body.dark-mode .btn-close-dialog:hover,
+body.dark-mode .btn-pos-close:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .segmented-type-toggle {
+    background-color: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+/* 9. Elementos de Punto de Venta (POS) y Restaurante */
+body.dark-mode .pos-topbar,
+body.dark-mode .salon-header {
+    background: #111e38 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .btn-topbar-back {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .btn-topbar-back:hover {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .topbar-total-pill {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .topbar-total-pill .pill-val {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .product-card,
+body.dark-mode .pos-prod-card,
+body.dark-mode .order-item-card,
+body.dark-mode .ticket-row-card {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .product-thumb-container,
+body.dark-mode .item-visual-box {
+    background: #111e38 !important;
+    border-bottom: 1px solid #1e293b !important;
+}
+
+body.dark-mode .ticket-empty-card,
+body.dark-mode .empty-order-state,
+body.dark-mode .empty-catalog-box {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .cat-chip,
+body.dark-mode .btn-quick-cash,
+body.dark-mode .btn-payment-method,
+body.dark-mode .btn-medio-pago {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .cat-chip:hover,
+body.dark-mode .btn-quick-cash:hover,
+body.dark-mode .btn-payment-method:hover,
+body.dark-mode .btn-medio-pago:hover {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .cat-chip.active {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .btn-payment-method.active,
+body.dark-mode .btn-medio-pago.active {
+    background: #1e3a8a !important;
+    border-color: #3b82f6 !important;
+    color: #93c5fd !important;
+}
+
+body.dark-mode .cash-calculator-card,
+body.dark-mode .efectivo-panel {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .change-display-box,
+body.dark-mode .vuelto-box {
+    background: #111e38 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .ticket-stepper,
+body.dark-mode .ticket-qty-stepper,
+body.dark-mode .pos-stepper {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+}
+
+body.dark-mode .btn-stepper,
+body.dark-mode .btn-qty,
+body.dark-mode .stepper-btn {
+    background: #111e38 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .stepper-input,
+body.dark-mode .qty-input,
+body.dark-mode .stepper-count {
+    background: #0b1329 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .ticket-subtotal,
+body.dark-mode .item-price-col .col-val {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .product-price,
+body.dark-mode .prod-price {
+    color: #38bdf8 !important;
+}
+
+body.dark-mode .checkout-total-row .val {
+    color: #f8fafc !important;
+}
+
+/* 10. Títulos, Subtítulos y Tipografía */
+body.dark-mode .m-title,
+body.dark-mode .hero-title,
+body.dark-mode .product-title,
+body.dark-mode .prod-name,
+body.dark-mode .ticket-title,
+body.dark-mode .ticket-row-title,
+body.dark-mode .item-dish-name,
+body.dark-mode .drawer-title,
+body.dark-mode .dialog-title,
+body.dark-mode .header-title,
+body.dark-mode .pos-main-title {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .client-name {
+    color: #f8fafc !important;
+}
+
+body.dark-mode p.text-muted,
+body.dark-mode small.text-muted,
+body.dark-mode .hero-subtitle,
+body.dark-mode .pos-subtitle,
+body.dark-mode .drawer-subtitle,
+body.dark-mode .header-subtitle,
+body.dark-mode .catalog-hint,
+body.dark-mode .ticket-row-meta,
+body.dark-mode .col-label {
+    color: #94a3b8 !important;
+}
+
+/* 11. Insignias y Botones de Acción Secundarios */
+body.dark-mode .badge-table-name {
+    background: #1e3a8a !important;
+    color: #93c5fd !important;
+}
+
+body.dark-mode .badge-table-pos {
+    background: #064e3b !important;
+    color: #6ee7b7 !important;
+    border-color: #047857 !important;
+}
+
+body.dark-mode .btn_secondary {
+    color: #93c5fd !important;
+    background: #0b1329 !important;
+    border: 1px solid #1e293b !important;
+}
+
+body.dark-mode .btn_action {
+    border: 1px solid #0284c7 !important;
+    background: #0b1329 !important;
+    color: #38bdf8 !important;
+}
+
+/* 12. Barras de Desplazamiento en Modo Oscuro */
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #334155 !important;
+    border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #0b1329 !important;
+}

@@ -67,6 +67,7 @@ export class ProductoDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.initialFrm();
     this.fnCargaCboCategoria();
     if (this.idProductoSelected) {

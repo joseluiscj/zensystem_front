@@ -46,6 +46,7 @@ export class CategoriaDialogComponent implements OnInit {
   ){}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.initialFrm();
     // this.getTipo();
 

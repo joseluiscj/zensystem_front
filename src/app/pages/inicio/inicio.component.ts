@@ -47,6 +47,7 @@ export class InicioComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.filtrarHoy();
     // this.establecerSaludo();
     // this.cargarDashboard();

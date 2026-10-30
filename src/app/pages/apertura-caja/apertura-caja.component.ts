@@ -68,6 +68,7 @@ export class AperturaCajaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.basicForm = new UntypedFormGroup({
       caja: new FormControl(''),
       state: new FormControl(''),

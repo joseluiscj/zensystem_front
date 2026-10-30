@@ -62,6 +62,7 @@ export class KardexComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     // Si viene con queryParams (ej: ?idProducto=5)
     // this.aplicarFiltroHoy();
     this.route.queryParams.subscribe(params => {

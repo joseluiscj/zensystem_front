@@ -143,3 +143,47 @@ mat-list-item a {
     align-items: center;
     justify-content: center;
 }
+
+
+/* BOTÓN DE TEMA MODO OSCURO / MODO CLARO */
+.btn-theme-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  backdrop-filter: blur(8px);
+}
+
+.btn-theme-nav:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-theme-nav mat-icon {
+  font-size: 19px;
+  width: 19px;
+  height: 19px;
+  transition: transform 0.3s ease;
+}
+
+.btn-theme-nav:hover mat-icon {
+  transform: rotate(20deg);
+}
+
+.btn-theme-nav .icon-sun {
+  color: #facc15;
+}
+
+.btn-theme-nav .icon-moon {
+  color: #e0f2fe;
+}

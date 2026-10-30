@@ -5,165 +5,65 @@
       </li>
       <li class="nav-item d-sm-inline-block d-md-none">
         <img src="assets/img/logo/letra2.png" style="width: 130px;" loading="lazy" >
-        <!-- <img src="assets/img/template/icon.png" loading="lazy" style="width: 46px;"> -->
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="index3.html" class="nav-link">Home</a>
       </li>
-      <!-- 
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Contact</a>
-      </li> -->
     </ul> 
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item  " style="margin-right: -12px;" [matMenuTriggerFor]="menu">
+    <ul class="navbar-nav ml-auto d-flex align-items-center">
+
+      <!-- BOTÓN SWITCH MODO OSCURO / MODO CLARO -->
+      <li class="nav-item mr-3">
+        <button 
+          type="button" 
+          class="btn-theme-nav" 
+          (click)="toggleTheme()" 
+          [matTooltip]="isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'">
+          <mat-icon class="icon-sun" *ngIf="isDarkMode">light_mode</mat-icon>
+          <mat-icon class="icon-moon" *ngIf="!isDarkMode">dark_mode</mat-icon>
+          <span class="theme-text d-none d-md-inline">{{ isDarkMode ? 'Modo Claro' : 'Modo Oscuro' }}</span>
+        </button>
+      </li>
+
+      <li class="nav-item" style="margin-right: -12px;" [matMenuTriggerFor]="menu">
         <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button" style="padding-top: 15px;">
           <span style="font-weight: 500;color: #fff;">José Luis</span>
         </a>
       </li> 
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <div class="media">
-              <img src="assets/img/template/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <div class="media">
-              <img src="assets/img/template/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <div class="media">
-              <img src="assets/img/template/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-        </div>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-            <mat-icon>notifications</mat-icon>
-            <span class="badge badge-warning navbar-badge" style="line-height: 0.4;font-size: 10px;">
-                15
-            </span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">15 Notifications</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
-        </a>
-      </li> -->
-        <button mat-icon-button [matMenuTriggerFor]="menu" style="margin-right: 4px;">
-          <mat-icon style="color: #fff;" >account_circle</mat-icon>
+
+      <button mat-icon-button [matMenuTriggerFor]="menu" style="margin-right: 4px;">
+        <mat-icon style="color: #fff;">account_circle</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <!-- Opción de Tema dentro del Menú -->
+        <button mat-menu-item (click)="toggleTheme()">
+          <mat-icon [style.color]="isDarkMode ? '#fbbf24' : '#64748b'">
+            {{ isDarkMode ? 'light_mode' : 'dark_mode' }}
+          </mat-icon>
+          <span>{{ isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro' }}</span>
         </button>
-        <mat-menu #menu="matMenu" >
-            <button mat-menu-item (click)="dataUser()">
-                <mat-icon>account_box</mat-icon>
-                <span>Mis datos</span>
-            </button>
-            <button mat-menu-item   (click)="logout()">
-                <mat-icon>output</mat-icon>
-                <span>Salir del sistema</span>
-            </button>
-        </mat-menu>
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-            <mat-icon>notifications</mat-icon>
-            <span class="badge badge-warning navbar-badge" style="line-height: 0.4;font-size: 10px;">
-                15
-            </span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li> -->
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="dataUser()">
+          <mat-icon>account_box</mat-icon>
+          <span>Mis datos</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>output</mat-icon>
+          <span>Salir del sistema</span>
+        </button>
+      </mat-menu>
     </ul>
   </nav>
 
-  <aside class="main-sidebar sidebar-dark-primary elevation-2 " style="background: #113C68; height: 100vh !important;overflow-y: hidden;z-index: 1038;bottom: 0;float: none;left: 0;position: fixed !important;top: 0 !important;">
-    <div  class="brand-link" style="display: flex;justify-content: space-around;align-items: center; padding-bottom: 4px;padding-top: 4px;">
-      <!-- <img src="assets/img/siade1.png"  alt="" style="width: 160px;"> -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-2" style="background: #113C68; height: 100vh !important;overflow-y: hidden;z-index: 1038;bottom: 0;float: none;left: 0;position: fixed !important;top: 0 !important;">
+    <div class="brand-link" style="display: flex;justify-content: space-around;align-items: center; padding-bottom: 4px;padding-top: 4px;">
       <img src="assets/img/logo/letra3.png" style="width: 167px;" loading="lazy">
-      <!-- <img src="assets/img/template/icon.png" loading="lazy" style="width: 46px;"> -->
       <button class="pr-0" mat-icon-button data-widget="pushmenu" href="#" role="button" matTooltip="Ocultar Menú">
         <mat-icon class="nav_icon" style="color: #fff;">keyboard_double_arrow_left</mat-icon>
       </button>
     </div>
-    <div class="sidebar"  style="display: flex; flex-direction: column;  ">
-      <!-- <div class="user-panel mt-1 pb-2 mb-1 d-flex">
-      </div> -->
+    <div class="sidebar" style="display: flex; flex-direction: column;">
       <nav class="mt-2" style="flex: 1; overflow-y: auto;">
         <mat-nav-list>
           <ng-container *ngFor="let menu of menuItems">
@@ -176,7 +76,7 @@
                 </mat-panel-title>
               </mat-expansion-panel-header>
               
-              <mat-list-item *ngFor="let subItem of menu.subItems"   >
+              <mat-list-item *ngFor="let subItem of menu.subItems">
                 <a mat-button [routerLink]="subItem.route" routerLinkActive="active-link">
                   <mat-icon class="nav_icon" style="color: #fff;">{{ subItem.icon }}</mat-icon>
                   {{ subItem.title }}
@@ -185,7 +85,7 @@
             </mat-expansion-panel>
             <!-- Si NO tiene submenús, se renderiza como enlace directo -->
             <ng-template #singleItem>
-              <mat-list-item >
+              <mat-list-item>
                 <a mat-button [routerLink]="menu.route" routerLinkActive="active-link">
                   <mat-icon class="nav_icon" style="color: #fff;font-size: 24px;width: 24px;height: 24px;">{{ menu.icon }}</mat-icon>
                   {{ menu.title }}
@@ -195,9 +95,9 @@
           </ng-container>
         </mat-nav-list>
       </nav>
-      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 8px;  ">
-        <div  >
-          <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesión" class="btn_salir_menu"  >
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 8px;">
+        <div>
+          <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesión" class="btn_salir_menu">
             <mat-icon>output</mat-icon> &nbsp;Salir del sistema 
           </button>
         </div>

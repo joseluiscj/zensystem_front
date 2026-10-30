@@ -47,6 +47,7 @@ export class MesaComponent implements OnInit{
     private _snackbar: MatSnackBar,
   ){}
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.mesaService.findAllList().subscribe(data =>{
       this.createTable(data);
     })

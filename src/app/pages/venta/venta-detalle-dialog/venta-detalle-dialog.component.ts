@@ -35,6 +35,7 @@ export class VentaDetalleDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     if (this.idPedido) {
       this.cargarDetalle();
     } else {

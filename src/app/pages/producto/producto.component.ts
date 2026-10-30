@@ -75,6 +75,7 @@ export class ProductoComponent {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.fnCargaCboCategoria();
 
     this.productoService.findAllList().subscribe(data => {

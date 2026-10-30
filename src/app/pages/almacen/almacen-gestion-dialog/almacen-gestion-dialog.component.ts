@@ -36,6 +36,7 @@ export class AlmacenGestionDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.iniciarFormulario();
     this.cargarAlmacenes();
   }

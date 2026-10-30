@@ -62,6 +62,7 @@ export class CajaComponent {
   ){}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.cajaService.findAllList().subscribe(data =>{
       this.createTable(data);
     }) 

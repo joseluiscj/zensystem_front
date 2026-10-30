@@ -61,6 +61,7 @@ export class RestauranteComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.listData();
   }
 

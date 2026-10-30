@@ -74,6 +74,7 @@ export class MovimientoCajaDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     const mov = this.data?.movimiento;
     this.movimientoOriginal = mov || null;
     this.esEdicion = !!mov;

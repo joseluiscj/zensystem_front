@@ -53,6 +53,7 @@ export class AlmacenKardexDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'auto' });
     this.cargarMovimientos();
   }
 
