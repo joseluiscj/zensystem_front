@@ -1,193 +1,333 @@
-<div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
-    <div class="m-section-title">
-        <h4 class="m-title mb-1">Gestión de Catálogo de Productos</h4>
-        <div class="m-title-description">Administre nombres, precios de venta, costos de compra, códigos SKU y stock mínimo.</div>
+<div class="producto-wrapper">
+
+  <!-- ============================================================
+       CABECERA PRINCIPAL (HERO BANNER)
+       ============================================================ -->
+  <header class="producto-hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Gestión de Productos & Menú</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">storefront</mat-icon>
+          <span>Catálogo general de platos, bebidas, precios de venta, costos y control de inventario</span>
+        </p>
+      </div>
     </div>
-    <div class="m-section-buttons" align="center">
-        <button mat-raised-button (click)="openDialog()" class="btn_primary">
-            <mat-icon>add</mat-icon> Nuevo Producto
-        </button>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="cargarProductos()" matTooltip="Refrescar catálogo">
+        <mat-icon [class.spin-icon]="cargaContenido">refresh</mat-icon>
+        <span>Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-primary" (click)="openDialog()" matTooltip="Registrar un nuevo producto en el catálogo">
+        <mat-icon>add_circle</mat-icon>
+        <span>+ Nuevo Producto</span>
+      </button>
     </div>
-</div>   
- 
-<mat-expansion-panel [(expanded)]="isPanelOpen" class="expansion-panel-below-button m-3" style="border-radius: 8px;">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      <mat-icon>manage_search</mat-icon> &nbsp;
-      Filtrar información por:
-    </mat-panel-title>
-  </mat-expansion-panel-header>
-  
-  <form [formGroup]="basicForm" (ngSubmit)="btnBuscar()">
-    <div class="row"> 
-      <div class="col-md-4">
-        <mat-form-field appearance="fill" class="custom-input" style="width: 100%;">
-          <mat-label class="labeltext">Nombre o Código SKU:</mat-label>
-          <input matInput placeholder="Escribir..." formControlName="nombres" autocomplete="off" maxlength="30">
+  </header>
+
+  <!-- ============================================================
+       TARJETAS DE KPIS Y RESUMEN RÁPIDO
+       ============================================================ -->
+  <!-- <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-total" (click)="filtrarPorStockRapido('todos')" [class.kpi-active]="filtroStockRapido === 'todos'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Catálogo Completo</span>
+          <div class="kpi-icon-circle total-circle">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value">{{ kpis.totalProductos }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-slate">
+            <mat-icon>format_list_bulleted</mat-icon> {{ kpis.totalProductos }} registrados
+          </span>
+          <span class="kpi-hint">Ver todos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-stock" (click)="filtrarPorStockRapido('con_stock')" [class.kpi-active]="filtroStockRapido === 'con_stock'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Control de Stock</span>
+          <div class="kpi-icon-circle stock-circle">
+            <mat-icon>warehouse</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-emerald">{{ kpis.conControlStock }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-green">
+            <mat-icon>check_circle</mat-icon> Inventariables
+          </span>
+          <span class="kpi-hint">En almacén</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-nostock" (click)="filtrarPorStockRapido('sin_stock')" [class.kpi-active]="filtroStockRapido === 'sin_stock'">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Sin Control de Stock</span>
+          <div class="kpi-icon-circle nostock-circle">
+            <mat-icon>all_inclusive</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-blue">{{ kpis.sinControlStock }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-blue">
+            <mat-icon>hourglass_disabled</mat-icon> Libre / Ilimitado
+          </span>
+          <span class="kpi-hint">Servicios/Platos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-categorias">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Categorías Activas</span>
+          <div class="kpi-icon-circle cat-circle">
+            <mat-icon>category</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-purple">{{ kpis.totalCategorias }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-purple">
+            <mat-icon>layers</mat-icon> Clasificaciones
+          </span>
+          <span class="kpi-hint">En carta y menú</span>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- ============================================================
+       BARRA DE FILTROS & BÚSQUEDA
+       ============================================================ -->
+  <div class="producto-filters-card mb-4">
+    <div class="filters-row">
+      <!-- Búsqueda rápida por nombre o código SKU -->
+      <div class="filter-item filter-search">
+        <label class="filter-label">Buscar Producto / SKU:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput [formControl]="filtroTextoControl" (keyup.enter)="btnBuscar()" placeholder="Ej: Arroz, PROD-001, Limonada...">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <button *ngIf="filtroTextoControl.value" matSuffix mat-icon-button (click)="filtroTextoControl.setValue(''); btnBuscar()" matTooltip="Limpiar texto">
+            <mat-icon>close</mat-icon>
+          </button>
         </mat-form-field>
       </div>
-      <div class="col-md-4">
-        <mat-form-field appearance="fill" class="custom-input" style="width: 100%;">
-          <mat-label class="labeltext">Categoría</mat-label>
-          <mat-select placeholder="Seleccione una opción" [formControl]="ValueCategoria">
-            <mat-option>
-              <ngx-mat-select-search [formControl]="filterCategoria" placeholderLabel="Buscar"></ngx-mat-select-search>
-            </mat-option>
-            <mat-option *ngFor="let option of filteredCategoria | async" [value]="option.id">
-              {{ option.nombre }}
+
+      <!-- Filtro por Categoría -->
+      <div class="filter-item">
+        <label class="filter-label">Categoría:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [formControl]="ValueCategoria" (selectionChange)="btnBuscar()">
+            <mat-option [value]="null">-- Todas las categorías --</mat-option>
+            <mat-option *ngFor="let cat of lst_categoria" [value]="cat.id">
+              {{ cat.nombre }}
             </mat-option>
           </mat-select>
         </mat-form-field>
       </div>
-      <div class="col-md-3 btn_boton_filter">
-        <div align="center" style="display: flex; align-items: center;">
-          <button mat-raised-button color="primary" type="submit" class="btn_primary">
-            <mat-icon>search</mat-icon> Buscar
-          </button> &nbsp;
-          <button mat-raised-button (click)="onClear()" class="btn_secondary">
-            <mat-icon>disabled_by_default</mat-icon> Limpiar
-          </button>
-        </div>
+
+      <!-- Filtro por Control de Stock -->
+      <div class="filter-item">
+        <label class="filter-label">Control de Stock:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [formControl]="controlStockFilter" (selectionChange)="aplicarFiltroControlStock()">
+            <mat-option value="todos">-- Todos los productos --</mat-option>
+            <mat-option value="1">Con Control de Stock (Almacén)</mat-option>
+            <mat-option value="0">Sin Control de Stock (Libre)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="filter-actions">
+        <button type="button" class="btn-filter-search" (click)="btnBuscar()" matTooltip="Aplicar filtros de búsqueda">
+          <mat-icon>search</mat-icon>
+          <span>Buscar</span>
+        </button>
+        <button type="button" class="btn-filter-clear" (click)="onClear()" matTooltip="Restablecer filtros">
+          <mat-icon>restart_alt</mat-icon>
+          <span>Limpiar</span>
+        </button>
       </div>
     </div>
-  </form>
-</mat-expansion-panel>
-
-<div style="margin: 10px 28px;" *ngIf="cargaContenido">
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-</div>
-
-<div class="content_body_web">
-  <div class="row m-2" style="justify-content: center;">
-    <div class="col-md-12">
-      <mat-card class="p-0 stable">
-        <mat-card-content class=""> 
-          <div class="table-container small-font-table" style="overflow-x: auto; border-radius: 10px;">
-            <table mat-table [dataSource]="dataSource" matSort>
-              <!-- # -->
-              <ng-container matColumnDef="#">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> # </th>
-                <td mat-cell *matCellDef="let row; let i = index"> {{getRowNumber(i)}} </td>
-              </ng-container>
-
-              <!-- SKU -->
-              <ng-container matColumnDef="codigo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> SKU </th>
-                <td mat-cell *matCellDef="let row">
-                  <span style="font-family: monospace; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">
-                    {{row.codigo}}
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Imagen -->
-              <ng-container matColumnDef="imgId">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Img </th>
-                <td mat-cell *matCellDef="let row">
-                  <div class="{{row.imgId!=''?'':'d-none'}}">
-                    <img src="{{row.imgId}}" alt="" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;">
-                  </div>
-                </td>
-              </ng-container> 
-
-              <!-- Categoria -->
-              <ng-container matColumnDef="categoria">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Categoría </th>
-                <td mat-cell *matCellDef="let row">
-                  <span style="font-size: 11px; font-weight: 600; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">
-                    {{row.categoria}}
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Nombre -->
-              <ng-container matColumnDef="nombre">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Producto </th>
-                <td mat-cell *matCellDef="let row">
-                  <strong>{{row.nombre}}</strong>
-                  <div *ngIf="row.descripcion" style="font-size: 11px; color: #64748b;">{{row.descripcion}}</div>
-                </td>
-              </ng-container>
-
-              <!-- Costo Compra -->
-              <ng-container matColumnDef="costo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Costo Compra </th>
-                <td mat-cell *matCellDef="let row" style="font-family: monospace; font-weight: 700; color: #475569;">
-                  ${{row.costo | number:'1.2-2'}}
-                </td>
-              </ng-container>
-
-              <!-- Precio Venta -->
-              <ng-container matColumnDef="precio">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio Venta </th>
-                <td mat-cell *matCellDef="let row" style="font-family: monospace; font-weight: 700; color: #0f172a;">
-                  ${{row.precio | number:'1.2-2'}}
-                </td>
-              </ng-container>
-
-              <!-- Control Stock -->
-              <ng-container matColumnDef="controlStock">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Control Stock </th>
-                <td mat-cell *matCellDef="let row" style="text-align: center;">
-                  <span *ngIf="row.controlStock != 0" style="background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;">
-                    <mat-icon style="font-size: 13px; width: 13px; height: 13px;">check_circle</mat-icon> Almacén
-                  </span>
-                  <span *ngIf="row.controlStock == 0" style="background: #f1f5f9; color: #64748b; padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 3px;">
-                    <mat-icon style="font-size: 13px; width: 13px; height: 13px;">block</mat-icon> Sin Stock
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Stock Minimo -->
-              <ng-container matColumnDef="stockMinimo">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Stock Mínimo </th>
-                <td mat-cell *matCellDef="let row" style="text-align: center;">
-                  <span *ngIf="row.controlStock != 0" style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">
-                    {{row.stockMinimo}}
-                  </span>
-                  <span *ngIf="row.controlStock == 0" style="color: #94a3b8; font-size: 11px;">
-                    -
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Unidad Medida -->
-              <ng-container matColumnDef="unidadMedida">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Unidad </th>
-                <td mat-cell *matCellDef="let row" style="text-align: center;">
-                  <span style="background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">
-                    {{row.unidadMedida}}
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Acciones -->
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef style="text-align: center;">Acción</th>
-                <td mat-cell *matCellDef="let row">
-                  <div style="display: flex; justify-content: center; gap: 6px;">
-                    <button mat-raised-button (click)="openDialog(row.id)" class="small-buttonc btn_action"
-                      matTooltip="Editar Producto, Precios y Stock Mínimo">
-                      <mat-icon class="m-0">edit_square</mat-icon>
-                    </button>
-
-                    <button mat-raised-button (click)="deletDialog(row.id)" class="small-buttonc btn_delete"
-                      matTooltip="Eliminar">
-                      <mat-icon class="m-0" style="color: #EB5757 !important;">delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;"
-                [ngClass]="getRowClass(i)">
-              </tr>
-            </table>
-          </div>
-          <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" aria-label="Select page of products"></mat-paginator>
-        </mat-card-content>
-      </mat-card>
-    </div>
   </div>
+
+  <!-- ============================================================
+       TABLA PRINCIPAL DE PRODUCTOS
+       ============================================================ -->
+  <div class="producto-table-card">
+    <div class="table-card-header">
+      <div class="header-title-box">
+        <div class="table-icon-badge">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div>
+          <h3 class="table-main-title">Catálogo Maestro de Productos</h3>
+          <p class="table-sub-title">Precios de venta, costo de compra, SKU y stock mínimo configurado</p>
+        </div>
+      </div>
+
+      <div class="header-tools">
+        <span class="badge-total-records">{{ dataSource?.filteredData?.length || 0 }} productos encontrados</span>
+      </div>
+    </div>
+
+    <!-- Barra de Carga -->
+    <mat-progress-bar *ngIf="cargaContenido" mode="indeterminate" class="table-loading-bar"></mat-progress-bar>
+
+    <div class="table-responsive-container">
+      <table mat-table [dataSource]="dataSource" matSort class="w-100 custom-product-table">
+        <!-- # -->
+        <ng-container matColumnDef="#">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px;"> # </th>
+          <td mat-cell *matCellDef="let row; let i = index"> {{ getRowNumber(i) }} </td>
+        </ng-container>
+
+        <!-- SKU -->
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 110px;"> SKU / Código </th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge-sku">{{ row.codigo }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Imagen -->
+        <ng-container matColumnDef="imgId">
+          <th mat-header-cell *matHeaderCellDef style="width: 65px; text-align: center;"> Img </th>
+          <td mat-cell *matCellDef="let row" style="text-align: center;">
+            <div class="prod-thumb-box">
+              <img *ngIf="row.imgId" [src]="row.imgId" alt="Img" class="prod-thumb-img">
+              <div *ngIf="!row.imgId" class="prod-thumb-placeholder">
+                <mat-icon>fastfood</mat-icon>
+              </div>
+            </div>
+          </td>
+        </ng-container> 
+
+        <!-- Categoría -->
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Categoría </th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge-category">{{ row.categoria || 'General' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Nombre -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Producto </th>
+          <td mat-cell *matCellDef="let row">
+            <div class="prod-title-text">{{ row.nombre }}</div>
+            <div *ngIf="row.descripcion" class="prod-desc-text">{{ row.descripcion }}</div>
+          </td>
+        </ng-container>
+
+        <!-- Costo Compra -->
+        <ng-container matColumnDef="costo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Costo Compra </th>
+          <td mat-cell *matCellDef="let row" class="text-costo text-end">
+            S/ {{ (row.costo || 0) | number:'1.2-2' }}
+          </td>
+        </ng-container>
+
+        <!-- Precio Venta -->
+        <ng-container matColumnDef="precio">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Precio Venta </th>
+          <td mat-cell *matCellDef="let row" class="text-precio text-end">
+            S/ {{ (row.precio || 0) | number:'1.2-2' }}
+          </td>
+        </ng-container>
+
+        <!-- Control Stock -->
+        <ng-container matColumnDef="controlStock">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Control Stock </th>
+          <td mat-cell *matCellDef="let row" style="text-align: center;">
+            <span *ngIf="row.controlStock != 0" class="badge-stock-almacen">
+              <mat-icon>check_circle</mat-icon> En Almacén
+            </span>
+            <span *ngIf="row.controlStock == 0" class="badge-stock-libre">
+              <mat-icon>all_inclusive</mat-icon> Libre / Sin Stock
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Stock Mínimo -->
+        <ng-container matColumnDef="stockMinimo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Stock Mínimo </th>
+          <td mat-cell *matCellDef="let row" style="text-align: center;">
+            <span *ngIf="row.controlStock != 0" class="badge-stock-minimo">
+              {{ row.stockMinimo }}
+            </span>
+            <span *ngIf="row.controlStock == 0" class="text-muted">
+              &mdash;
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Unidad Medida -->
+        <ng-container matColumnDef="unidadMedida">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Unidad </th>
+          <td mat-cell *matCellDef="let row" style="text-align: center;">
+            <span class="badge-unidad">
+              {{ row.unidadMedida || 'UNIDAD' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center; width: 110px;"> Acciones </th>
+          <td mat-cell *matCellDef="let row" style="text-align: center;">
+            <div class="d-flex justify-content-center gap-1">
+              <button 
+                type="button" 
+                class="btn-row-action btn-row-edit" 
+                (click)="openDialog(row.id)"
+                matTooltip="Editar Producto">
+                <mat-icon>edit_square</mat-icon>
+              </button>
+
+              <button 
+                type="button" 
+                class="btn-row-action btn-row-delete" 
+                (click)="deletDialog(row.id)"
+                matTooltip="Eliminar Producto">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;" [ngClass]="getRowClass(i)"></tr>
+
+        <!-- Fila cuando no hay registros -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell text-center py-5" [attr.colspan]="displayedColumns.length">
+            <div class="empty-table-state">
+              <mat-icon class="empty-icon">inventory_2</mat-icon>
+              <h4>No se encontraron productos</h4>
+              <p class="text-muted">Pruebe ajustando los términos de búsqueda o filtros seleccionados.</p>
+              <button type="button" class="btn-empty-reset" (click)="onClear()">
+                <mat-icon>restart_alt</mat-icon> Limpiar Filtros
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" aria-label="Seleccionar página"></mat-paginator>
+  </div>
+
 </div>

@@ -1,8 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../material/material.module';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { FormControl, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableDataSource } from '@angular/material/table';
@@ -22,11 +21,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   selector: 'app-producto',
   standalone: true,
   imports: [
+    CommonModule,
     MaterialModule,
-    MatExpansionModule,  
+    FormsModule,
     ReactiveFormsModule,
     MatPaginatorModule,
-    CommonModule,
     MatTooltipModule,
     MatProgressBarModule,
     DecimalPipe
@@ -34,29 +33,37 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   templateUrl: './producto.component.html',
   styleUrl: './producto.component.css'
 })
-export class ProductoComponent {
-  isPanelOpen = true;
-  basicForm: UntypedFormGroup;
+export class ProductoComponent implements OnInit {
   cargaContenido: boolean = true;
 
-  // Categoria
-  ValueCategoria = new FormControl();
-  filterCategoria = new FormControl();
-  filteredCategoria: Observable<any[]>;
-  lst_categoria: Categoria[];
+  // Filtros
+  filtroTextoControl = new FormControl('');
+  ValueCategoria = new FormControl(null);
+  controlStockFilter = new FormControl('todos');
 
-  // Table
+  // Categorías
+  filterCategoria = new FormControl('');
+  filteredCategoria: Observable<any[]>;
+  lst_categoria: Categoria[] = [];
+
+  // KPIs
+  kpis = {
+    totalProductos: 0,
+    conControlStock: 0,
+    sinControlStock: 0,
+    totalCategorias: 0
+  };
+  filtroStockRapido: 'todos' | 'con_stock' | 'sin_stock' = 'todos';
+
+  // Datos
+  rawProductos: Producto[] = [];
   dataSource: MatTableDataSource<Producto>;
-  dataMovil: Producto[] = [];
-  paginatedItems = [];
-  pageSize = 10;
-  pageIndex = 0;
   displayedColumns: string[] = [
     '#',
     'codigo',
     'imgId',
-    'categoria', 
-    'nombre', 
+    'categoria',
+    'nombre',
     'costo',
     'precio',
     'controlStock',
@@ -64,6 +71,7 @@ export class ProductoComponent {
     'unidadMedida',
     'actions',
   ];
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -77,45 +85,119 @@ export class ProductoComponent {
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
     this.fnCargaCboCategoria();
-
-    this.productoService.findAllList().subscribe(data => {
-      this.createTable(data);
-    });
+    this.cargarProductos();
 
     this.productoService.getDataChange().subscribe(data => {
       this.createTable(data);
     });
+  }
 
-    this.basicForm = new UntypedFormGroup({
-      nombres: new FormControl(''),
+  cargarProductos(): void {
+    this.cargaContenido = true;
+    const body = {
+      nombres: this.filtroTextoControl.value || '',
+      categoria: this.ValueCategoria.value != null ? this.ValueCategoria.value : '',
+    };
+
+    this.productoService.findAllList(body).subscribe({
+      next: (data) => {
+        this.rawProductos = data || [];
+        // this.actualizarKpis(this.rawProductos);
+        this.aplicarFiltrosLocales();
+      },
+      error: () => {
+        this.cargaContenido = false;
+        this._snackbar.open('Error al cargar catálogo de productos', 'Cerrar', { duration: 3000 });
+      }
     });
   }
 
-  createTable(data: Producto[]) {
-    this.dataSource = new MatTableDataSource(data);
+  createTable(data: Producto[]): void {
+    this.rawProductos = data || [];
+    // this.actualizarKpis(this.rawProductos);
+    this.aplicarFiltrosLocales();
+  }
+
+  // actualizarKpis(data: Producto[]): void {
+  //   this.kpis.totalProductos = data.length;
+  //   this.kpis.conControlStock = data.filter(p => p.controlStock != 0).length;
+  //   this.kpis.sinControlStock = data.filter(p => p.controlStock == 0).length;
+
+  //   const cats = new Set(data.map(p => p.categoria).filter(c => !!c));
+  //   this.kpis.totalCategorias = cats.size || this.lst_categoria?.length || 0;
+  // }
+
+  filtrarPorStockRapido(tipo: 'todos' | 'con_stock' | 'sin_stock'): void {
+    this.filtroStockRapido = tipo;
+    if (tipo === 'todos') {
+      this.controlStockFilter.setValue('todos', { emitEvent: false });
+    } else if (tipo === 'con_stock') {
+      this.controlStockFilter.setValue('1', { emitEvent: false });
+    } else if (tipo === 'sin_stock') {
+      this.controlStockFilter.setValue('0', { emitEvent: false });
+    }
+    this.aplicarFiltrosLocales();
+  }
+
+  aplicarFiltroControlStock(): void {
+    const val = this.controlStockFilter.value;
+    if (val === '1') {
+      this.filtroStockRapido = 'con_stock';
+    } else if (val === '0') {
+      this.filtroStockRapido = 'sin_stock';
+    } else {
+      this.filtroStockRapido = 'todos';
+    }
+    this.aplicarFiltrosLocales();
+  }
+
+  aplicarFiltrosLocales(): void {
+    let filtrados = [...this.rawProductos];
+    const stockVal = this.controlStockFilter.value;
+
+    if (stockVal === '1') {
+      filtrados = filtrados.filter(p => p.controlStock != 0);
+    } else if (stockVal === '0') {
+      filtrados = filtrados.filter(p => p.controlStock == 0);
+    }
+
+    this.dataSource = new MatTableDataSource(filtrados);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.cargaContenido = false;
-    this.dataMovil = data;
-    this.updatePaginatedItems();
   }
 
-  private _filterCategoria(value: string): any[] {
-    const filterValue = value.toLowerCase();
-    return this.lst_categoria.filter(option => option.nombre.toLowerCase().includes(filterValue));
+  btnBuscar(): void {
+    this.cargarProductos();
   }
 
-  fnCargaCboCategoria() {
+  onClear(): void {
+    this.filtroTextoControl.setValue('');
+    this.ValueCategoria.setValue(null);
+    this.controlStockFilter.setValue('todos');
+    this.filtroStockRapido = 'todos';
+    this.cargarProductos();
+  }
+
+  fnCargaCboCategoria(): void {
     this.globalService.getCategoria().subscribe((data) => {
-      this.lst_categoria = data;
+      this.lst_categoria = data || [];
       this.filteredCategoria = this.filterCategoria.valueChanges.pipe(
         startWith(''),
-        map(value => this._filterCategoria(value))
+        map(value => this._filterCategoria(value || ''))
       );
+      if (this.rawProductos.length > 0) {
+        // this.actualizarKpis(this.rawProductos);
+      }
     });
   }
 
-  openDialog(id?: number) {
+  private _filterCategoria(value: string): any[] {
+    const filterValue = (value || '').toLowerCase();
+    return this.lst_categoria.filter(option => option.nombre.toLowerCase().includes(filterValue));
+  }
+
+  openDialog(id?: number): void {
     this._dialog.open(ProductoDialogComponent, {
       data: id,
       disableClose: true,
@@ -123,7 +205,7 @@ export class ProductoComponent {
     });
   }
 
-  deletDialog(id: number) {
+  deletDialog(id: number): void {
     const dialogRef = this._dialog.open(AlertMsjComponent, {
       width: '350px',
       data: { status: 'confirm' },
@@ -133,33 +215,16 @@ export class ProductoComponent {
       if (result) {
         this.productoService.cambioEstado({ id: id, estado: 0 }).subscribe(data => {
           if (data['code'] == 200) {
-            this._snackbar.open("Datos eliminados correctamente", "Aviso!", { duration: 3000, panelClass: 'custom-snackbar' });
+            this._snackbar.open("Producto eliminado correctamente", "Aviso!", { duration: 3000, panelClass: 'custom-snackbar' });
             this.productoService.findAll().subscribe((data) => {
               this.productoService.setDataChange(data);
             });
           } else {
-            this._snackbar.open(data['message'], "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
+            this._snackbar.open(data['message'] || 'Error al eliminar producto', "Error!", { duration: 3000, panelClass: 'custom-snackbar' });
           }
         });
       }
     });
-  }
-
-  btnBuscar() {
-    this.cargaContenido = true;
-    const body = {
-      nombres: this.basicForm.controls['nombres'].value,
-      categoria: this.ValueCategoria.value != null ? this.ValueCategoria.value : '',
-    };
-    this.productoService.findAllList(body).subscribe(data => {
-      this.createTable(data);
-    });
-  }
-
-  onClear() {
-    this.basicForm.reset();
-    this.ValueCategoria.reset();
-    this.btnBuscar();
   }
 
   getRowClass(index: number): string {
@@ -168,17 +233,5 @@ export class ProductoComponent {
 
   getRowNumber(index: number): number {
     return this.paginator ? (this.paginator.pageIndex * this.paginator.pageSize) + (index + 1) : index + 1;
-  }
-
-  updatePaginatedItems(): void {
-    const startIndex = this.pageIndex * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedItems = this.dataMovil.slice(startIndex, endIndex);
-  }
-
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.updatePaginatedItems();
   }
 }
