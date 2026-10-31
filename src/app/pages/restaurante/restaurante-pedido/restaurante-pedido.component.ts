@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { FormControl, FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,11 +11,9 @@ import { PedidoService } from '../../../services/pedido.service';
 import { Producto } from '../../../../model/producto';
 import { RestauranteDialogDetalleComponent } from './restaurante-dialog-detalle/restaurante-dialog-detalle.component';
 import { Pedido } from '../../../../model/pedido';
-import { Caja } from '../../../../model/caja';
-import { Observable } from 'rxjs';
-import { Persona } from '../../../../model/persona';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AlertMsjComponent } from '../../alert-msj/alert-msj.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-restaurante-pedido',
@@ -37,161 +35,125 @@ import { AlertMsjComponent } from '../../alert-msj/alert-msj.component';
 export class RestaurantePedidoComponent implements OnInit {
   @Input() mesa_Id?: number;
   @Output() cerrar = new EventEmitter<void>();
-  
-  // hideSingleSelectionIndicator_pendiente = signal(false);
-  // hideMultipleSelectionIndicator_antendido = signal(false);
 
   basicForm: UntypedFormGroup;
-  ocultarCarga:boolean=true;
-  nombreMesa:string = "----";
-  error:boolean=false;
-  listaDetalle:Producto[] = [];
-  pedido:Pedido;
+  ocultarCarga: boolean = true;
+  nombreMesa: string = "----";
+  error: boolean = false;
+  listaDetalle: Producto[] = [];
+  pedido: Pedido;
   
-  isButtonDisabled:boolean=false;
-  selectePagoCon:string = 'EF';
-  selecteCaja:number;
-  selecteCajero:number; 
+  isButtonDisabled: boolean = false;
+  accion: string = "nuevo";
+  id_pedido: number;
 
-  ///tipo evento
-  // caja: Caja[];
-  // ValueCaja = new FormControl();
-  // filterControlCaja = new FormControl();
-  // filteredCaja: Observable<any[]>;
-  listCaja: Caja[]=[];
-  listCajero: Persona[]=[];
-  accion:string = "nuevo";
-  id_pedido:number;
-
-  check_pendiente:boolean=false;
-  check_atendido:boolean=false;
+  check_pendiente: boolean = true;
+  check_atendido: boolean = false;
 
   constructor(
-    // private _dialogRef: MatDialogRef<RestauranteDialogComponent>,
-    private _dialog:MatDialog,
+    private _dialog: MatDialog,
     private mesaService: MesaService,
     private _snackbar: MatSnackBar,
     private pedidoService: PedidoService,
-  ){}
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
     this.initialFrm();
-    console.log(this.mesa_Id)
-    if(this.mesa_Id){
+    if (this.mesa_Id) {
       this.mesaService.findById(this.mesa_Id).subscribe(data => {
-        if(data['code'] == 200){
+        if (data['code'] == 200) {
           this.nombreMesa = data['data']['f_nombre'];
           this.id_pedido = data['data']['id_pedido'];
           this.pedido = data['detallePedido'];
 
-          if(data['data']['f_disponible']==0){
+          if (data['data']['f_disponible'] == 0) {
             this.accion = 'actualizar';
           }
-          this.listCaja = data['caja'] || [];
-          this.listCajero = data['dataCajeros'] || [];
-
-          if (this.pedido?.f_caja) {
-            this.selecteCaja = Number(this.pedido.f_caja);
-          } else if (this.listCaja.length > 0) {
-            this.selecteCaja = this.listCaja[0].id;
-          }
-
-          if (this.pedido?.f_cajero) {
-            this.selecteCajero = Number(this.pedido.f_cajero);
-          } else if (this.listCajero.length > 0) {
-            this.selecteCajero = this.listCajero[0].id;
-          }
-
-          this.selectePagoCon = this.pedido?.f_pagoCon || 'EF';
 
           this.initialFrm();
-        }else{
-          this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+        } else {
+          this._snackbar.open(data['message'], "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
         }
-      })
+      });
+
       this.mesaService.findByIdDetail(this.mesa_Id).subscribe(data => {
-        if(data['code'] == 200){
-            this.listaDetalle = data['data'];
-            this.fnTotal(); 
-        }else{
-          this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+        if (data['code'] == 200) {
+          this.listaDetalle = data['data'] || [];
+          this.fnTotal(); 
+        } else {
+          this._snackbar.open(data['message'], "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
         }
-      })
-    }else{
-      this._snackbar.open('Debe seleccionar mesa', "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+      });
+    } else {
+      this._snackbar.open('Debe seleccionar mesa', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
     } 
   }
-  private initialFrm(){
+
+  private initialFrm() {
     this.basicForm = new UntypedFormGroup({
-      id: new UntypedFormControl(0),
-      nombreCliente: new UntypedFormControl(this.pedido?.f_nombreCliente || ''),
-      pagoCon: new UntypedFormControl(this.selectePagoCon),
-      caja: new UntypedFormControl(this.selecteCaja),
-      cajero: new UntypedFormControl(this.selecteCajero),
+      id: new UntypedFormControl(this.id_pedido || 0),
+      nombreCliente: new UntypedFormControl(this.pedido?.f_nombreCliente || 'CONSUMIDOR FINAL'),
       montoTotal: new UntypedFormControl(this.pedido?.f_montoTotal || '0.00'),
-      montoEfectivo: new UntypedFormControl(this.pedido?.f_montoEfectivo || ''),
-      vuelto: new UntypedFormControl(this.pedido?.f_vuelto || '0.00'),
     }); 
-    if (this.pedido?.f_state==1) {
+
+    if (this.pedido?.f_state == 1) {
       this.check_atendido = true;
       this.check_pendiente = false;
-    }else{
+    } else {
       this.check_pendiente = true;
       this.check_atendido = false;
     }
   }
-  save(){
-    if(!this.validateFrm()){
-      this.isButtonDisabled=true;
+
+  save() {
+    if (!this.validateFrm()) {
+      this.isButtonDisabled = true;
       const objP = new Pedido();
       objP.id = this.id_pedido;
       objP.f_idMesa = this.mesa_Id;
-      objP.f_nombreCliente = this.basicForm.controls["nombreCliente"].value;
+      objP.f_nombreCliente = this.basicForm.controls["nombreCliente"].value || 'CONSUMIDOR FINAL';
       objP.f_montoTotal = this.basicForm.controls["montoTotal"].value;
-      objP.f_montoEfectivo = this.basicForm.controls["montoEfectivo"].value;
-      objP.f_vuelto = this.basicForm.controls["vuelto"].value;
-      objP.f_pagoCon = this.selectePagoCon || this.basicForm.controls["pagoCon"].value;
-      objP.f_caja = this.selecteCaja || this.basicForm.controls["caja"].value;
-      objP.f_cajero = this.selecteCajero || this.basicForm.controls["cajero"].value;
-      objP.f_state = this.check_atendido?1:0;
+      objP.f_montoEfectivo = 0;
+      objP.f_vuelto = 0;
+      objP.f_pagoCon = 'EF';
+      objP.f_state = this.check_atendido ? 1 : 0;
+      objP.f_detalle = this.listaDetalle;
 
-      objP.f_detalle = this.listaDetalle
-      if (this.accion=='nuevo') {
+      if (this.accion == 'nuevo') {
         this.pedidoService.save(objP).subscribe(data => {
-          this.isButtonDisabled=false;
-          if(data['code'] == 200){
-            this._snackbar.open("Pedido registrado correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
+          this.isButtonDisabled = false;
+          if (data['code'] == 200) {
+            this._snackbar.open("Comanda registrada correctamente. El cobro se realiza desde Ventas.", "Correcto!", { duration: 4000, panelClass: 'custom-snackbar' });
             this.cerrar.emit();
-          }else{
-            this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+          } else {
+            this._snackbar.open(data['message'] || 'Error al guardar comanda', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
           }
-        })
-      }else{
+        });
+      } else {
         this.pedidoService.update(objP.id, objP).subscribe(data => {
-          this.isButtonDisabled=false;
-          if(data['code'] == 200){
-            this._snackbar.open("Pedido actualizado correctamente", "Correcto!",{duration:3000,panelClass: 'custom-snackbar'});
+          this.isButtonDisabled = false;
+          if (data['code'] == 200) {
+            this._snackbar.open("Comanda actualizada correctamente. El cobro se realiza desde Ventas.", "Correcto!", { duration: 4000, panelClass: 'custom-snackbar' });
             this.cerrar.emit();
-          }else{
-            this._snackbar.open(data['message'], "Error!",{duration:4000,panelClass: 'custom-snackbar'});
+          } else {
+            this._snackbar.open(data['message'] || 'Error al actualizar comanda', "Error!", { duration: 4000, panelClass: 'custom-snackbar' });
           }
-        })
+        });
       }
     }
   }
-  validateFrm() :boolean{
+
+  validateFrm(): boolean {
     this.error = false; 
-    if((this.basicForm.controls["montoTotal"].value) == "" || (this.basicForm.controls["montoTotal"].value) == null){
-      this._snackbar.open("Debe seleccionar al menos un porducto", "Aviso!",{duration:3000});
+    if (!this.listaDetalle || this.listaDetalle.length === 0) {
+      this._snackbar.open("Debe agregar al menos un producto a la comanda", "Aviso!", { duration: 3000 });
       this.error = true;
     } 
-    if(!this.check_pendiente && !this.check_atendido){
-      this._snackbar.open("Debe seleccionar Pendiente o Antendido", "Aviso!",{duration:3000});
-      this.error = true;
-    }
     return this.error;
   }
+
   openDialogDetalle() {  
     let dialogRef = this._dialog.open(RestauranteDialogDetalleComponent, {
       width: '430px',
@@ -207,12 +169,12 @@ export class RestaurantePedidoComponent implements OnInit {
     });
   }
 
-  eliminarProducto(index:number){
+  eliminarProducto(index: number) {
     this.listaDetalle.splice(index, 1);
     this.fnTotal();
   }
 
-  actualizarProducto(index:number){
+  actualizarProducto(index: number) {
     let dialogRef = this._dialog.open(RestauranteDialogDetalleComponent, {
       width: '430px',
       maxWidth: '95vw',
@@ -262,153 +224,46 @@ export class RestaurantePedidoComponent implements OnInit {
     }
   }
 
-  seleccionarMedioPago(metodo: string): void {
-    this.selectePagoCon = metodo;
-    this.basicForm.controls['pagoCon'].setValue(metodo);
-    if (metodo === 'TA') {
-      const total = this.basicForm.controls['montoTotal'].value;
-      this.basicForm.controls['montoEfectivo'].setValue(total);
-      this.fnVuelto();
-    }
-  }
-
-  establecerEfectivoRapido(monto: number | 'exacto'): void {
-    const total = parseFloat(this.basicForm.controls['montoTotal'].value || 0);
-    if (monto === 'exacto') {
-      this.basicForm.controls['montoEfectivo'].setValue(total.toFixed(2));
-    } else {
-      this.basicForm.controls['montoEfectivo'].setValue(Number(monto).toFixed(2));
-    }
-    this.fnVuelto();
-  }
-
-  fnTotal(){
+  fnTotal() {
     let total = 0;
     this.listaDetalle.forEach((item) => {
       total += Number(item.f_subTotal || 0);
     });
     const totalStr = total.toFixed(2);
     this.basicForm.controls["montoTotal"].setValue(totalStr);
-    
-    // Si no se ha ingresado monto efectivo, o es tarjeta, sugerir el total exacto
-    const efectivoActual = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
-    if (!efectivoActual || efectivoActual === 0 || this.selectePagoCon === 'TA') {
-      this.basicForm.controls["montoEfectivo"].setValue(totalStr);
-    }
-    this.fnVuelto();
   }
 
   cerrarFormulario() {
     this.cerrar.emit();
   }
 
-  fnVuelto(){
-    const total = parseFloat(this.basicForm.controls["montoTotal"].value || 0);
-    const efectivo = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
-    let vuelto = total - efectivo;
-    if (vuelto > 0) {
-      vuelto = 0;
-    } else {
-      vuelto = vuelto * -1;
-    }
-    this.basicForm.controls["vuelto"].setValue(vuelto.toFixed(2));
+  irAVentas() {
+    this.router.navigate(['/pages/venta']);
   }
 
-  onPendienteChange(event: any): void {
-    this.check_pendiente = event.checked;
-    if (event.checked) {
-      this.check_atendido = false;
-    }
+  anularMesa() {
+    let dialogRef = this._dialog.open(AlertMsjComponent, {
+      width: '320px',
+      disableClose: true,
+      data: { mensaje: '¿Está seguro de ANULAR esta comanda y liberar la mesa?' }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'yes') {
+        const datax = {
+          id: this.mesa_Id,
+        };
+        this.mesaService.anular(datax).subscribe(data => {
+          if (data['code'] == 200) {
+            this._snackbar.open('Comanda anulada y mesa liberada correctamente', 'Correcto!', {
+              duration: 3000,
+              panelClass: 'custom-snackbar'
+            });
+            this.cerrar.emit();
+          } else {
+            this._snackbar.open(data['message'], "Error!", { duration: 6000, panelClass: 'custom-snackbar' });
+          }
+        }); 
+      } 
+    });
   }
-
-  onAtendidoChange(event: any): void {
-    this.check_atendido = event.checked;
-    if (event.checked) {
-      this.check_pendiente = false;
-    }
-  }
-liberarMesa(){
-  const caja = this.selecteCaja || this.basicForm.controls["caja"].value;
-  const cajero = this.selecteCajero || this.basicForm.controls["cajero"].value;
-  const pagoCon = this.selectePagoCon || this.basicForm.controls["pagoCon"].value;
-  const montoTotal = parseFloat(this.basicForm.controls["montoTotal"].value || 0);
-  const montoEfectivo = parseFloat(this.basicForm.controls["montoEfectivo"].value || 0);
-  const vuelto = parseFloat(this.basicForm.controls["vuelto"].value || 0);
-
-  if (!caja) {
-    this._snackbar.open("Debe seleccionar una Caja para el cobro", "Aviso!", {duration: 3500});
-    return;
-  }
-  if (!cajero) {
-    this._snackbar.open("Debe seleccionar un Cajero", "Aviso!", {duration: 3500});
-    return;
-  }
-  if (!pagoCon) {
-    this._snackbar.open("Debe seleccionar Medio de Pago", "Aviso!", {duration: 3500});
-    return;
-  }
-  if (montoTotal <= 0) {
-    this._snackbar.open("El total del pedido debe ser mayor a 0", "Aviso!", {duration: 3500});
-    return;
-  }
-  if (montoEfectivo < montoTotal) {
-    this._snackbar.open("El monto recibido debe ser igual o mayor al total del pedido", "Aviso!", {duration: 3500});
-    return;
-  }
-
-  let dialogRef = this._dialog.open(AlertMsjComponent, {
-    width: '320px',
-    disableClose: true,
-    data: { mensaje: `¿Confirmar cobro de $${montoTotal.toFixed(2)} y liberar mesa?` }
-  });
-  dialogRef.afterClosed().subscribe(result => {
-    if (result === 'yes') {
-      const datax = {
-        id: this.mesa_Id,
-        f_pagoCon: pagoCon,
-        f_caja: caja,
-        f_cajero: cajero,
-        f_montoEfectivo: montoEfectivo,
-        f_vuelto: vuelto,
-        f_nombreCliente: this.basicForm.controls["nombreCliente"].value
-      };
-      this.mesaService.liberar(datax).subscribe(data => {
-        if(data['code'] == 200){
-          this._snackbar.open('¡Cobro registrado y mesa liberada correctamente!', 'Correcto!', {
-            duration: 3500,
-            panelClass: 'custom-snackbar'
-          });
-          this.cerrar.emit();
-        }else{
-          this._snackbar.open(data['message'] || 'Error al liberar mesa', "Error!", {duration: 6000, panelClass: 'custom-snackbar'});
-        }
-      });
-    } 
-  });
-}
-anularMesa(){
-  let dialogRef = this._dialog.open(AlertMsjComponent, {
-    width: '300px',
-    disableClose: true,
-    data: { mensaje: '¿Está seguro de ANULAR el pedido?'}
-  });
-  dialogRef.afterClosed().subscribe(result => {
-    if (result === 'yes') {
-      const datax = {
-        id: this.mesa_Id,
-      }
-      this.mesaService.anular(datax).subscribe(data => {
-        if(data['code'] == 200){
-          this._snackbar.open('Pedido anulado correctamente ', 'Correcto!', {
-            duration: 3000,
-            panelClass: 'custom-snackbar'
-          });
-          this.cerrar.emit();
-        }else{
-          this._snackbar.open(data['message'], "Error!",{duration:6000,panelClass: 'custom-snackbar'});
-        }
-      }) 
-    } 
-  });
-}
 }

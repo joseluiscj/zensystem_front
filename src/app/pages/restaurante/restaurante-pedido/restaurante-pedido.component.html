@@ -1,5 +1,5 @@
 <div class="pos-wrapper">
-  <!-- Barra Superior / Header del POS -->
+  <!-- Barra Superior / Header de la Comanda -->
   <header class="pos-topbar">
     <div class="pos-topbar-left">
       <button type="button" class="btn-topbar-back" (click)="cerrarFormulario()">
@@ -22,37 +22,38 @@
     </div>
 
     <div class="pos-topbar-actions">
-      <!-- Anular Pedido (Solo si ya existe pedido) -->
+      <!-- Anular Pedido (Solo si ya existe pedido registrado) -->
       <button 
         *ngIf="accion === 'actualizar'" 
         type="button" 
         class="btn-topbar-danger" 
         (click)="anularMesa()"
-        matTooltip="Cancelar y eliminar comanda actual">
+        matTooltip="Cancelar comanda y liberar mesa">
         <mat-icon>delete_forever</mat-icon>
         <span class="d-none d-sm-inline">Anular Pedido</span>
       </button>
 
-      <!-- Guardar Pedido -->
+      <!-- Ir a Ventas a Cobrar (Informativo si ya existe consumo) -->
+      <button 
+        *ngIf="accion === 'actualizar'" 
+        type="button" 
+        class="btn-topbar-ventas" 
+        (click)="irAVentas()"
+        matTooltip="Ir a la sección Ventas para registrar el cobro en caja y liberar esta mesa">
+        <mat-icon>point_of_sale</mat-icon>
+        <span class="d-none d-md-inline">Cobrar en Ventas (S/ {{ basicForm.controls['montoTotal'].value || '0.00' }})</span>
+        <span class="d-inline d-md-none">Cobrar en Ventas</span>
+      </button>
+
+      <!-- Guardar Comanda -->
       <button 
         type="button" 
         class="btn-topbar-secondary" 
         (click)="save()" 
         [disabled]="isButtonDisabled"
-        matTooltip="Guardar cambios sin cerrar la cuenta">
+        matTooltip="Guardar productos en la comanda de la mesa">
         <mat-icon>save</mat-icon>
-        <span>Guardar</span>
-      </button>
-
-      <!-- Cobrar y Liberar Mesa (Directo desde cabecera si está ocupada) -->
-      <button 
-        *ngIf="accion === 'actualizar'" 
-        type="button" 
-        class="btn-topbar-primary" 
-        (click)="liberarMesa()"
-        matTooltip="Efectuar cobro y desocupar mesa">
-        <mat-icon>point_of_sale</mat-icon>
-        <span>Cobrar (${{ basicForm.controls['montoTotal'].value || '0.00' }})</span>
+        <span>Guardar Comanda</span>
       </button>
     </div>
   </header>
@@ -65,7 +66,7 @@
   <!-- Contenedor Principal en 2 Columnas -->
   <div class="pos-content-container">
     <div class="row g-3">
-      <!-- COLUMNA IZQUIERDA: Detalle de Comanda / Lista de Platos (8 cols) -->
+      <!-- COLUMNA IZQUIERDA: Detalle de Comanda / Lista de Platos (7-8 cols) -->
       <div class="col-lg-7 col-xl-8">
         <div class="pos-panel order-panel">
           <!-- Cabecera de la Comanda -->
@@ -122,7 +123,7 @@
               <!-- Precio Unitario -->
               <div class="item-price-col">
                 <span class="col-label">Unitario</span>
-                <span class="col-val">${{ (item.f_precio || 0) | number:'1.2-2' }}</span>
+                <span class="col-val">S/ {{ (item.f_precio || 0) | number:'1.2-2' }}</span>
               </div>
 
               <!-- Stepper de Cantidad (+ / -) -->
@@ -141,7 +142,7 @@
               <!-- Subtotal del Item -->
               <div class="item-subtotal-col">
                 <span class="col-label">Subtotal</span>
-                <span class="col-subtotal-val">${{ (item.f_subTotal || 0) | number:'1.2-2' }}</span>
+                <span class="col-subtotal-val">S/ {{ (item.f_subTotal || 0) | number:'1.2-2' }}</span>
               </div>
 
               <!-- Botones de Acción -->
@@ -159,65 +160,38 @@
           <!-- Botón Rápido al final si la lista es extensa -->
           <div *ngIf="listaDetalle.length >= 3" class="order-footer-add-more">
             <button type="button" class="btn-add-more-items" (click)="openDialogDetalle()">
-              <mat-icon>add</mat-icon> Agregar otro producto a la cuenta
+              <mat-icon>add</mat-icon> Agregar otro producto a la comanda
             </button>
           </div>
         </div>
       </div>
 
-      <!-- COLUMNA DERECHA: Liquidación, Pago & Configuración de Mesa (4-5 cols) -->
+      <!-- COLUMNA DERECHA: Configuración del Pedido & Resumen (4-5 cols) -->
       <div class="col-lg-5 col-xl-4">
         <form [formGroup]="basicForm" class="checkout-sidebar-form">
           <!-- TARJETA 1: Información de Mesa y Comensal -->
           <div class="pos-panel info-panel">
             <div class="panel-section-title">
-              <mat-icon class="section-title-icon">person_outline</mat-icon>
-              <span>Datos del Servicio</span>
+              <mat-icon class="section-title-icon">table_bar</mat-icon>
+              <span>Datos de la Comanda</span>
             </div>
 
             <!-- Cliente -->
             <div class="pos-field-group">
-              <label class="pos-field-label">Cliente / Razón Social</label>
+              <label class="pos-field-label">Cliente / Comensal</label>
               <div class="pos-input-container">
                 <mat-icon class="input-icon">person</mat-icon>
                 <input 
                   type="text" 
                   formControlName="nombreCliente" 
-                  placeholder="Consumidor Final" 
+                  placeholder="CONSUMIDOR FINAL" 
                   class="pos-control-input uppercase" />
-              </div>
-            </div>
-
-            <!-- Cajero y Caja -->
-            <div class="row g-2 mt-1">
-              <div class="col-6">
-                <div class="pos-field-group mb-0">
-                  <label class="pos-field-label">Cajero</label>
-                  <div class="pos-input-container">
-                    <mat-icon class="input-icon">badge</mat-icon>
-                    <select [(ngModel)]="selecteCajero" formControlName="cajero" class="pos-control-select">
-                      <option *ngFor="let data of listCajero" [value]="data.id">{{ data.f_nombre }}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-6">
-                <div class="pos-field-group mb-0">
-                  <label class="pos-field-label">Caja Asignada</label>
-                  <div class="pos-input-container">
-                    <mat-icon class="input-icon">point_of_sale</mat-icon>
-                    <select [(ngModel)]="selecteCaja" formControlName="caja" class="pos-control-select">
-                      <option *ngFor="let caja of listCaja" [value]="caja.id">{{ caja.f_nombre }}</option>
-                    </select>
-                  </div>
-                </div>
               </div>
             </div>
 
             <!-- Estado de Cocina / Comanda (Segmented Pills) -->
             <div class="pos-field-group mt-3 mb-0">
-              <label class="pos-field-label">Estado de la Orden</label>
+              <label class="pos-field-label">Estado de la Orden en Cocina / Salón</label>
               <div class="segmented-status-pills">
                 <button 
                   type="button" 
@@ -225,7 +199,7 @@
                   [class.active-pending]="check_pendiente"
                   (click)="seleccionarEstado('pendiente')">
                   <mat-icon class="pill-icon">hourglass_empty</mat-icon>
-                  <span>Pendiente</span>
+                  <span>Pendiente (En Preparación)</span>
                 </button>
 
                 <button 
@@ -234,142 +208,66 @@
                   [class.active-served]="check_atendido"
                   (click)="seleccionarEstado('atendido')">
                   <mat-icon class="pill-icon">check_circle</mat-icon>
-                  <span>Atendido</span>
+                  <span>Atendido (Servido en Mesa)</span>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- TARJETA 2: Cobro, Arqueo & Liquidación -->
+          <!-- TARJETA 2: Resumen del Pedido & Acciones de Guardado -->
           <div class="pos-panel checkout-panel mt-3">
             <div class="panel-section-title">
-              <mat-icon class="section-title-icon">payments</mat-icon>
-              <span>Cobro en Caja</span>
+              <mat-icon class="section-title-icon">receipt</mat-icon>
+              <span>Resumen de la Orden</span>
             </div>
 
-            <!-- Medio de Pago (Efectivo vs Tarjeta) -->
-            <div class="pos-field-group">
-              <label class="pos-field-label">Medio de Pago</label>
-              <div class="payment-tabs-grid">
-                <button 
-                  type="button" 
-                  class="payment-tab-btn" 
-                  [class.selected-tab]="selectePagoCon === 'EF'"
-                  (click)="seleccionarMedioPago('EF')">
-                  <mat-icon class="tab-icon">attach_money</mat-icon>
-                  <div class="tab-text">
-                    <span class="tab-name">Efectivo</span>
-                    <span class="tab-hint">Moneda física</span>
-                  </div>
-                </button>
-
-                <button 
-                  type="button" 
-                  class="payment-tab-btn" 
-                  [class.selected-tab]="selectePagoCon === 'TA'"
-                  (click)="seleccionarMedioPago('TA')">
-                  <mat-icon class="tab-icon">credit_card</mat-icon>
-                  <div class="tab-text">
-                    <span class="tab-name">Tarjeta</span>
-                    <span class="tab-hint">Datafast / POS</span>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Total de la Cuenta (Banner Prominente) -->
+            <!-- Total de la Comanda (Banner Prominente) -->
             <div class="grand-total-banner">
               <div class="total-meta">
-                <span class="total-caption">TOTAL A COBRAR</span>
-                <span class="total-currency">USD ($)</span>
+                <span class="total-caption">TOTAL COMANDA</span>
+                <span class="total-currency">PEN (S/)</span>
               </div>
               <div class="total-number-display">
-                ${{ (basicForm.controls['montoTotal'].value || 0) | number:'1.2-2' }}
+                S/ {{ (basicForm.controls['montoTotal'].value || 0) | number:'1.2-2' }}
               </div>
             </div>
 
-            <!-- Sección de Efectivo / Billetes Rápidos / Cambio -->
-            <div *ngIf="selectePagoCon === 'EF'" class="cash-settlement-block">
-              <!-- Botones de Billetes Rápidos -->
-              <div class="pos-field-group mb-2">
-                <label class="pos-field-label">Pago Rápido</label>
-                <div class="quick-cash-grid">
-                  <button type="button" class="quick-pill pill-exact" (click)="establecerEfectivoRapido('exacto')">
-                    Exacto
-                  </button>
-                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(10)">$10</button>
-                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(20)">$20</button>
-                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(50)">$50</button>
-                  <button type="button" class="quick-pill" (click)="establecerEfectivoRapido(100)">$100</button>
-                </div>
+            <!-- Aviso Informativo del Flujo de Restaurante / Ventas -->
+            <div class="comanda-info-banner mt-3 mb-3">
+              <div class="comanda-info-header">
+                <mat-icon>info</mat-icon>
+                <span>Gestión de Pedido</span>
               </div>
-
-              <!-- Input Monto Recibido -->
-              <div class="pos-field-group mb-2">
-                <label class="pos-field-label">Monto Entregado por Cliente</label>
-                <div class="pos-input-container large-tender-input">
-                  <span class="currency-symbol">$</span>
-                  <input 
-                    type="number" 
-                    step="0.01" 
-                    formControlName="montoEfectivo" 
-                    (input)="fnVuelto()" 
-                    placeholder="0.00" 
-                    class="pos-control-input text-end fw-bold font-monospace" />
-                </div>
-              </div>
-
-              <!-- Caja de Cambio / Vuelto -->
-              <div class="change-calc-box" [class.positive-change]="(basicForm.controls['vuelto'].value || 0) > 0">
-                <div class="change-info-left">
-                  <mat-icon class="change-box-icon">currency_exchange</mat-icon>
-                  <div>
-                    <span class="change-box-title">Vuelto / Cambio</span>
-                    <span class="change-box-desc">A entregar al comensal</span>
-                  </div>
-                </div>
-                <div class="change-amount-display">
-                  ${{ (basicForm.controls['vuelto'].value || 0) | number:'1.2-2' }}
-                </div>
-              </div>
+              <p class="comanda-info-text">
+                En <strong>Restaurante</strong> se registran los productos y pedidos de la mesa. El cobro en caja y la liberación de la mesa se efectúan desde la opción <strong>Ventas</strong>.
+              </p>
             </div>
 
-            <!-- Mensaje Informativo si es Tarjeta -->
-            <div *ngIf="selectePagoCon === 'TA'" class="card-payment-notice">
-              <mat-icon class="notice-icon">contactless</mat-icon>
-              <div>
-                <strong>Pago Electrónico</strong>
-                <p>Procese el cobro en el terminal bancario antes de liberar la mesa.</p>
-              </div>
-            </div>
-
-            <!-- Botones Principales de Cierre -->
+            <!-- Botones Principales -->
             <div class="checkout-footer-actions">
-              <!-- Botón Cobrar y Liberar Mesa (siempre que la mesa esté ocupada) -->
-              <button 
-                *ngIf="accion === 'actualizar'" 
-                type="button" 
-                class="btn-checkout-primary"
-                (click)="liberarMesa()">
-                <div class="btn-checkout-content">
-                  <mat-icon class="main-btn-icon">verified</mat-icon>
-                  <div class="main-btn-text">
-                    <span class="btn-headline">Cobrar & Liberar Mesa</span>
-                    <span class="btn-subheadline">Ingresar venta a caja y desocupar</span>
-                  </div>
-                </div>
-                <mat-icon class="btn-arrow-icon">arrow_forward</mat-icon>
-              </button>
-
               <!-- Botón Guardar Comanda -->
               <button 
                 type="button" 
-                class="btn-checkout-save" 
-                [class.btn-checkout-full]="accion === 'nuevo'"
+                class="btn-checkout-primary btn-checkout-comanda" 
                 [disabled]="isButtonDisabled"
                 (click)="save()">
-                <mat-icon>save</mat-icon>
-                <span>{{ accion === 'nuevo' ? 'Abrir Mesa y Guardar Comanda' : 'Guardar Cambios de Comanda' }}</span>
+                <div class="btn-checkout-content">
+                  <mat-icon class="main-btn-icon">save</mat-icon>
+                  <div class="main-btn-text">
+                    <span class="btn-headline">{{ accion === 'nuevo' ? 'Abrir Mesa y Guardar Comanda' : 'Guardar Cambios de Comanda' }}</span>
+                    <span class="btn-subheadline">Actualiza los platos y mantiene la mesa ocupada</span>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Botón Ir a Ventas si está ocupada -->
+              <button 
+                *ngIf="accion === 'actualizar'"
+                type="button" 
+                class="btn-checkout-goto-ventas mt-2"
+                (click)="irAVentas()">
+                <mat-icon>point_of_sale</mat-icon>
+                <span>Cobrar y Liberar Mesa en Ventas</span>
               </button>
             </div>
           </div>

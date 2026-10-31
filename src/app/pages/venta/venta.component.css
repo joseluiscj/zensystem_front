@@ -1178,3 +1178,59 @@
   color: #cbd5e1;
   margin-bottom: 12px;
 }
+
+
+/* ============================================================
+   BOTONES DE COBRO DIRECTO DE COMANDAS EN VENTAS
+   ============================================================ */
+.btn-action.btn-cobrar-pill {
+  width: auto;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 4px;
+  box-shadow: 0 2px 5px rgba(16, 185, 129, 0.28);
+}
+
+.btn-action.btn-cobrar-pill:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+.btn-action.btn-cobrar-pill mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.btn-editor-cobrar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-editor-cobrar:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+.btn-editor-cobrar mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}

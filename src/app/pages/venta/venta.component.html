@@ -293,6 +293,17 @@
               <!-- Acciones -->
               <td class="td-acciones text-center">
                 <div class="action-buttons-wrap">
+                  <!-- Cobrar y Liberar Mesa (Directo si está pendiente) -->
+                  <button 
+                    *ngIf="v.state !== 1" 
+                    type="button" 
+                    class="btn-action btn-cobrar-pill" 
+                    (click)="abrirCobroMesa(v)" 
+                    matTooltip="Cobrar consumo y liberar mesa">
+                    <mat-icon>point_of_sale</mat-icon>
+                    <span class="btn-cobrar-txt">Cobrar</span>
+                  </button>
+
                   <!-- Ver Detalle -->
                   <button type="button" class="btn-action btn-view" (click)="verDetalle(v.idPedido)" matTooltip="Ver detalle completo / Ticket">
                     <mat-icon>visibility</mat-icon>
@@ -374,6 +385,15 @@
       </div>
 
       <div class="editor-hero-actions">
+        <button 
+          *ngIf="editForm.controls['state'].value !== 1" 
+          type="button" 
+          class="btn-editor-cobrar" 
+          (click)="cobrarDesdeEdicion()"
+          matTooltip="Efectuar cobro y desocupar la mesa">
+          <mat-icon>point_of_sale</mat-icon>
+          <span>Cobrar y Liberar Mesa</span>
+        </button>
         <button type="button" class="btn-editor-cancel" (click)="cancelarEdicion()">
           Cancelar
         </button>

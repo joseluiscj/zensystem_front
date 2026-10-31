@@ -1,0 +1,214 @@
+<div class="cobro-dialog-wrapper">
+  <!-- Cabecera del Diálogo -->
+  <div class="cobro-modal-header">
+    <div class="header-title-box">
+      <div class="header-icon-circle">
+        <mat-icon>point_of_sale</mat-icon>
+      </div>
+      <div>
+        <h3 class="modal-title">Cobrar y Liberar Mesa</h3>
+        <p class="modal-subtitle">Orden #{{ idPedido }} &bull; {{ mesaNombre }}</p>
+      </div>
+    </div>
+    <button mat-icon-button class="btn-close-modal" (click)="cerrar()" matTooltip="Cerrar ventana">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loader si está consultando -->
+  <div *ngIf="cargando" class="cobro-loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="loader-label">Verificando estado de cajas...</p>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!cargando" class="cobro-modal-body">
+
+    <!-- 1. ALERTA BLOQUEANTE SI NO HAY CAJA ABIERTA -->
+    <div *ngIf="!hayCajaAperturada" class="alert-no-caja-dialog mb-3">
+      <div class="alert-left">
+        <div class="alert-icon-wrap">
+          <mat-icon>lock</mat-icon>
+        </div>
+        <div class="alert-text">
+          <h4 class="alert-heading">Cobro Bloqueado: Sin caja abierta</h4>
+          <p class="alert-desc">
+            No es posible registrar el cobro ni liberar la mesa porque no existe ninguna caja aperturada con turno activo en el sistema.
+          </p>
+        </div>
+      </div>
+      <button type="button" class="btn-dialog-aperturar" (click)="irAperturaCaja()">
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Aperturar Caja Ahora</span>
+      </button>
+    </div>
+
+    <!-- 2. RESUMEN DE LA COMANDA Y MONTO TOTAL -->
+    <div class="order-summary-card mb-3">
+      <div class="summary-meta-row">
+        <div class="meta-item">
+          <span class="meta-lbl">Mesa:</span>
+          <span class="meta-val badge-mesa">
+            <mat-icon>table_restaurant</mat-icon> {{ mesaNombre }}
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-lbl">Cliente:</span>
+          <span class="meta-val fw-bold">{{ nombreCliente }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="resumenProductos" class="summary-products-preview mt-2">
+        <span class="preview-lbl">Consumo:</span>
+        <span class="preview-text">{{ resumenProductos }}</span>
+      </div>
+
+      <!-- Banner de Total a Cobrar -->
+      <div class="cobro-total-banner mt-3">
+        <div class="total-caption-wrap">
+          <span class="total-tag">TOTAL A LIQUIDAR</span>
+          <span class="total-curr">PEN (S/)</span>
+        </div>
+        <div class="total-amount-display">
+          S/ {{ montoTotal | number:'1.2-2' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CONFIGURACIÓN DEL COBRO (SOLO SI HAY CAJA APERTURADA) -->
+    <div *ngIf="hayCajaAperturada" class="payment-setup-section">
+
+      <!-- Caja y Cajero -->
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-sm-6">
+          <label class="form-label-cobro">Caja de Cobro *</label>
+          <div class="input-cobro-group">
+            <mat-icon class="input-icon">point_of_sale</mat-icon>
+            <select class="form-select form-cobro-control" [(ngModel)]="idCajaSeleccionada">
+              <option *ngFor="let c of cajas" [value]="c.id">
+                {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6">
+          <label class="form-label-cobro">Cajero Responsable</label>
+          <div class="input-cobro-group">
+            <mat-icon class="input-icon">badge</mat-icon>
+            <select class="form-select form-cobro-control" [(ngModel)]="idCajeroSeleccionado">
+              <option *ngFor="let u of cajeros" [value]="u.id">
+                {{ u.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métodos de Pago -->
+      <label class="form-label-cobro">Método de Cobro</label>
+      <div class="payment-tabs-row mb-3">
+        <button 
+          type="button" 
+          class="payment-tab-btn" 
+          [class.active]="pagoCon === 'EF'"
+          (click)="setMedioPago('EF')">
+          <mat-icon>attach_money</mat-icon>
+          <span>Efectivo en Caja</span>
+        </button>
+
+        <button 
+          type="button" 
+          class="payment-tab-btn" 
+          [class.active]="pagoCon === 'TA'"
+          (click)="setMedioPago('TA')">
+          <mat-icon>credit_card</mat-icon>
+          <span>Tarjeta Débito/Crédito</span>
+        </button>
+      </div>
+
+      <!-- Panel de Efectivo y Vuelto -->
+      <div *ngIf="pagoCon === 'EF'" class="cash-calc-card">
+        <label class="form-label-cobro">Monto Recibido del Cliente (S/)</label>
+
+        <!-- Botones sugeridos rápidos -->
+        <div class="quick-cash-row mb-2">
+          <button type="button" class="btn-cash-quick exact" (click)="setMontoSugerido(montoTotal)">
+            Exacto (S/ {{ montoTotal | number:'1.2-2' }})
+          </button>
+          <button *ngIf="montoTotal <= 20" type="button" class="btn-cash-quick" (click)="setMontoSugerido(20)">
+            S/ 20
+          </button>
+          <button *ngIf="montoTotal <= 50" type="button" class="btn-cash-quick" (click)="setMontoSugerido(50)">
+            S/ 50
+          </button>
+          <button *ngIf="montoTotal <= 100" type="button" class="btn-cash-quick" (click)="setMontoSugerido(100)">
+            S/ 100
+          </button>
+          <button type="button" class="btn-cash-quick" (click)="setMontoSugerido(200)">
+            S/ 200
+          </button>
+        </div>
+
+        <div class="row g-2 align-items-center">
+          <div class="col-6">
+            <div class="input-cobro-group">
+              <span class="input-prefix">S/</span>
+              <input 
+                type="number" 
+                step="0.10"
+                min="0"
+                class="form-control form-cobro-control text-end fw-bold fs-5" 
+                placeholder="0.00"
+                [(ngModel)]="montoEfectivo"
+                (input)="calcularVuelto()"
+              />
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="change-display-pill" [class.change-positive]="vuelto > 0" [class.change-negative]="montoEfectivo !== null && montoEfectivo < montoTotal">
+              <span class="change-lbl">Vuelto a entregar:</span>
+              <span class="change-val">
+                S/ {{ (montoEfectivo !== null && montoEfectivo >= montoTotal ? vuelto : 0) | number:'1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="montoEfectivo !== null && montoEfectivo < montoTotal" class="cash-shortage-alert mt-2">
+          <mat-icon>warning</mat-icon>
+          <span>Faltan S/ {{ (montoTotal - montoEfectivo) | number:'1.2-2' }} para completar el total</span>
+        </div>
+      </div>
+
+      <!-- Tarjeta notice -->
+      <div *ngIf="pagoCon === 'TA'" class="card-notice-pill">
+        <mat-icon>credit_score</mat-icon>
+        <span>Procese la transacción bancaria en el terminal POS antes de confirmar la liberación de la mesa.</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Barra de Acciones / Botones Inferiores -->
+  <div class="cobro-modal-footer">
+    <button type="button" class="btn-modal-cancel" (click)="cerrar()" [disabled]="procesando">
+      Cancelar
+    </button>
+
+    <button 
+      type="button" 
+      class="btn-modal-confirm" 
+      (click)="confirmarCobro()"
+      [disabled]="!esValidoParaCobrar || procesando">
+      <mat-icon *ngIf="!procesando && hayCajaAperturada">check_circle</mat-icon>
+      <mat-icon *ngIf="!procesando && !hayCajaAperturada">lock</mat-icon>
+      <mat-icon *ngIf="procesando" class="spin-icon">refresh</mat-icon>
+      <span *ngIf="!procesando && hayCajaAperturada">Cobrar y Liberar Mesa (S/ {{ montoTotal | number:'1.2-2' }})</span>
+      <span *ngIf="!procesando && !hayCajaAperturada">Aperturar Caja para Cobrar</span>
+      <span *ngIf="procesando">Procesando Cobro...</span>
+    </button>
+  </div>
+</div>

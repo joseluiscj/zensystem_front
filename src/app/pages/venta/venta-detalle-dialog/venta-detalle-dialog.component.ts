@@ -68,6 +68,17 @@ export class VentaDetalleDialogComponent implements OnInit {
     window.print();
   }
 
+  cobrar(): void {
+    this.dialogRef.close({
+      accion: 'cobrar',
+      idPedido: this.idPedido,
+      idMesa: this.pedido?.f_idMesa,
+      mesa_nombre: this.pedido?.mesa_nombre,
+      nombreCliente: this.pedido?.f_nombreCliente,
+      montoTotal: Number(this.pedido?.f_montoTotal || 0)
+    });
+  }
+
   editar(): void {
     this.dialogRef.close({ accion: 'editar', idPedido: this.idPedido });
   }

@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { PedidoService, VentaItem, ResumenVentas } from '../../services/pedido.service';
 import { MesaService } from '../../services/mesa.service';
 import { VentaDetalleDialogComponent } from './venta-detalle-dialog/venta-detalle-dialog.component';
+import { VentaCobroMesaDialogComponent } from './venta-cobro-mesa-dialog/venta-cobro-mesa-dialog.component';
 import { RestauranteDialogDetalleComponent } from '../restaurante/restaurante-pedido/restaurante-dialog-detalle/restaurante-dialog-detalle.component';
 import { AlertMsjComponent } from '../alert-msj/alert-msj.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -211,6 +212,69 @@ export class VentaComponent implements OnInit {
     dialogRef.afterClosed().subscribe((res) => {
       if (res && res.accion === 'editar' && res.idPedido) {
         this.iniciarEdicion(res.idPedido);
+      } else if (res && res.accion === 'cobrar' && res.idPedido) {
+        const venta = this.ventas.find(x => x.idPedido === res.idPedido);
+        if (venta) {
+          this.abrirCobroMesa(venta);
+        } else {
+          this.abrirCobroMesa({
+            idPedido: res.idPedido,
+            idMesa: res.idMesa,
+            mesa_nombre: res.mesa_nombre,
+            nombreCliente: res.nombreCliente,
+            montoTotal: res.montoTotal
+          } as any);
+        }
+      }
+    });
+  }
+
+  abrirCobroMesa(v: VentaItem): void {
+    const dialogRef = this.dialog.open(VentaCobroMesaDialogComponent, {
+      width: '540px',
+      maxWidth: '95vw',
+      panelClass: 'modal-dialog-center',
+      data: {
+        idPedido: v.idPedido,
+        idMesa: v.idMesa,
+        mesa_nombre: v.mesa_nombre,
+        nombreCliente: v.nombreCliente,
+        montoTotal: Number(v.montoTotal || 0),
+        items_count: v.items_count,
+        resumen_productos: v.resumen_productos
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res && res.cobrado) {
+        this.cargarVentas();
+      }
+    });
+  }
+
+  cobrarDesdeEdicion(): void {
+    if (!this.idPedidoEditando) return;
+    const fVals = this.editForm.value;
+    const mesaObj = this.mesasDisponibles.find(m => m.id == fVals.idMesa);
+
+    const dialogRef = this.dialog.open(VentaCobroMesaDialogComponent, {
+      width: '540px',
+      maxWidth: '95vw',
+      panelClass: 'modal-dialog-center',
+      data: {
+        idPedido: this.idPedidoEditando,
+        idMesa: fVals.idMesa,
+        mesa_nombre: mesaObj ? mesaObj.f_nombre : 'Mesa',
+        nombreCliente: fVals.nombreCliente,
+        montoTotal: Number(fVals.montoTotal || 0)
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((res) => {
+      if (res && res.cobrado) {
+        this.modo = 'lista';
+        this.idPedidoEditando = null;
+        this.cargarVentas();
       }
     });
   }

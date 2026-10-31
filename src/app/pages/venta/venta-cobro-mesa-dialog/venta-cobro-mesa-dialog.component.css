@@ -1,0 +1,591 @@
+/* ============================================================
+   DIÁLOGO DE COBRO Y LIBERACIÓN DE MESA
+   ============================================================ */
+.cobro-dialog-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  font-family: inherit;
+  color: #1e293b;
+}
+
+/* Cabecera */
+.cobro-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+}
+
+.header-icon-circle mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.modal-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.btn-close-modal {
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  color: #0f172a;
+}
+
+/* Loader */
+.cobro-loader {
+  padding: 30px;
+  text-align: center;
+}
+
+.loader-label {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Cuerpo */
+.cobro-modal-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  max-height: calc(85vh - 140px);
+}
+
+/* Alerta Sin Caja */
+.alert-no-caja-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #fff1f2;
+  border: 1.5px solid #fecdd3;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.alert-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-icon-wrap {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-icon-wrap mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.alert-heading {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #991b1b;
+}
+
+.alert-desc {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #b91c1c;
+}
+
+.btn-dialog-aperturar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dialog-aperturar:hover {
+  background: #b91c1c;
+}
+
+.btn-dialog-aperturar mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Resumen de la Orden */
+.order-summary-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.summary-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+}
+
+.meta-lbl {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.badge-mesa {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.badge-mesa mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+.summary-products-preview {
+  font-size: 0.8rem;
+  color: #475569;
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 8px;
+}
+
+.preview-lbl {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.preview-text {
+  font-style: italic;
+}
+
+/* Total Banner */
+.cobro-total-banner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.2);
+}
+
+.total-tag {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  display: block;
+}
+
+.total-curr {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.total-amount-display {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #10b981;
+}
+
+/* Form Controls */
+.form-label-cobro {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.input-cobro-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-cobro-group .input-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.input-cobro-group .input-prefix {
+  position: absolute;
+  left: 12px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.form-cobro-control {
+  padding-left: 36px !important;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.form-cobro-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* Payment Tabs */
+.payment-tabs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.payment-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-tab-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.payment-tab-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.payment-tab-btn.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.18);
+}
+
+/* Panel Efectivo */
+.cash-calc-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.quick-cash-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-cash-quick {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cash-quick:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-cash-quick.exact {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.change-display-pill {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 6px 12px;
+  height: 38px;
+}
+
+.change-display-pill.change-positive {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.change-display-pill.change-positive .change-val {
+  color: #15803d;
+}
+
+.change-display-pill.change-negative {
+  background: #fff1f2;
+  border-color: #fca5a5;
+}
+
+.change-display-pill.change-negative .change-val {
+  color: #e11d48;
+}
+
+.change-lbl {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1;
+}
+
+.change-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.cash-shortage-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.cash-shortage-alert mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.card-notice-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.card-notice-pill mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #15803d;
+}
+
+/* Footer */
+.cobro-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-modal-cancel {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-cancel:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.btn-modal-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-modal-confirm:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+.btn-modal-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-modal-confirm mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   MODO OSCURO
+   ============================================================ */
+:host-context(body.dark-mode) .cobro-dialog-wrapper {
+  color: #f8fafc;
+}
+
+:host-context(body.dark-mode) .cobro-modal-header {
+  background: #111e38;
+  border-color: #1e293b;
+}
+
+:host-context(body.dark-mode) .modal-title {
+  color: #f8fafc;
+}
+
+:host-context(body.dark-mode) .modal-subtitle {
+  color: #94a3b8;
+}
+
+:host-context(body.dark-mode) .order-summary-card,
+:host-context(body.dark-mode) .cash-calc-card {
+  background: #0b1329;
+  border-color: #1e293b;
+}
+
+:host-context(body.dark-mode) .cobro-modal-footer {
+  background: #0b1329;
+  border-color: #1e293b;
+}
+
+:host-context(body.dark-mode) .form-cobro-control {
+  background: #111e38;
+  border-color: #1e293b;
+  color: #f8fafc;
+}
+
+:host-context(body.dark-mode) .payment-tab-btn {
+  background: #111e38;
+  border-color: #1e293b;
+  color: #cbd5e1;
+}
+
+:host-context(body.dark-mode) .payment-tab-btn.active {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+
+:host-context(body.dark-mode) .change-display-pill {
+  background: #111e38;
+  border-color: #1e293b;
+}
+
+:host-context(body.dark-mode) .change-val {
+  color: #f8fafc;
+}

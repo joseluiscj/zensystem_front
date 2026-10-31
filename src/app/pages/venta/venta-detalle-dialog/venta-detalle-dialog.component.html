@@ -138,9 +138,10 @@
 
   <!-- Botones de Acción -->
   <div class="ticket-modal-actions">
-    <!-- <button mat-stroked-button class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir comprobante">
-      <mat-icon>print</mat-icon> Imprimir
-    </button> -->
+    <!-- Botón Cobrar y Liberar si está pendiente -->
+    <button *ngIf="pedido.f_state !== 1" type="button" class="btn-action-cobrar" (click)="cobrar()" matTooltip="Cobrar comanda y liberar mesa">
+      <mat-icon>point_of_sale</mat-icon> Cobrar y Liberar Mesa
+    </button>
     <button mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
       <mat-icon>edit</mat-icon> Editar Comanda
     </button>
