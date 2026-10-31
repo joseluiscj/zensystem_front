@@ -26,11 +26,11 @@ export class AperturaCajaService {
     return this.http.post<CajaDetalle[]>(`${this.url}/list`, filters || {});
   }
 
-  getCajasDisponibles(): Observable<{code: number, data: any[]}> {
-    return this.http.get<{code: number, data: any[]}>(`${this.url}/cajas-disponibles`);
+  getCajasDisponibles(): Observable<{code: number, data: any[], usuarios?: any[], usuarioActual?: number}> {
+    return this.http.get<{code: number, data: any[], usuarios?: any[], usuarioActual?: number}>(`${this.url}/cajas-disponibles`);
   }
 
-  aperturar(data: {idCaja: number, aMonto: number}): Observable<{code: number, message?: string, data?: any}> {
+  aperturar(data: {idCaja: number, aMonto: number, idUsuario?: number}): Observable<{code: number, message?: string, data?: any}> {
     return this.http.post<{code: number, message?: string, data?: any}>(`${this.url}/aperturar`, data);
   }
 

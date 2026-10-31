@@ -26,7 +26,7 @@
     <form [formGroup]="basicForm" *ngIf="!cargandoCajas && cajasDisponibles.length > 0">
       <div class="row">
         <div class="col-12 mb-3">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline" class="w-100" style="margin-bottom: -18px;">
             <mat-label>Seleccionar Caja</mat-label>
             <mat-select formControlName="idCaja" (valueChange)="onCajaSelected($event)">
               <mat-option *ngFor="let c of cajasDisponibles" [value]="c.id">
@@ -36,6 +36,23 @@
             <mat-icon matSuffix>point_of_sale</mat-icon>
             <mat-error *ngIf="basicForm.controls['idCaja'].hasError('required')">
               Debe seleccionar una caja.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 mb-3">
+          <mat-form-field appearance="outline" class="w-100" style="margin-bottom: -18px;">
+            <mat-label>Habilitar Caja al Usuario</mat-label>
+            <mat-select formControlName="idUsuario">
+              <mat-option *ngFor="let u of usuariosDisponibles" [value]="u.id">
+                <span class="fw-bold">{{ u.nombreCompleto }}</span>
+                <span class="text-muted ms-1">({{ u.rol }})</span>
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>person</mat-icon>
+            <!-- <mat-hint>Selecciona el usuario al que se le asignará y habilitará este turno de caja.</mat-hint> -->
+            <mat-error *ngIf="basicForm.controls['idUsuario'].hasError('required')">
+              Debe seleccionar el usuario al que se le habilitará la caja.
             </mat-error>
           </mat-form-field>
         </div>

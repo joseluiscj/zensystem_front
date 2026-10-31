@@ -26,7 +26,9 @@ export class AperturaDialogComponent implements OnInit {
   basicForm: UntypedFormGroup;
   isButtonDisabled: boolean = false;
   cajasDisponibles: any[] = [];
+  usuariosDisponibles: any[] = [];
   cargandoCajas: boolean = true;
+  usuarioActualId: number | null = null;
 
   constructor(
     private dialogRef: MatDialogRef<AperturaDialogComponent>,
@@ -43,6 +45,7 @@ export class AperturaDialogComponent implements OnInit {
   private initialForm() {
     this.basicForm = new UntypedFormGroup({
       idCaja: new UntypedFormControl('', [Validators.required]),
+      idUsuario: new UntypedFormControl('', [Validators.required]),
       aMonto: new UntypedFormControl(0.00, [Validators.required, Validators.min(0)]),
     });
   }
@@ -50,10 +53,13 @@ export class AperturaDialogComponent implements OnInit {
   cargarCajasDisponibles() {
     this.cargandoCajas = true;
     this.aperturaService.getCajasDisponibles().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.cargandoCajas = false;
         if (res.code === 200) {
-          this.cajasDisponibles = res.data;
+          this.cajasDisponibles = res.data || [];
+          this.usuariosDisponibles = res.usuarios || [];
+          this.usuarioActualId = res.usuarioActual || null;
+
           if (this.cajasDisponibles.length > 0) {
             this.basicForm.controls['idCaja'].setValue(this.cajasDisponibles[0].id);
             // Prellenar saldo anterior de la caja si existe
@@ -61,11 +67,20 @@ export class AperturaDialogComponent implements OnInit {
               this.basicForm.controls['aMonto'].setValue(parseFloat(this.cajasDisponibles[0].saldo));
             }
           }
+
+          if (this.usuariosDisponibles.length > 0) {
+            const actual = this.usuariosDisponibles.find(u => u.id === this.usuarioActualId);
+            if (actual) {
+              this.basicForm.controls['idUsuario'].setValue(actual.id);
+            } else {
+              this.basicForm.controls['idUsuario'].setValue(this.usuariosDisponibles[0].id);
+            }
+          }
         }
       },
       error: () => {
         this.cargandoCajas = false;
-        this.snackBar.open('Error al cargar cajas disponibles', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar cajas disponibles y usuarios', 'Cerrar', { duration: 3000 });
       }
     });
   }
@@ -86,6 +101,7 @@ export class AperturaDialogComponent implements OnInit {
     this.isButtonDisabled = true;
     const payload = {
       idCaja: this.basicForm.controls['idCaja'].value,
+      idUsuario: this.basicForm.controls['idUsuario'].value,
       aMonto: parseFloat(this.basicForm.controls['aMonto'].value || 0)
     };
 
