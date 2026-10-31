@@ -147,6 +147,10 @@ export class InicioComponent implements OnInit {
     this.router.navigate(['/pages/restaurante']);
   }
 
+  irPuntoVenta(): void {
+    this.router.navigate(['/pages/pos']);
+  }
+
   irAperturaCaja(): void {
     this.router.navigate(['/pages/apertura']);
   }

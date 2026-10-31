@@ -17,8 +17,8 @@
           <mat-icon class="subtitle-icon">calendar_today</mat-icon>
           <span>{{ fechaActual | date:'fullDate':'':'es-ES' | titlecase }}</span>
           <span class="subtitle-divider">&bull;</span>
-          <mat-icon class="subtitle-icon">storefront</mat-icon>
-          <span>Panel de Control & Ventas  </span>
+          <!-- <mat-icon class="subtitle-icon">storefront</mat-icon> -->
+          <!-- <span>Panel de Control & Ventas  </span> -->
         </p>
       </div>
     </div>
@@ -29,9 +29,13 @@
         <span class="d-none d-sm-inline">Actualizar</span>
       </button>
 
-      <button type="button" class="btn-hero-action btn-primary-restaurant" (click)="irRestaurante()">
+      <button type="button" class="btn-hero-action btn-primary-restaurant" (click)="irRestaurante()" >
         <mat-icon>table_restaurant</mat-icon>
         <span>Salón de Mesas</span>
+      </button>
+      <button type="button" class="btn-hero-action btn-primary-venta" (click)="irPuntoVenta()">
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Punto de venta</span>
       </button>
     </div>
   </header>

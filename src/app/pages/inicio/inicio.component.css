@@ -164,17 +164,27 @@
 }
 
 .btn-primary-restaurant {
+  background: linear-gradient(135deg, #38bdf8 0%, #38bdf8 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.btn-primary-restaurant:hover {
+  background: linear-gradient(135deg, #3893b9 0%, #3ea0c9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(80, 179, 236, 0.45);
+}
+.btn-primary-venta {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
-.btn-primary-restaurant:hover {
+.btn-primary-venta:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
 }
-
 /* ============================================================
    LOADER
    ============================================================ */
