@@ -12,9 +12,11 @@ import { RestauranteComponent } from "./restaurante/restaurante.component";
 import { AlmacenComponent } from "./almacen/almacen.component";
 import { KardexComponent } from "./kardex/kardex.component";
 import { MovimientoCajaComponent } from "./movimiento-caja/movimiento-caja.component";
+import { PosComponent } from "./pos/pos.component";
 
 export const pagesRoutes: Routes = [
     {path: 'inicio', component:InicioComponent, canActivate: [certGuard]},
+    {path: 'pos', component:PosComponent, canActivate: [certGuard]},
     {path: 'producto', component:ProductoComponent, canActivate: [certGuard]},
     {path: 'categoria', component:CategoriaComponent, canActivate: [certGuard]},
     // {path: 'pedido', component:PedidoComponent, canActivate: [certGuard]},
