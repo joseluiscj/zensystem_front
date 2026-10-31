@@ -876,3 +876,28 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 body.dark-mode ::-webkit-scrollbar-track {
     background: #0b1329 !important;
 }
+
+
+/* 13. POS: Alerta y Bloqueo de Caja en Modo Oscuro */
+body.dark-mode .alert-no-caja-banner {
+    background: #2a111a !important;
+    border-color: #881337 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .alert-no-caja-banner .alert-title {
+    color: #fda4af !important;
+}
+
+body.dark-mode .alert-no-caja-banner .alert-subtitle {
+    color: #f43f5e !important;
+}
+
+body.dark-mode .box-sin-caja {
+    background: #2a111a !important;
+    border-color: #881337 !important;
+}
+
+body.dark-mode .sin-caja-label {
+    color: #fda4af !important;
+}

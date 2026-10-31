@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MaterialModule } from '../../../material/material.module';
@@ -79,8 +80,17 @@ export class VentaPosComponent implements OnInit {
 
   constructor(
     private pedidoService: PedidoService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
+
+  get hayCajaAperturada(): boolean {
+    return Array.isArray(this.cajas) && this.cajas.length > 0;
+  }
+
+  irAperturaCaja(): void {
+    this.router.navigate(['/pages/apertura']);
+  }
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -104,6 +114,8 @@ export class VentaPosComponent implements OnInit {
 
           if (this.cajas.length > 0) {
             this.idCajaSeleccionada = this.cajas[0].id;
+          } else {
+            this.idCajaSeleccionada = '';
           }
           if (this.almacenes.length > 0) {
             this.idAlmacenSeleccionado = this.almacenes[0].id;
@@ -137,6 +149,12 @@ export class VentaPosComponent implements OnInit {
   }
 
   agregarAlCarrito(prod: any): void {
+    if (!this.hayCajaAperturada) {
+      this.snackBar.open('Ventas bloqueadas: Debe aperturar una caja antes de registrar ventas.', 'Aperturar Caja', { duration: 4500 })
+        .onAction().subscribe(() => this.irAperturaCaja());
+      return;
+    }
+
     const index = this.carrito.findIndex(item => item.idProducto === prod.id);
     if (index >= 0) {
       this.carrito[index].cantidad++;
@@ -231,6 +249,7 @@ export class VentaPosComponent implements OnInit {
   }
 
   get esValidoParaCobrar(): boolean {
+    if (!this.hayCajaAperturada) return false;
     if (this.carrito.length === 0) return false;
     if (this.totalVenta <= 0) return false;
     if (this.pagoCon === 'EF') {
@@ -240,6 +259,12 @@ export class VentaPosComponent implements OnInit {
   }
 
   guardarVenta(): void {
+    if (!this.hayCajaAperturada) {
+      this.snackBar.open('No es posible realizar ventas: No hay ninguna caja aperturada en el sistema. Debe aperturar una caja antes de continuar.', 'Aperturar Caja', { duration: 5000 })
+        .onAction().subscribe(() => this.irAperturaCaja());
+      return;
+    }
+
     if (!this.esValidoParaCobrar) {
       this.snackBar.open('Verifique el monto de cobro o agregue productos al ticket.', 'Cerrar', { duration: 3000 });
       return;

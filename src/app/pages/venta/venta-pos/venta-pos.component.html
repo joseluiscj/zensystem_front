@@ -16,9 +16,13 @@
         </div>
         <div class="pos-indicator-details">
           <h2 class="pos-main-title">Punto de Venta / Mostrador</h2>
-          <div class="pos-badge-status">
+          <div class="pos-badge-status status-closed" *ngIf="!cargando && !hayCajaAperturada">
+            <span class="status-indicator-dot dot-red"></span>
+            <span>Sin Caja Abierta</span>
+          </div>
+          <div class="pos-badge-status" *ngIf="!cargando && hayCajaAperturada">
             <span class="status-indicator-dot"></span>
-            <span>Venta Directa</span>
+            <span>Caja Abierta: {{ cajas[0]?.nombre }}</span>
           </div>
         </div>
       </div>
@@ -46,17 +50,39 @@
       <button 
         type="button" 
         class="btn-topbar-primary" 
+        [class.btn-topbar-blocked]="!hayCajaAperturada"
         (click)="guardarVenta()" 
-        [disabled]="!esValidoParaCobrar || guardando"
-        matTooltip="Confirmar y procesar venta">
-        <mat-icon>check_circle</mat-icon>
-        <span>Cobrar (S/ {{ totalVenta | number:'1.2-2' }})</span>
+        [disabled]="!esValidoParaCobrar || guardando || !hayCajaAperturada"
+        [matTooltip]="!hayCajaAperturada ? 'Debe aperturar una caja antes de cobrar' : 'Confirmar y procesar venta'">
+        <mat-icon>{{ !hayCajaAperturada ? 'lock' : 'check_circle' }}</mat-icon>
+        <span>{{ !hayCajaAperturada ? 'Caja Cerrada' : ('Cobrar (S/ ' + (totalVenta | number:'1.2-2') + ')') }}</span>
       </button>
     </div>
   </header>
 
   <!-- Barra de progreso si está procesando -->
   <mat-progress-bar *ngIf="cargando || guardando" mode="indeterminate" class="pos-loading-bar"></mat-progress-bar>
+
+  <!-- ============================================================
+       ALERTA VISUAL BLOQUEANTE: SIN CAJA APERTURADA
+       ============================================================ -->
+  <div *ngIf="!cargando && !hayCajaAperturada" class="alert-no-caja-banner mb-3">
+    <div class="alert-no-caja-left">
+      <div class="alert-no-caja-icon">
+        <mat-icon>lock</mat-icon>
+      </div>
+      <div class="alert-no-caja-info">
+        <h3 class="alert-title">Ventas Bloqueadas: No hay ninguna caja aperturada</h3>
+        <p class="alert-subtitle">
+          Para realizar ventas en el Punto de Venta es obligatorio contar con al menos una caja abierta y con turno activo.
+        </p>
+      </div>
+    </div>
+    <button type="button" class="btn-aperturar-action" (click)="irAperturaCaja()">
+      <mat-icon>point_of_sale</mat-icon>
+      <span>Aperturar Caja Ahora</span>
+    </button>
+  </div>
 
   <!-- ============================================================
        CONTENIDO PRINCIPAL EN 2 COLUMNAS (CATÁLOGO vs TICKET/COBRO)
@@ -299,13 +325,22 @@
               <!-- Caja a Afectar -->
               <div class="col-12 col-sm-6">
                 <label class="form-label-pos">Caja de Cobro *</label>
-                <div class="pos-input-group">
+                <div class="pos-input-group" *ngIf="hayCajaAperturada">
                   <mat-icon class="input-icon">point_of_sale</mat-icon>
                   <select class="form-select pos-form-control" [(ngModel)]="idCajaSeleccionada">
                     <option *ngFor="let c of cajas" [value]="c.id">
                       {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
                     </option>
                   </select>
+                </div>
+                <div class="box-sin-caja" *ngIf="!hayCajaAperturada">
+                  <div class="sin-caja-label">
+                    <mat-icon class="text-danger">lock</mat-icon>
+                    <span>Sin caja abierta</span>
+                  </div>
+                  <button type="button" class="btn-link-apertura" (click)="irAperturaCaja()">
+                    Aperturar
+                  </button>
                 </div>
               </div>
 
@@ -406,11 +441,14 @@
             <button 
               type="button" 
               class="btn-complete-sale" 
+              [class.btn-sale-blocked]="!hayCajaAperturada"
               (click)="guardarVenta()" 
-              [disabled]="!esValidoParaCobrar || guardando">
-              <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+              [disabled]="!esValidoParaCobrar || guardando || !hayCajaAperturada">
+              <mat-icon *ngIf="!guardando && hayCajaAperturada">check_circle</mat-icon>
+              <mat-icon *ngIf="!guardando && !hayCajaAperturada">lock</mat-icon>
               <mat-icon *ngIf="guardando" class="spin-icon">refresh</mat-icon>
-              <span *ngIf="!guardando">COBRAR Y REGISTRAR VENTA (S/ {{ totalVenta | number:'1.2-2' }})</span>
+              <span *ngIf="!guardando && hayCajaAperturada">COBRAR Y REGISTRAR VENTA (S/ {{ totalVenta | number:'1.2-2' }})</span>
+              <span *ngIf="!guardando && !hayCajaAperturada">VENTAS DESHABILITADAS: APERTURAR CAJA</span>
               <span *ngIf="guardando">PROCESANDO COBRO...</span>
             </button>
           </div>
