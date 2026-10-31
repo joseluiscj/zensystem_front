@@ -73,6 +73,14 @@ export class MovimientoCajaDialogComponent implements OnInit {
     this.categoriasIngresos = data?.categoriasIngresos || [];
   }
 
+  obtenerFechaHoy(): string {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
     const mov = this.data?.movimiento;
@@ -83,7 +91,7 @@ export class MovimientoCajaDialogComponent implements OnInit {
     const tipo = mov ? mov.tipo : (this.data?.tipoInicial || 'E');
     const idCajaInicial = mov ? mov.idCaja : (this.cajas.length > 0 ? this.cajas[0].id : '');
 
-    const hoy = new Date().toISOString().substring(0, 10);
+    const hoy = this.obtenerFechaHoy();
     const fechaInicial = mov?.fecha ? mov.fecha.substring(0, 10) : hoy;
 
     this.movimientoForm = this.fb.group({

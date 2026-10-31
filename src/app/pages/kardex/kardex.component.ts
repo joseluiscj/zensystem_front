@@ -103,10 +103,18 @@ export class KardexComponent implements OnInit {
     this.cargarMovimientos();
   }
 
+  obtenerFechaHoy(): string {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoy.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   aplicarFiltroHoy(): void {
     this.esFiltroHoy = !this.esFiltroHoy;
     if (this.esFiltroHoy) {
-      const hoy = new Date().toISOString().substring(0, 10);
+      const hoy = this.obtenerFechaHoy();
       this.filtros.fechaInicio = hoy;
       this.filtros.fechaFin = hoy;
     } else {
@@ -114,6 +122,11 @@ export class KardexComponent implements OnInit {
       this.filtros.fechaFin = '';
     }
     this.cargarMovimientos();
+  }
+
+  onFechaChange(): void {
+    const hoy = this.obtenerFechaHoy();
+    this.esFiltroHoy = (this.filtros.fechaInicio === hoy && this.filtros.fechaFin === hoy);
   }
 
   limpiarFiltros(): void {

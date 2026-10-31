@@ -175,7 +175,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Desde:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="esFiltroHoy = false; cargarMovimientos()">
+          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()">
         </mat-form-field>
       </div>
 
@@ -183,7 +183,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Hasta:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="esFiltroHoy = false; cargarMovimientos()">
+          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()">
         </mat-form-field>
       </div>
 
