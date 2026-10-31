@@ -97,6 +97,9 @@ export class PedidoService extends GenericService<Pedido> {
       cajas: any[];
       cajeros: any[];
       almacenes: any[];
+      almacenPrincipal?: any;
+      hayCajaAperturada?: boolean;
+      totalCajasAperturadas?: number;
     };
   }> {
     return this.http.get<any>(`${this.url}/pos-catalogo`);

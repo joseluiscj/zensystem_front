@@ -263,7 +263,7 @@
 
         <!-- Stock Mínimo -->
         <ng-container matColumnDef="stockMinimo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Stock Mínimo </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;" matTooltip="Stock mínimo de reposición en Almacén Principal"> Stock Mínimo (Alm. Principal) </th>
           <td mat-cell *matCellDef="let row" style="text-align: center;">
             <span *ngIf="row.controlStock != 0" class="badge-stock-minimo">
               {{ row.stockMinimo }}

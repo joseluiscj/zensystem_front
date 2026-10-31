@@ -355,3 +355,79 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+/* ESTILOS ALMACÉN PRINCIPAL */
+.principal-toggle-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.toggle-label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #166534;
+}
+
+.toggle-hint {
+  margin: 4px 0 0 0;
+  font-size: 0.78rem;
+  color: #15803d;
+}
+
+.alm-card-principal {
+  border-color: #86efac !important;
+  background: #fcfdfd !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08) !important;
+}
+
+.badge-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.badge-principal mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: #16a34a;
+}
+
+.btn-make-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-make-principal:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.btn-make-principal mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  color: #f59e0b;
+}

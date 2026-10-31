@@ -56,7 +56,7 @@ export class VentaPosComponent implements OnInit {
   nombreCliente: string = 'CONSUMIDOR FINAL';
   tipoComprobante: string = 'Ticket de Venta';
   idCajaSeleccionada: any = '';
-  idAlmacenSeleccionado: any = 1;
+  almacenPrincipal: any = null;
   pagoCon: string = 'EF';
   montoEfectivo: number | null = null;
 
@@ -111,14 +111,12 @@ export class VentaPosComponent implements OnInit {
           this.categorias = res.data.categorias || [];
           this.cajas = res.data.cajas || [];
           this.almacenes = res.data.almacenes || [];
+          this.almacenPrincipal = res.data.almacenPrincipal || null;
 
           if (this.cajas.length > 0) {
             this.idCajaSeleccionada = this.cajas[0].id;
           } else {
             this.idCajaSeleccionada = '';
-          }
-          if (this.almacenes.length > 0) {
-            this.idAlmacenSeleccionado = this.almacenes[0].id;
           }
           this.filtrarProductos();
         }
@@ -277,7 +275,7 @@ export class VentaPosComponent implements OnInit {
       montoVuelto: this.pagoCon === 'EF' ? this.vuelto : 0,
       nombreCliente: (this.nombreCliente || '').trim() || 'CONSUMIDOR FINAL',
       idCaja: this.idCajaSeleccionada,
-      idAlmacen: this.idAlmacenSeleccionado,
+      idAlmacen: this.almacenPrincipal?.idAlmacen || this.almacenPrincipal?.id,
       detalle: this.carrito.map(item => ({
         idProducto: item.idProducto,
         cantidad: item.cantidad,

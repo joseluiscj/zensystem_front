@@ -49,7 +49,25 @@ export class AlmacenGestionDialogComponent implements OnInit {
       codigo: [alm?.codigo || '', [Validators.required, Validators.maxLength(20)]],
       responsable: [alm?.responsable || ''],
       ubicacion: [alm?.ubicacion || ''],
-      descripcion: [alm?.descripcion || '']
+      descripcion: [alm?.descripcion || ''],
+      esPrincipal: [alm?.esPrincipal == 1 || false]
+    });
+  }
+
+  marcarComoPrincipal(alm: AlmacenItem): void {
+    if (alm.esPrincipal == 1) return;
+    this.cargando = true;
+    this.almacenService.setPrincipal(alm.idAlmacen).subscribe({
+      next: (res) => {
+        this.cargando = false;
+        this.snackBar.open(res.message || 'Almacén principal actualizado.', 'Cerrar', { duration: 3000 });
+        this.cargarAlmacenes();
+      },
+      error: (err) => {
+        this.cargando = false;
+        const msg = err.error?.message || 'Error al actualizar almacén principal';
+        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+      }
     });
   }
 

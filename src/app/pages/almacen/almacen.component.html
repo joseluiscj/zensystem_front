@@ -144,7 +144,7 @@
           <mat-select [(ngModel)]="filtros.idAlmacen" (selectionChange)="cargarInventario()">
             <mat-option value="todos">-- Todos los almacenes --</mat-option>
             <mat-option *ngFor="let alm of almacenes" [value]="alm.id">
-              {{ alm.nombre }} ({{ alm.codigo }})
+              {{ alm.nombre }} ({{ alm.codigo }}) {{ alm.esPrincipal ? '⭐ (Principal)' : '' }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -206,11 +206,9 @@
                 <span class="th-almacen-name" [matTooltip]="alm.nombre">{{ alm.nombre }}</span>
               </div>
             </th>
+            <th class="text-center">Stock Alm. Principal</th>
             <th class="text-center">Stock Total</th>
-            <!-- <th class="text-end">Costo (S/)</th>
-            <th class="text-end">Precio (S/)</th> -->
-            <th class="text-center">Mínimo</th>
-            <!-- <th class="text-end">Valor Total (S/)</th> -->
+            <th class="text-center">Mínimo (Alm. Principal)</th>
             <th class="text-center">Acciones ERP</th>
           </tr>
         </thead>
@@ -246,7 +244,7 @@
               </div>
             </td>
 
-            <!-- Stock Global Total & Estado -->
+            <!-- Stock Almacén Principal & Estado -->
             <td class="text-center">
               <div class="stock-pill-wrapper">
                 <span class="stock-pill" [ngClass]="{
@@ -263,6 +261,15 @@
                 <span class="stock-label-sub" [ngClass]="'sub-' + prod.estado_stock">
                   {{ prod.estado_stock === 'normal' ? 'Disponible' : (prod.estado_stock === 'bajo' ? 'Stock Bajo' : 'Agotado') }}
                 </span>
+              </div>
+            </td>
+
+            <!-- Stock Total (Suma de todo lo que hay en todos los almacenes) -->
+            <td class="text-center">
+              <div class="stock-total-badge" matTooltip="Suma de existencias de este producto en todos los almacenes">
+                <mat-icon>inventory_2</mat-icon>
+                <strong>{{ getStockTotal(prod) | number:'1.2-2' }}</strong>
+                <span class="stock-unit-mini">{{ prod.unidadMedida || 'UND' }}</span>
               </div>
             </td>
 

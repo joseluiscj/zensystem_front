@@ -188,6 +188,14 @@ export class AlmacenComponent implements OnInit {
     return item ? Number(item.stock) : 0;
   }
 
+  getStockTotal(prod: ProductoAlmacen): number {
+    if (prod.stockTotal !== undefined && prod.stockTotal !== null) {
+      return Number(prod.stockTotal);
+    }
+    if (!prod || !prod.stocks_almacenes) return 0;
+    return prod.stocks_almacenes.reduce((acc: number, curr: any) => acc + (Number(curr.stock) || 0), 0);
+  }
+
   getStockAlmacenTooltip(prod: ProductoAlmacen, alm: any): string {
     const stock = this.getStockAlmacen(prod, alm.id);
     return `${alm.nombre} (${alm.codigo}): ${stock.toFixed(2)} ${prod.unidadMedida || 'UND'}`;

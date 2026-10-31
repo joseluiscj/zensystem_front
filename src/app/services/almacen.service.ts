@@ -24,6 +24,8 @@ export interface ProductoAlmacen {
   precio: number;
   costo: number;
   stock: number;
+  stockPrincipal?: number;
+  stockTotal?: number;
   stockMinimo: number;
   controlStock?: number | boolean;
   unidadMedida: string;
@@ -90,6 +92,7 @@ export interface AlmacenItem {
   descripcion: string;
   responsable: string;
   ubicacion: string;
+  esPrincipal?: number | boolean;
   productosConStock: number;
   unidadesTotales: number;
   valorTotal: number;
@@ -102,7 +105,7 @@ export interface RespuestaAlmacen {
   kpis: KpisAlmacen;
   catalogos: {
     categorias: { id: number; f_nombre: string }[];
-    almacenes: { id: number; nombre: string; codigo: string; responsable: string; ubicacion?: string; descripcion?: string }[];
+    almacenes: { id: number; nombre: string; codigo: string; responsable: string; ubicacion?: string; descripcion?: string; esPrincipal?: number | boolean }[];
   };
 }
 
@@ -143,8 +146,13 @@ export class AlmacenService {
     descripcion?: string;
     responsable?: string;
     ubicacion?: string;
+    esPrincipal?: number | boolean;
   }): Observable<{ code: number; message: string; data?: any }> {
     return this.http.post<{ code: number; message: string; data?: any }>(`${this.baseUrl}/almacen`, payload);
+  }
+
+  setPrincipal(idAlmacen: number): Observable<{ code: number; message: string; data?: any }> {
+    return this.http.post<{ code: number; message: string; data?: any }>(`${this.baseUrl}/${idAlmacen}/set-principal`, {});
   }
 
   realizarTraspaso(payload: {

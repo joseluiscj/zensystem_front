@@ -323,7 +323,7 @@
               </div>
 
               <!-- Caja a Afectar -->
-              <div class="col-12 col-sm-6">
+              <div class="col-12">
                 <label class="form-label-pos">Caja de Cobro *</label>
                 <div class="pos-input-group" *ngIf="hayCajaAperturada">
                   <mat-icon class="input-icon">point_of_sale</mat-icon>
@@ -341,19 +341,6 @@
                   <button type="button" class="btn-link-apertura" (click)="irAperturaCaja()">
                     Aperturar
                   </button>
-                </div>
-              </div>
-
-              <!-- Almacén de Salida -->
-              <div class="col-12 col-sm-6">
-                <label class="form-label-pos">Almacén de Salida</label>
-                <div class="pos-input-group">
-                  <mat-icon class="input-icon">warehouse</mat-icon>
-                  <select class="form-select pos-form-control" [(ngModel)]="idAlmacenSeleccionado">
-                    <option *ngFor="let a of almacenes" [value]="a.id">
-                      {{ a.nombre }}
-                    </option>
-                  </select>
                 </div>
               </div>
             </div>
