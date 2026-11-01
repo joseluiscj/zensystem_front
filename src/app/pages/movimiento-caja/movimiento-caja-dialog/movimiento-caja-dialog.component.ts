@@ -57,8 +57,8 @@ export class MovimientoCajaDialogComponent implements OnInit {
     { codigo: 'EF', nombre: 'Efectivo' },
     { codigo: 'TJ', nombre: 'Tarjeta' },
     { codigo: 'TR', nombre: 'Transferencia Bancaria' },
-    { codigo: 'YP', nombre: 'Yape' },
-    { codigo: 'PL', nombre: 'Plin' }
+    // { codigo: 'YP', nombre: 'Yape' },
+    // { codigo: 'PL', nombre: 'Plin' }
   ];
 
   constructor(

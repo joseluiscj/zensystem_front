@@ -70,8 +70,8 @@ export class VentaPosComponent implements OnInit {
   mediosPago: { codigo: string; nombre: string; icon: string }[] = [
     { codigo: 'EF', nombre: 'Efectivo', icon: 'payments' },
     { codigo: 'TJ', nombre: 'Tarjeta', icon: 'credit_card' },
-    { codigo: 'YP', nombre: 'Yape', icon: 'phone_android' },
-    { codigo: 'PL', nombre: 'Plin', icon: 'phone_android' },
+    // { codigo: 'YP', nombre: 'Yape', icon: 'phone_android' },
+    // { codigo: 'PL', nombre: 'Plin', icon: 'phone_android' },
     { codigo: 'TR', nombre: 'Transferencia', icon: 'account_balance' }
   ];
 

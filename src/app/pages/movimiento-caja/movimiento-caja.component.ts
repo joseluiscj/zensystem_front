@@ -214,8 +214,8 @@ export class MovimientoCajaComponent implements OnInit {
       'TJ': 'Tarjeta',
       'TA': 'Tarjeta',
       'TR': 'Transferencia',
-      'YP': 'Yape',
-      'PL': 'Plin'
+      // 'YP': 'Yape',
+      // 'PL': 'Plin'
     };
     return mapa[codigo] || codigo;
   }
