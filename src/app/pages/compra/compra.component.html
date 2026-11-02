@@ -44,7 +44,7 @@
             <mat-icon>payments</mat-icon>
           </div>
         </div>
-        <div class="kpi-card-value text-primary">S/ {{ kpis.montoTotal | number:'1.2-2' }}</div>
+        <div class="kpi-card-value text-primary">$/ {{ kpis.montoTotal | number:'1.2-2' }}</div>
         <div class="kpi-card-footer">
           <span class="kpi-badge badge-blue">
             <mat-icon>trending_up</mat-icon> Compras activas
@@ -237,7 +237,7 @@
             </td>
             <td class="text-end">
               <span class="fw-bold fs-6" [ngClass]="c.estado === 'ANULADO' ? 'text-decoration-line-through text-muted' : 'text-success'">
-                S/ {{ c.montoTotal | number:'1.2-2' }}
+                $/ {{ c.montoTotal | number:'1.2-2' }}
               </span>
               <div class="small text-muted">{{ c.totalItems }} prod. ({{ c.totalUnidades }} un.)</div>
             </td>

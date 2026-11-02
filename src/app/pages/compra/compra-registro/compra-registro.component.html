@@ -45,7 +45,7 @@
       <!-- Indicador de Total Rápido -->
       <div class="topbar-total-pill">
         <span class="pill-label">Total:</span>
-        <span class="pill-val">S/ {{ totalCompra | number:'1.2-2' }}</span>
+        <span class="pill-val">$/ {{ totalCompra | number:'1.2-2' }}</span>
       </div>
 
       <!-- Botón de Registro Directo en Cabecera -->
@@ -57,7 +57,7 @@
         matTooltip="Confirmar y registrar compra en el sistema">
         <mat-icon *ngIf="!guardando">check_circle</mat-icon>
         <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
-        <span>{{ guardando ? 'Registrando...' : ('Registrar Compra (S/ ' + (totalCompra | number:'1.2-2') + ')') }}</span>
+        <span>{{ guardando ? 'Registrando...' : ('Registrar Compra ($/ ' + (totalCompra | number:'1.2-2') + ')') }}</span>
       </button>
     </div>
   </header>
@@ -139,7 +139,7 @@
           <select class="form-select" formControlName="idCaja">
             <option [ngValue]="null">-- Sin egreso automático de caja --</option>
             <option *ngFor="let c of cajas" [value]="c.idCaja">
-              {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+              {{ c.nombre }} (Saldo: $/ {{ c.saldo | number:'1.2-2' }})
             </option>
           </select>
         </div>
@@ -199,7 +199,7 @@
           <select class="form-select" (change)="onSelectProductoDirecto($event)">
             <option value="">+ Seleccionar de la lista desplegable...</option>
             <option *ngFor="let p of productos" [value]="p.idProducto">
-              {{ p.nombre }} ({{ p.codigo }}) - Costo: S/ {{ p.costo | number:'1.2-2' }} | Stock: {{ p.stock }}
+              {{ p.nombre }} ({{ p.codigo }}) - Costo: $/ {{ p.costo | number:'1.2-2' }} | Stock: {{ p.stock }}
             </option>
           </select>
         </div>
@@ -243,7 +243,7 @@
             <div class="card-item-bottom">
               <div class="product-cost-info">
                 <span class="cost-label">Costo catálogo:</span>
-                <span class="cost-value">S/ {{ p.costo | number:'1.2-2' }}</span>
+                <span class="cost-value">$/ {{ p.costo | number:'1.2-2' }}</span>
               </div>
               <button type="button" class="btn btn-sm btn-primary btn-add-cart">
                 <mat-icon>add</mat-icon>
@@ -287,8 +287,8 @@
               <th style="width: 100px;" class="text-center">Unidad</th>
               <th style="width: 110px;" class="text-center">Stock Actual</th>
               <th style="width: 140px;" class="text-center">Cantidad</th>
-              <th style="width: 160px;" class="text-center">Costo Unitario (S/)</th>
-              <th style="width: 140px;" class="text-end">Subtotal (S/)</th>
+              <th style="width: 160px;" class="text-center">Costo Unitario ($/)</th>
+              <th style="width: 140px;" class="text-end">Subtotal ($/)</th>
               <th style="width: 150px;" class="text-center" title="Si se marca, el costo del catálogo se actualizará con este valor">
                 ¿Actualizar Costo?
               </th>
@@ -302,7 +302,7 @@
 
               <!-- Código -->
               <td>
-                <span class="badge bg-light text-secondary border font-monospace">{{ det.codigo || 'S/C' }}</span>
+                <span class="badge bg-light text-secondary border font-monospace">{{ det.codigo || '$/C' }}</span>
               </td>
 
               <!-- Producto -->
@@ -343,7 +343,7 @@
               <!-- Costo Unitario Editable -->
               <td class="text-center">
                 <div class="input-group">
-                  <span class="input-group-text py-0 px-2 fw-semibold">S/</span>
+                  <span class="input-group-text py-0 px-2 fw-semibold">$/</span>
                   <input 
                     type="number" 
                     class="form-control text-end fw-bold wide-input" 
@@ -358,7 +358,7 @@
 
               <!-- Subtotal Calculado -->
               <td class="text-end fw-bold text-dark fs-6">
-                S/ {{ det.subtotal | number:'1.2-2' }}
+                $/ {{ det.subtotal | number:'1.2-2' }}
               </td>
 
               <!-- Checkbox Actualizar Costo -->
@@ -416,15 +416,15 @@
           <div class="totals-summary-box p-3 rounded bg-light border">
             <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
               <span class="text-muted">Subtotal (sin IGV):</span>
-              <span class="fw-semibold">S/ {{ subtotalSinIgv | number:'1.2-2' }}</span>
+              <span class="fw-semibold">$/ {{ subtotalSinIgv | number:'1.2-2' }}</span>
             </div>
             <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
               <span class="text-muted">IGV (18%):</span>
-              <span class="fw-semibold">S/ {{ igvMonto | number:'1.2-2' }}</span>
+              <span class="fw-semibold">$/ {{ igvMonto | number:'1.2-2' }}</span>
             </div>
             <div class="d-flex justify-content-between fs-4 border-top pt-2 mb-3">
               <span class="fw-bold text-dark">TOTAL COMPRA:</span>
-              <span class="fw-bold text-primary">S/ {{ totalCompra | number:'1.2-2' }}</span>
+              <span class="fw-bold text-primary">$/ {{ totalCompra | number:'1.2-2' }}</span>
             </div>
 
             <!-- Botones -->

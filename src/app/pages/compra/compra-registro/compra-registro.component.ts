@@ -73,7 +73,7 @@ export class CompraRegistroComponent implements OnInit {
   metodosPago = [
     { codigo: 'EF', nombre: 'Efectivo' },
     { codigo: 'TA', nombre: 'Tarjeta Débito / Crédito' },
-    { codigo: 'TR', nombre: 'Transferencia / Yape / Plin' },
+    // { codigo: 'TR', nombre: 'Transferencia / Yape / Plin' },
     { codigo: 'CR', nombre: 'A Crédito / Por pagar' },
     { codigo: 'NINGUNO', nombre: 'Sin movimiento de dinero' }
   ];
