@@ -1,0 +1,298 @@
+<div class="compras-container" [class.modo-full]="modo === 'nuevo'">
+
+  <!-- ============================================================
+       MODO 1: LISTADO DE COMPRAS Y KPIS
+       ============================================================ -->
+  <ng-container *ngIf="modo === 'lista'">
+
+    <!-- HERO BANNER -->
+    <header class="hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>shopping_cart</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Gestión de Compras y Abastecimiento</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">storefront</mat-icon>
+          <span>Registro de compras a proveedores, control de comprobantes e ingreso de mercadería a almacén</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="cargarCompras()" matTooltip="Refrescar lista">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span>Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-primary" (click)="abrirNuevaCompra()" matTooltip="Registrar una nueva compra">
+        <mat-icon>add_shopping_cart</mat-icon>
+        <span>+ Nueva Compra</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- TARJETAS DE KPIS -->
+  <div class="row g-3 mb-4">
+    <!-- Inversión Total -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-inversion">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Inversión en Compras</span>
+          <div class="kpi-icon-circle inversion-circle">
+            <mat-icon>payments</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-primary">S/ {{ kpis.montoTotal | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-blue">
+            <mat-icon>trending_up</mat-icon> Compras activas
+          </span>
+          <span class="kpi-hint">{{ kpis.comprasActivas }} registradas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total de Compras -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-total">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Total Registros</span>
+          <div class="kpi-icon-circle total-circle">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-dark">{{ kpis.totalCompras }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-gray">
+            <mat-icon>history</mat-icon> En el período
+          </span>
+          <span class="kpi-hint">Filtro aplicado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unidades Ingresadas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-unidades">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Unidades Ingresadas</span>
+          <div class="kpi-icon-circle unidades-circle">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-success">{{ kpis.totalUnidades | number:'1.2-2' }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-emerald">
+            <mat-icon>warehouse</mat-icon> Suma de stock
+          </span>
+          <span class="kpi-hint">En almacenes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compras Anuladas -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card kpi-anuladas">
+        <div class="kpi-card-header">
+          <span class="kpi-card-title">Compras Anuladas</span>
+          <div class="kpi-icon-circle anuladas-circle">
+            <mat-icon>cancel</mat-icon>
+          </div>
+        </div>
+        <div class="kpi-card-value text-danger">{{ kpis.comprasAnuladas }}</div>
+        <div class="kpi-card-footer">
+          <span class="kpi-badge badge-rose">
+            <mat-icon>block</mat-icon> Revertidas
+          </span>
+          <span class="kpi-hint">Stock devuelto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS -->
+  <div class="card p-3 mb-4 shadow-sm border filter-card">
+    <div class="row g-2 align-items-end">
+      <!-- Rango de Fechas -->
+      <div class="col-12 col-md-3">
+        <label class="form-label small fw-bold mb-1">Rango de Fechas</label>
+        <div class="d-flex gap-1">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
+        </div>
+      </div>
+
+      <!-- Accesos Rápidos de Fecha -->
+      <div class="col-auto">
+        <label class="form-label small fw-bold mb-1 d-none d-md-block">&nbsp;</label>
+        <div class="d-flex gap-1">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroHoy()">Hoy</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEsteMes()">Este Mes</button>
+        </div>
+      </div>
+
+      <!-- Almacén -->
+      <div class="col-6 col-md-2">
+        <label class="form-label small fw-bold mb-1">Almacén</label>
+        <select class="form-select form-select-sm" [(ngModel)]="filtros.idAlmacen" (change)="cargarCompras()">
+          <option value="todos">Todos los almacenes</option>
+          <option *ngFor="let a of almacenes" [value]="a.idAlmacen">{{ a.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Método de Pago -->
+      <div class="col-6 col-md-2">
+        <label class="form-label small fw-bold mb-1">Método de Pago</label>
+        <select class="form-select form-select-sm" [(ngModel)]="filtros.metodoPago" (change)="cargarCompras()">
+          <option value="todos">Todos los pagos</option>
+          <option value="EF">Efectivo</option>
+          <option value="TA">Tarjeta</option>
+          <option value="TR">Transferencia</option>
+          <option value="CR">Crédito</option>
+        </select>
+      </div>
+
+      <!-- Estado -->
+      <div class="col-6 col-md-1">
+        <label class="form-label small fw-bold mb-1">Estado</label>
+        <select class="form-select form-select-sm" [(ngModel)]="filtros.estado" (change)="cargarCompras()">
+          <option value="todos">Todos</option>
+          <option value="REGISTRADO">Activas</option>
+          <option value="ANULADO">Anuladas</option>
+        </select>
+      </div>
+
+      <!-- Buscador -->
+      <div class="col-12 col-md-3">
+        <label class="form-label small fw-bold mb-1">Buscar</label>
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control" [(ngModel)]="filtros.search" (keyup.enter)="cargarCompras()" placeholder="Código, proveedor, comprobante...">
+          <button class="btn btn-primary" type="button" (click)="cargarCompras()">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">search</mat-icon>
+          </button>
+          <button class="btn btn-outline-secondary" type="button" (click)="limpiarFiltros()" title="Limpiar filtros">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">clear</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA DE COMPRAS -->
+  <div class="card shadow-sm border table-card">
+    <mat-progress-bar *ngIf="cargando" mode="indeterminate"></mat-progress-bar>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 110px;">Código</th>
+            <th style="width: 130px;">Fecha / Hora</th>
+            <th>Proveedor</th>
+            <th>Comprobante</th>
+            <th>Almacén</th>
+            <th>Pago / Caja</th>
+            <th class="text-end" style="width: 120px;">Monto Total</th>
+            <th class="text-center" style="width: 110px;">Estado</th>
+            <th class="text-center" style="width: 110px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of comprasPaginadas" [class.table-danger-subtle]="c.estado === 'ANULADO'">
+            <td>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold">
+                {{ c.codigo }}
+              </span>
+            </td>
+            <td>
+              <div class="fw-semibold text-dark">{{ c.fechaCompra | date:'dd/MM/yyyy' }}</div>
+              <small class="text-muted">{{ c.fechaCompra | date:'HH:mm' }}</small>
+            </td>
+            <td>
+              <div class="fw-bold text-dark">{{ c.proveedorNombre }}</div>
+              <small class="text-muted" *ngIf="c.proveedorDocumento">Doc: {{ c.proveedorDocumento }}</small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ c.tipoComprobante }}</span>
+              <div class="small text-muted" *ngIf="c.nroComprobante">{{ c.nroComprobante }}</div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1">
+                <mat-icon class="sm-icon text-secondary">warehouse</mat-icon>
+                <span>{{ c.almacenNombre }}</span>
+              </div>
+            </td>
+            <td>
+              <div>
+                <span class="badge bg-light text-secondary border">
+                  {{ c.metodoPago === 'EF' ? 'Efectivo' : (c.metodoPago === 'TA' ? 'Tarjeta' : (c.metodoPago === 'TR' ? 'Transferencia' : (c.metodoPago === 'CR' ? 'Crédito' : 'Sin Pago'))) }}
+                </span>
+                <span *ngIf="c.cajaNombre && c.cajaNombre !== 'Sin Caja'" class="ms-1 small text-muted">
+                  ({{ c.cajaNombre }})
+                </span>
+              </div>
+              <small *ngIf="c.nroOperacion" class="text-muted">Op: {{ c.nroOperacion }}</small>
+            </td>
+            <td class="text-end">
+              <span class="fw-bold fs-6" [ngClass]="c.estado === 'ANULADO' ? 'text-decoration-line-through text-muted' : 'text-success'">
+                S/ {{ c.montoTotal | number:'1.2-2' }}
+              </span>
+              <div class="small text-muted">{{ c.totalItems }} prod. ({{ c.totalUnidades }} un.)</div>
+            </td>
+            <td class="text-center">
+              <span class="badge" [ngClass]="c.estado === 'REGISTRADO' ? 'bg-success' : 'bg-danger'">
+                {{ c.estado }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-1">
+                <button type="button" class="btn btn-sm btn-outline-primary p-1" (click)="verDetalle(c)" title="Ver detalle del comprobante">
+                  <mat-icon class="sm-icon">visibility</mat-icon>
+                </button>
+                <button *ngIf="c.estado === 'REGISTRADO'" type="button" class="btn btn-sm btn-outline-danger p-1" (click)="anularCompra(c)" title="Anular compra y revertir stock">
+                  <mat-icon class="sm-icon">cancel</mat-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="compras.length === 0 && !cargando">
+            <td colspan="9" class="text-center py-5 text-muted">
+              <mat-icon style="font-size: 40px; width: 40px; height: 40px;" class="text-secondary opacity-50 mb-2 d-block mx-auto">production_quantity_limits</mat-icon>
+              No se encontraron compras registradas con los filtros seleccionados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light" *ngIf="compras.length > 0">
+      <small class="text-muted">
+        Mostrando {{ (paginaActual - 1) * registrosPorPagina + 1 }} - 
+        {{ paginaActual * registrosPorPagina > compras.length ? compras.length : paginaActual * registrosPorPagina }} 
+        de {{ compras.length }} registros
+      </small>
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="paginaActual === 1" (click)="cambiarPagina(-1)">
+          Anterior
+        </button>
+        <span class="small fw-bold">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(1)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  </ng-container>
+
+  <!-- ============================================================
+       MODO 2: REGISTRO DE COMPRA EN PANTALLA COMPLETA (TIPO POS)
+       ============================================================ -->
+  <ng-container *ngIf="modo === 'nuevo'">
+    <app-compra-registro (volver)="cerrarRegistro($event)"></app-compra-registro>
+  </ng-container>
+
+</div>

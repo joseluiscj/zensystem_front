@@ -14,6 +14,7 @@ import { KardexComponent } from "./kardex/kardex.component";
 import { MovimientoCajaComponent } from "./movimiento-caja/movimiento-caja.component";
 import { PosComponent } from "./pos/pos.component";
 import { UsuarioComponent } from "./usuario/usuario.component";
+import { CompraComponent } from "./compra/compra.component";
 
 export const pagesRoutes: Routes = [
     {path: 'inicio', component:InicioComponent, canActivate: [certGuard]},
@@ -23,6 +24,7 @@ export const pagesRoutes: Routes = [
     // {path: 'pedido', component:PedidoComponent, canActivate: [certGuard]},
     {path: 'almacen', component:AlmacenComponent, canActivate: [certGuard]},
     {path: 'kardex', component:KardexComponent, canActivate: [certGuard]},
+    {path: 'compras', component:CompraComponent, canActivate: [certGuard]},
     {path: 'restaurante', component:RestauranteComponent, canActivate: [certGuard]},
     {path: 'mesa', component:MesaComponent, canActivate: [certGuard]},
     {path: 'venta', component:VentaComponent, canActivate: [certGuard]},

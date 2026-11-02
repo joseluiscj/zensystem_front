@@ -1,0 +1,346 @@
+<div class="compra-dialog-container">
+  <!-- Cabecera -->
+  <div class="dialog-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <div class="header-icon">
+        <mat-icon>add_shopping_cart</mat-icon>
+      </div>
+      <div>
+        <h4 class="mb-0 fw-bold">Registrar Nueva Compra</h4>
+        <span class="text-muted small">
+          Correlativo sugerido: <strong class="text-primary">{{ proximoCodigo }}</strong> | Ingreso directo a inventario y Kardex
+        </span>
+      </div>
+    </div>
+    <button mat-icon-button (click)="cancelar()" [disabled]="guardando">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="cargando || guardando" mode="indeterminate"></mat-progress-bar>
+
+  <form [formGroup]="compraForm" (ngSubmit)="guardar()" class="dialog-form p-3">
+    <!-- SECCIÓN 1: DATOS DEL PROVEEDOR Y COMPROBANTE -->
+    <div class="card p-3 mb-3 border bg-light-subtle">
+      <h6 class="fw-bold mb-3 text-secondary d-flex align-items-center gap-1">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px;">business</mat-icon>
+        Datos del Proveedor y Comprobante
+      </h6>
+
+      <div class="row g-2">
+        <div class="col-md-5 col-12">
+          <label class="form-label small fw-bold">Proveedor / Razón Social <span class="text-danger">*</span></label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><mat-icon class="sm-icon">storefront</mat-icon></span>
+            <input type="text" class="form-control" formControlName="proveedorNombre" placeholder="Ej: Distribuidora San Jorge S.A.C." required>
+          </div>
+          <small class="text-danger" *ngIf="compraForm.get('proveedorNombre')?.touched && compraForm.get('proveedorNombre')?.hasError('required')">
+            El nombre del proveedor es obligatorio.
+          </small>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <label class="form-label small fw-bold">RUC / DNI</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><mat-icon class="sm-icon">badge</mat-icon></span>
+            <input type="text" class="form-control" formControlName="proveedorDocumento" placeholder="20123456789">
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Fecha de Compra <span class="text-danger">*</span></label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><mat-icon class="sm-icon">calendar_today</mat-icon></span>
+            <input type="date" class="form-control" formControlName="fechaCompra" required>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Tipo de Comprobante <span class="text-danger">*</span></label>
+          <select class="form-select form-select-sm" formControlName="tipoComprobante">
+            <option *ngFor="let t of tiposComprobante" [value]="t.codigo">{{ t.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Nro. de Comprobante / Serie</label>
+          <input type="text" class="form-control form-control-sm" formControlName="nroComprobante" placeholder="Ej: F001-0004523">
+        </div>
+
+        <div class="col-md-4 col-12">
+          <label class="form-label small fw-bold">Almacén de Ingreso <span class="text-danger">*</span></label>
+          <select class="form-select form-select-sm" formControlName="idAlmacen" required>
+            <option *ngFor="let a of almacenes" [value]="a.idAlmacen">
+              {{ a.nombre }} {{ a.esPrincipal == 1 ? '⭐ (Principal)' : '' }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: FORMA DE PAGO Y CAJA -->
+    <div class="card p-3 mb-3 border bg-light-subtle">
+      <h6 class="fw-bold mb-3 text-secondary d-flex align-items-center gap-1">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px;">payments</mat-icon>
+        Información de Pago y Caja (Egreso)
+      </h6>
+
+      <div class="row g-2">
+        <div class="col-md-4 col-6">
+          <label class="form-label small fw-bold">Método de Pago <span class="text-danger">*</span></label>
+          <select class="form-select form-select-sm" formControlName="metodoPago">
+            <option *ngFor="let m of metodosPago" [value]="m.codigo">{{ m.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 col-6" *ngIf="compraForm.get('metodoPago')?.value !== 'CR' && compraForm.get('metodoPago')?.value !== 'NINGUNO'">
+          <label class="form-label small fw-bold">Caja de Salida (Egreso)</label>
+          <select class="form-select form-select-sm" formControlName="idCaja">
+            <option [ngValue]="null">-- Sin egreso automático de caja --</option>
+            <option *ngFor="let c of cajas" [value]="c.idCaja">
+              {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4 col-12" *ngIf="compraForm.get('metodoPago')?.value === 'TA' || compraForm.get('metodoPago')?.value === 'TR'">
+          <label class="form-label small fw-bold">Nro. de Operación (Opcional)</label>
+          <input type="text" class="form-control form-control-sm" formControlName="nroOperacion" placeholder="Ej: OP-987654">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: BÚSQUEDA Y SELECCIÓN DE PRODUCTOS -->
+    <div class="card p-3 mb-3 border product-selection-card">
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <h6 class="fw-bold mb-0 text-dark d-flex align-items-center gap-1">
+          <mat-icon style="font-size: 20px; width: 20px; height: 20px;" class="text-primary">inventory_2</mat-icon>
+          Búsqueda y Selección de Productos
+        </h6>
+
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" (click)="togglePanelProductos()">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">{{ mostrarPanelProductos ? 'visibility_off' : 'visibility' }}</mat-icon>
+            <span>{{ mostrarPanelProductos ? 'Ocultar catálogo' : 'Mostrar catálogo' }}</span>
+          </button>
+          <span class="badge bg-primary rounded-pill">{{ detalles.length }} en compra</span>
+        </div>
+      </div>
+
+      <!-- Barra de búsqueda principal y selector desplegable -->
+      <div class="row g-2 mb-2">
+        <!-- Buscador en tiempo real -->
+        <div class="col-md-7 col-12">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white"><mat-icon class="sm-icon text-muted">search</mat-icon></span>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="filtroProducto" 
+              [ngModelOptions]="{standalone: true}" 
+              (input)="buscarProductos()" 
+              (focus)="mostrarPanelProductos = true"
+              placeholder="Buscar por nombre o código (ej: Arroz, Coca, Pollo)..."
+            />
+            <button 
+              *ngIf="filtroProducto" 
+              type="button" 
+              class="btn btn-outline-secondary" 
+              (click)="limpiarBusqueda()" 
+              title="Limpiar búsqueda">
+              <mat-icon class="sm-icon">clear</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector clásico desplegable (para selección directa) -->
+        <div class="col-md-5 col-12">
+          <select class="form-select form-select-sm" (change)="onSelectProductoDirecto($event)">
+            <option value="">+ Seleccionar de la lista desplegable...</option>
+            <option *ngFor="let p of productos" [value]="p.idProducto">
+              {{ p.nombre }} ({{ p.codigo }}) - Costo: S/ {{ p.costo | number:'1.2-2' }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filtro rápido por categorías -->
+      <div class="category-chips-scroll d-flex gap-1 mb-2 overflow-auto py-1">
+        <button 
+          *ngFor="let cat of categorias" 
+          type="button" 
+          class="btn btn-sm py-0 px-2 rounded-pill category-pill" 
+          [ngClass]="categoriaSeleccionada === cat ? 'btn-primary' : 'btn-outline-secondary'"
+          (click)="seleccionarCategoria(cat)">
+          {{ cat }} ({{ contarPorCategoria(cat) }})
+        </button>
+      </div>
+
+      <!-- Panel visual de productos disponibles para agregar -->
+      <div *ngIf="mostrarPanelProductos" class="product-picker-panel border rounded p-2 mb-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-1 px-1">
+          <small class="text-muted fw-bold">
+            Mostrando {{ productosFiltrados.length }} productos disponibles. Haga clic en cualquiera para agregarlo:
+          </small>
+          <small *ngIf="filtroProducto || categoriaSeleccionada !== 'Todas'" class="text-primary cursor-pointer" (click)="limpiarBusqueda()">
+            Ver todos
+          </small>
+        </div>
+
+        <div class="product-grid">
+          <div 
+            *ngFor="let p of productosFiltrados" 
+            class="product-picker-item" 
+            (click)="agregarProducto(p)" 
+            [title]="'Haga clic para agregar ' + p.nombre">
+            <div class="item-main">
+              <span class="product-title">{{ p.nombre }}</span>
+              <div class="product-meta">
+                <span class="badge bg-secondary-subtle text-secondary me-1">{{ p.codigo }}</span>
+                <span class="text-muted">{{ p.categoria }} ({{ p.unidadMedida }})</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="product-cost">Costo: <strong>S/ {{ p.costo | number:'1.2-2' }}</strong></div>
+              <div class="product-stock" [ngClass]="p.stock <= 0 ? 'text-danger' : 'text-muted'">
+                Stock: {{ p.stock }}
+              </div>
+              <button type="button" class="btn btn-sm btn-primary py-0 px-2 mt-1 btn-add-item">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">add</mat-icon> Agregar
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="productosFiltrados.length === 0" class="col-12 text-center py-3 text-muted">
+            <mat-icon style="font-size: 28px; width: 28px; height: 28px;" class="opacity-50">search_off</mat-icon>
+            <div>No se encontraron productos coincidentes con "{{ filtroProducto }}".</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de ítems agregados a la compra actual -->
+      <div class="d-flex justify-content-between align-items-center mb-2 mt-2">
+        <span class="fw-bold text-dark small text-uppercase">Productos agregados a la compra:</span>
+        <small class="text-muted" *ngIf="detalles.length > 0">Modifique cantidades y costos unitarios si varían respecto al catálogo:</small>
+      </div>
+
+      <div class="table-responsive border rounded bg-white">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 35px;">#</th>
+              <th>Producto</th>
+              <th style="width: 100px;" class="text-center">Stock Act.</th>
+              <th style="width: 120px;" class="text-center">Cantidad</th>
+              <th style="width: 130px;" class="text-center">Costo Unit. (S/)</th>
+              <th style="width: 120px;" class="text-end">Subtotal (S/)</th>
+              <th style="width: 130px;" class="text-center" title="Actualiza el costo del producto en el catálogo maestro">¿Act. Costo?</th>
+              <th style="width: 45px;" class="text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let det of detalles; let i = index">
+              <td class="text-muted">{{ i + 1 }}</td>
+              <td>
+                <div class="fw-bold text-dark">{{ det.nombre }}</div>
+                <small class="text-muted">{{ det.codigo }} ({{ det.unidadMedida }})</small>
+              </td>
+              <td class="text-center">
+                <span class="badge" [ngClass]="det.stockActual <= 0 ? 'bg-danger-subtle text-danger' : 'bg-light text-secondary border'">
+                  {{ det.stockActual }}
+                </span>
+              </td>
+              <td>
+                <input 
+                  type="number" 
+                  class="form-control form-control-sm text-center fw-bold" 
+                  [(ngModel)]="det.cantidad" 
+                  [ngModelOptions]="{standalone: true}" 
+                  (input)="recalcularFila(det)" 
+                  min="0.01" 
+                  step="any"
+                />
+              </td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text py-0 px-1">S/</span>
+                  <input 
+                    type="number" 
+                    class="form-control form-control-sm text-end fw-semibold" 
+                    [(ngModel)]="det.costoUnitario" 
+                    [ngModelOptions]="{standalone: true}" 
+                    (input)="recalcularFila(det)" 
+                    min="0" 
+                    step="any"
+                  />
+                </div>
+              </td>
+              <td class="text-end fw-bold text-dark">
+                S/ {{ det.subtotal | number:'1.2-2' }}
+              </td>
+              <td class="text-center">
+                <div class="form-check d-inline-block">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [(ngModel)]="det.actualizarCostoProducto" 
+                    [ngModelOptions]="{standalone: true}" 
+                    id="actCosto_{{i}}"
+                  />
+                </div>
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm p-1" (click)="eliminarFila(i)" title="Eliminar producto">
+                  <mat-icon style="font-size: 16px; width: 16px; height: 16px;">delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="detalles.length === 0">
+              <td colspan="8" class="text-center py-4 text-muted">
+                <mat-icon style="font-size: 32px; width: 32px; height: 32px;" class="text-secondary opacity-50 mb-1 d-block mx-auto">production_quantity_limits</mat-icon>
+                No ha agregado productos todavía. Escriba en el buscador o haga clic en cualquier producto del catálogo para agregarlo.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: OBSERVACIONES Y TOTALES -->
+    <div class="row g-3">
+      <div class="col-md-7 col-12">
+        <label class="form-label small fw-bold">Observaciones / Glosa de la Compra</label>
+        <textarea class="form-control form-control-sm" rows="3" formControlName="observaciones" placeholder="Detalles adicionales, condiciones de entrega, observaciones..."></textarea>
+      </div>
+
+      <div class="col-md-5 col-12">
+        <div class="card bg-light border p-3">
+          <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
+            <span class="text-muted small">Subtotal sin IGV:</span>
+            <span class="fw-semibold">S/ {{ subtotalSinIgv | number:'1.2-2' }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
+            <span class="text-muted small">IGV (18%):</span>
+            <span class="fw-semibold">S/ {{ igvMonto | number:'1.2-2' }}</span>
+          </div>
+          <div class="d-flex justify-content-between fs-5 border-top pt-2">
+            <span class="fw-bold text-dark">Total Compra:</span>
+            <span class="fw-bold text-primary">S/ {{ totalCompra | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="dialog-actions d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+      <button type="button" class="btn btn-outline-secondary px-4" (click)="cancelar()" [disabled]="guardando">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-1" [disabled]="guardando || detalles.length === 0">
+        <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+        <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+        <span>{{ guardando ? 'Registrando...' : 'Registrar Compra' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

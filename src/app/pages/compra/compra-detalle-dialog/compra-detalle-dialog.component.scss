@@ -1,0 +1,52 @@
+.compra-detalle-modal {
+  min-width: 650px;
+  max-width: 900px;
+
+  @media (max-width: 768px) {
+    min-width: 95vw;
+  }
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+
+  .header-icon {
+    width: 40px;
+    height: 40px;
+    background: #e0f2fe;
+    color: #0284c7;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.label-muted {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.inline-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+}
+
+@media print {
+  .modal-header button,
+  .modal-footer {
+    display: none !important;
+  }
+}

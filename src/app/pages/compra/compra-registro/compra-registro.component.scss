@@ -1,0 +1,396 @@
+/* ============================================================
+   CONTENEDOR PRINCIPAL EN PANTALLA COMPLETA
+   ============================================================ */
+.compra-full-wrapper {
+  padding: 0;
+  min-height: calc(100vh - 80px);
+}
+
+/* ============================================================
+   TOPBAR / CABECERA PRINCIPAL
+   ============================================================ */
+.compra-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #ffffff;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
+
+  .compra-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .btn-topbar-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .compra-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .compra-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+
+        mat-icon {
+          font-size: 26px;
+          width: 26px;
+          height: 26px;
+        }
+      }
+
+      .compra-main-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+      }
+
+      .compra-badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #0284c7;
+
+        .status-indicator-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background-color: #0284c7;
+          display: inline-block;
+          box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+        }
+      }
+    }
+  }
+
+  .compra-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .btn-topbar-danger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      color: #e11d48;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #ffe4e6;
+        border-color: #fda4af;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .topbar-total-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 10px;
+
+      .pill-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+      }
+
+      .pill-val {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #0284c7;
+      }
+    }
+
+    .btn-topbar-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+      }
+
+      &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+/* CARDS */
+.compra-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* CATEGORÍAS */
+.compra-categories-scroll {
+  white-space: nowrap;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+}
+
+.category-pill {
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* PANEL DEL CATÁLOGO DE PRODUCTOS */
+.catalog-grid-panel {
+  max-height: 230px;
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.product-card-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 95px;
+
+  &:hover {
+    border-color: #0284c7;
+    background-color: #f0f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.12);
+
+    .btn-add-cart {
+      background: #0369a1;
+    }
+  }
+
+  .card-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .product-card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+      display: block;
+    }
+
+    .product-card-meta {
+      margin-top: 2px;
+    }
+
+    .product-stock-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+
+      .stock-icon {
+        font-size: 12px;
+        width: 12px;
+        height: 12px;
+      }
+
+      &.stock-disponible {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+      }
+
+      &.stock-agotado {
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fee2e2;
+      }
+    }
+  }
+
+  .card-item-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 6px;
+
+    .product-cost-info {
+      display: flex;
+      flex-direction: column;
+
+      .cost-label {
+        font-size: 0.65rem;
+        color: #64748b;
+        text-transform: uppercase;
+      }
+
+      .cost-value {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+    }
+
+    .btn-add-cart {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      transition: all 0.15s ease;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+/* TABLA AMPLIA DE COMPRAS */
+.wide-purchase-table {
+  font-size: 0.88rem;
+
+  thead th {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    padding: 10px 12px;
+  }
+
+  tbody td {
+    padding: 8px 12px;
+  }
+
+  .wide-input {
+    font-size: 0.95rem;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+
+    &:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+    }
+  }
+}
+
+.totals-summary-box {
+  background: #f8fafc;
+}
+
+.sm-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
