@@ -15,10 +15,26 @@ interface ILoginRequest {
 })
 export class LoginService {
   private url: string = `${environment.HOST}/login`;
-  private tokenTimer?: any;
+  
+  /** Tiempo máximo de inactividad permitido: 15 minutos (en milisegundos) */
+  readonly INACTIVITY_LIMIT_MS: number = 15 * 60 * 1000;
+  private readonly LAST_ACTIVITY_KEY: string = 'zensystem_last_activity';
+
+  private lastActivityTime: number = Date.now();
   private checkInterval?: any;
+  private activityListenersAttached: boolean = false;
   private visibilityHandler?: () => void;
   private readonly jwtHelper = new JwtHelperService();
+
+  // Eventos de usuario que denotan que el sistema está en uso activo
+  private readonly activityEvents: string[] = [
+    'mousemove',
+    'mousedown',
+    'keydown',
+    'touchstart',
+    'scroll',
+    'click'
+  ];
 
   constructor(
     private http: HttpClient,
@@ -35,13 +51,14 @@ export class LoginService {
   }
 
   /**
-   * Almacena el token y activa el monitoreo de expiración automática.
+   * Almacena el token y activa el monitoreo de inactividad (15 minutos).
    */
   setToken(token: string): void {
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem(environment.TOKEN_NAME, token);
     }
-    this.startTokenMonitor();
+    this.recordActivity();
+    this.startInactivityMonitor();
   }
 
   /**
@@ -52,6 +69,33 @@ export class LoginService {
       return sessionStorage.getItem(environment.TOKEN_NAME);
     }
     return null;
+  }
+
+  /**
+   * Registra actividad del usuario (resetea el contador de inactividad de 15 minutos).
+   */
+  recordActivity(): void {
+    const now = Date.now();
+    this.lastActivityTime = now;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(this.LAST_ACTIVITY_KEY, String(now));
+    }
+  }
+
+  /**
+   * Obtiene la marca de tiempo de la última actividad del usuario.
+   */
+  getLastActivityTime(): number {
+    if (typeof sessionStorage !== 'undefined') {
+      const stored = sessionStorage.getItem(this.LAST_ACTIVITY_KEY);
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+          return parsed;
+        }
+      }
+    }
+    return this.lastActivityTime;
   }
 
   /**
@@ -70,11 +114,31 @@ export class LoginService {
   }
 
   /**
+   * Obtiene la información del usuario autenticado a partir del token JWT.
+   */
+  getCurrentUser(): { id: number; name: string } | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = this.jwtHelper.decodeToken(token);
+      if (decoded && decoded.sub) {
+        return {
+          id: Number(decoded.sub),
+          name: decoded.subn || ''
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Cierra la sesión, limpia los datos de sesión y redirige a la pantalla de login.
    * Si notify es verdadero, muestra un mensaje de aviso al usuario.
    */
   logout(notify: boolean = false, message: string = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.'): void {
-    this.clearTimers();
+    this.stopInactivityMonitor();
 
     if (typeof sessionStorage !== 'undefined') {
       sessionStorage.clear();
@@ -82,7 +146,7 @@ export class LoginService {
 
     if (notify) {
       this.snackBar.open(message, 'Cerrar', {
-        duration: 6000,
+        duration: 7000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom'
       });
@@ -92,7 +156,7 @@ export class LoginService {
   }
 
   /**
-   * Inicia el monitoreo de sesión al arrancar la aplicación o recargar la página.
+   * Inicia el monitoreo de inactividad al arrancar la aplicación o recargar la página.
    */
   initSessionMonitor(): void {
     const token = this.getToken();
@@ -100,69 +164,71 @@ export class LoginService {
       if (this.jwtHelper.isTokenExpired(token)) {
         this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
       } else {
-        this.startTokenMonitor();
+        // Verificar si antes de recargar ya habían transcurrido 15 minutos de inactividad
+        const lastAct = this.getLastActivityTime();
+        if (Date.now() - lastAct >= this.INACTIVITY_LIMIT_MS) {
+          this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.');
+          return;
+        }
+        // Si el usuario recargó la página mientras está activo, refrescar actividad y arrancar monitor
+        this.recordActivity();
+        this.startInactivityMonitor();
       }
     }
   }
 
   /**
-   * Configura los temporizadores para cerrar la sesión de forma automática cuando el token expire.
+   * Inicia los observadores de eventos de usuario y el intervalo de verificación de inactividad.
    */
-  private startTokenMonitor(): void {
-    this.clearTimers();
+  private startInactivityMonitor(): void {
+    this.stopInactivityMonitor();
+    this.attachActivityListeners();
 
-    const token = this.getToken();
-    if (!token) return;
-
-    try {
-      if (this.jwtHelper.isTokenExpired(token)) {
-        this.ngZone.run(() => {
-          this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
-        });
-        return;
-      }
-
-      const expirationDate = this.jwtHelper.getTokenExpirationDate(token);
-      if (expirationDate) {
-        const msUntilExpiration = expirationDate.getTime() - Date.now();
-
-        if (msUntilExpiration <= 0) {
-          this.ngZone.run(() => {
-            this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
-          });
-          return;
-        }
-
-        // Temporizador exacto que expira cuando se agota el tiempo de vida del JWT
-        this.tokenTimer = setTimeout(() => {
-          this.ngZone.run(() => {
-            this.logout(true, 'Su sesión ha expirado automáticamente. Por favor, vuelva a ingresar.');
-          });
-        }, msUntilExpiration);
-      }
-
-      // Verificación periódica cada 15 segundos en segundo plano (útil si el equipo fue suspendido o hibernó)
+    // Verificación periódica cada 10 segundos fuera de NgZone para óptimo rendimiento
+    this.ngZone.runOutsideAngular(() => {
       this.checkInterval = setInterval(() => {
-        this.checkTokenExpiration();
-      }, 15000);
-
-    } catch (e) {
-      console.error('Error al verificar tiempo del token:', e);
-      this.logout(true, 'Error de autenticación. Inicie sesión nuevamente.');
-    }
+        this.checkInactivity();
+      }, 10000);
+    });
   }
 
-  private checkTokenExpiration(): void {
+  /**
+   * Detiene los observadores y temporizadores de inactividad.
+   */
+  private stopInactivityMonitor(): void {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval);
+      this.checkInterval = undefined;
+    }
+    this.detachActivityListeners();
+  }
+
+  /**
+   * Evalúa si han transcurrido 15 minutos continuos sin uso del sistema.
+   */
+  private checkInactivity(): void {
     const token = this.getToken();
     if (!token) {
-      this.clearTimers();
+      this.stopInactivityMonitor();
       return;
     }
 
+    const lastAct = this.getLastActivityTime();
+    const idleMs = Date.now() - lastAct;
+
+    // Solo se cierra la sesión si han pasado 15 minutos continuos sin ninguna interacción
+    if (idleMs >= this.INACTIVITY_LIMIT_MS) {
+      this.ngZone.run(() => {
+        this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.');
+      });
+      return;
+    }
+
+    // Como respaldo secundario, verificar si el token JWT expiró
     try {
       if (this.jwtHelper.isTokenExpired(token)) {
         this.ngZone.run(() => {
-          this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+          this.logout(true, 'Su sesión ha expirado. Por favor, vuelva a iniciar sesión.');
         });
       }
     } catch {
@@ -172,28 +238,63 @@ export class LoginService {
     }
   }
 
+  /**
+   * Manejador de eventos de usuario (mouse, teclado, touch, scroll)
+   */
+  private handleUserActivity = (): void => {
+    const now = Date.now();
+    // Limitar escritura a como máximo una vez por segundo para evitar sobrecarga
+    if (now - this.lastActivityTime >= 1000) {
+      this.recordActivity();
+    }
+  };
+
+  /**
+   * Conecta los listeners en window/document para detectar actividad del usuario.
+   */
+  private attachActivityListeners(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined' || this.activityListenersAttached) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() => {
+      this.activityEvents.forEach(eventType => {
+        window.addEventListener(eventType, this.handleUserActivity, { passive: true });
+      });
+    });
+
+    this.activityListenersAttached = true;
+  }
+
+  /**
+   * Desconecta los listeners de actividad del usuario.
+   */
+  private detachActivityListeners(): void {
+    if (typeof window === 'undefined' || !this.activityListenersAttached) {
+      return;
+    }
+
+    this.activityEvents.forEach(eventType => {
+      window.removeEventListener(eventType, this.handleUserActivity);
+    });
+
+    this.activityListenersAttached = false;
+  }
+
+  /**
+   * Listener cuando el usuario cambia de pestaña o reactiva la ventana.
+   */
   private setupVisibilityListener(): void {
     if (typeof document !== 'undefined') {
       this.visibilityHandler = () => {
         if (!document.hidden && this.getToken()) {
-          this.checkTokenExpiration();
+          this.checkInactivity();
         }
       };
       document.addEventListener('visibilitychange', this.visibilityHandler);
       if (typeof window !== 'undefined') {
         window.addEventListener('focus', this.visibilityHandler);
       }
-    }
-  }
-
-  private clearTimers(): void {
-    if (this.tokenTimer) {
-      clearTimeout(this.tokenTimer);
-      this.tokenTimer = undefined;
-    }
-    if (this.checkInterval) {
-      clearInterval(this.checkInterval);
-      this.checkInterval = undefined;
     }
   }
 }

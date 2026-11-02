@@ -87,8 +87,11 @@ export interface DashboardData {
     fechaFin?: string;
   };
   usuario: {
+    id?: number;
+    idRol?: number;
     username: string;
     nombreCompleto: string;
     rol: string;
+    esMesero?: boolean;
   };
 }

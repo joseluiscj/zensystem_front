@@ -6,6 +6,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MesaService } from '../../../services/mesa.service';
 import { PedidoService } from '../../../services/pedido.service';
+import { LoginService } from '../../../services/login.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
@@ -53,6 +54,7 @@ export class VentaCobroMesaDialogComponent implements OnInit {
   idCajaSeleccionada: number | null = null;
   idCajeroSeleccionado: number | null = null;
   pagoCon: string = 'EF'; // 'EF' = Efectivo, 'TA' = Tarjeta
+  nroOperacion: string = ''; // Número de operación del voucher POS (opcional)
   montoEfectivo: number | null = null;
   vuelto: number = 0;
 
@@ -61,6 +63,7 @@ export class VentaCobroMesaDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: CobroMesaData,
     private mesaService: MesaService,
     private pedidoService: PedidoService,
+    private loginService: LoginService,
     private snackBar: MatSnackBar,
     private router: Router
   ) {
@@ -87,11 +90,15 @@ export class VentaCobroMesaDialogComponent implements OnInit {
           this.cajeros = res.data.cajeros || [];
           this.hayCajaAperturada = this.cajas.length > 0;
 
+          const currentUser = this.loginService.getCurrentUser();
+
           if (this.hayCajaAperturada) {
-            this.idCajaSeleccionada = this.cajas[0].id;
+            const miCaja = currentUser ? this.cajas.find((c: any) => Number(c.idUsuarioApertura) === Number(currentUser.id)) : null;
+            this.idCajaSeleccionada = miCaja ? miCaja.id : this.cajas[0].id;
           }
           if (this.cajeros.length > 0) {
-            this.idCajeroSeleccionado = this.cajeros[0].id;
+            const miCajero = currentUser ? this.cajeros.find((cj: any) => Number(cj.id) === Number(currentUser.id)) : null;
+            this.idCajeroSeleccionado = miCajero ? miCajero.id : this.cajeros[0].id;
           }
         }
       },
@@ -164,7 +171,8 @@ export class VentaCobroMesaDialogComponent implements OnInit {
       f_cajero: this.idCajeroSeleccionado,
       f_montoEfectivo: this.pagoCon === 'EF' ? this.montoEfectivo : this.montoTotal,
       f_vuelto: this.pagoCon === 'EF' ? this.vuelto : 0,
-      f_nombreCliente: this.nombreCliente
+      f_nombreCliente: this.nombreCliente,
+      f_nroOperacion: this.pagoCon === 'TA' ? (this.nroOperacion?.trim() || null) : null
     };
 
     this.mesaService.liberar(payload).subscribe({

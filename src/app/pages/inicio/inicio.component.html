@@ -33,7 +33,7 @@
         <mat-icon>table_restaurant</mat-icon>
         <span>Salón de Mesas</span>
       </button>
-      <button type="button" class="btn-hero-action btn-primary-venta" (click)="irPuntoVenta()">
+      <button *ngIf="!dashboard?.usuario?.esMesero && dashboard?.usuario?.rol !== 'MESERO'" type="button" class="btn-hero-action btn-primary-venta" (click)="irPuntoVenta()">
         <mat-icon>point_of_sale</mat-icon>
         <span>Punto de venta</span>
       </button>
@@ -193,9 +193,29 @@
         </div>
       </div>
 
-      <!-- KPI 4: Estado de Cajas -->
+      <!-- KPI 4: Estado de Cajas (Admin) o Mis Comandas (Mesero) -->
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
+        <!-- Vista para Mesero -->
+        <div *ngIf="dashboard.usuario?.esMesero || dashboard.usuario?.rol === 'MESERO'" class="kpi-metric-card kpi-register" (click)="irRestaurante()">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Mis Comandas Servidas</span>
+            <div class="kpi-icon-circle register-circle" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value">
+            {{ dashboard.kpis.pedidosAtendidos }} Atendidas
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-orange">
+              <mat-icon>hourglass_empty</mat-icon> {{ dashboard.kpis.pedidosPendientes }} en cocina
+            </span>
+            <span class="kpi-hint">Salón de Mesas</span>
+          </div>
+        </div>
+
+        <!-- Vista para Administrador / Cajero -->
+        <div *ngIf="!dashboard.usuario?.esMesero && dashboard.usuario?.rol !== 'MESERO'" class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Turnos de Caja</span>
             <div class="kpi-icon-circle register-circle">

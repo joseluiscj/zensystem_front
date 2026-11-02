@@ -1,0 +1,134 @@
+<mat-dialog-content class="cl_model">
+    <div class="modal_div_cab_title">
+        <div class="card-title-text" style="font-weight: 700; font-size: 18px; color: #0f172a;">
+            {{ actualizar ? 'Actualizar Usuario' : 'Registrar Nuevo Usuario' }}
+        </div> 
+        <div class="modal_close_tile" (click)="close()">
+            <mat-icon>close</mat-icon>
+        </div> 
+    </div> 
+    <mat-divider></mat-divider> 
+
+    <div class="example-container mt-2">
+        <div *ngIf="ocultar !== 'd-none'" style="text-align: center; margin-bottom: 5px; font-size: 12px; color: #2563eb;">
+            <span>
+                <b><i class="fas fa-spinner fa-spin"></i> Cargando datos del usuario...</b>
+            </span>
+        </div>
+
+        <form [formGroup]="basicForm"> 
+            <div class="row wrap mt-2"> 
+                <div class="col-md-12">
+
+                    <!-- Nro Documento / Usuario -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Nro Documento / Usuario (DNI)</mat-label>
+                        <input matInput placeholder="Ej. 70409311" formControlName="nroDocumento" autocomplete="off" maxlength="20" [readonly]="isInputDisabled">
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">badge</mat-icon>
+                        <!-- <mat-hint *ngIf="!actualizar" style="font-size: 11px; color: #64748b;">
+                            Este documento servirá como nombre de usuario para iniciar sesión.
+                        </mat-hint> -->
+                    </mat-form-field>
+                    
+                    <!-- Nombres -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Nombres</mat-label>
+                        <input matInput placeholder="Ej. Carlos Juan" formControlName="nombres" autocomplete="off" class="uppercase-input">
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">person</mat-icon>
+                    </mat-form-field>
+ 
+                    <!-- Apellido Paterno -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Apellido Paterno</mat-label>
+                        <input matInput placeholder="Ej. Gómez" formControlName="apellidoPaterno" autocomplete="off" class="uppercase-input">
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">person_outline</mat-icon>
+                    </mat-form-field>
+
+                    <!-- Apellido Materno (Opcional) -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Apellido Materno (Opcional)</mat-label>
+                        <input matInput placeholder="Ej. Torres" formControlName="apellidoMaterno" autocomplete="off" class="uppercase-input">
+                    </mat-form-field>
+
+                    <!-- Perfil / Rol del Usuario -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Perfil / Rol de Acceso:</mat-label>
+                        <mat-select required placeholder="Seleccione Rol" formControlName="rol">
+                            <mat-option *ngFor="let val of roles" [value]="val.id.toString()">
+                                <span *ngIf="val.nombre === 'ADMINISTRADOR'">🛡️ <strong>ADMINISTRADOR</strong> (Acceso total al sistema)</span>
+                                <span *ngIf="val.nombre === 'MESERO'">🍽️ <strong>MESERO</strong> (Solo Inicio y Restaurante/Mesas)</span>
+                                <span *ngIf="val.nombre !== 'ADMINISTRADOR' && val.nombre !== 'MESERO'">{{ val.nombre }}</span>
+                            </mat-option> 
+                        </mat-select>
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">admin_panel_settings</mat-icon>
+                    </mat-form-field>
+
+                    <!-- Correo electrónico (Opcional) -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Correo electrónico (Opcional)</mat-label>
+                        <input matInput type="email" placeholder="correo@ejemplo.com" formControlName="correo" maxlength="60"/>
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">email</mat-icon>
+                    </mat-form-field>
+
+                    <!-- Teléfono (Opcional) -->
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Teléfono (Opcional)</mat-label>
+                        <input matInput type="text" placeholder="Ej. 987654321" formControlName="telefono" />
+                        <mat-icon matPrefix style="color: #64748b; margin-right: 6px;">phone</mat-icon>
+                    </mat-form-field>
+
+                    <!-- Nota sobre contraseña por defecto al registrar -->
+                    <div *ngIf="!actualizar && !panelContrasena" class="alert alert-info py-2 px-3 mb-2" style="font-size: 12px; border-radius: 8px;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Por defecto, la contraseña inicial será el <strong>Nro de Documento</strong>.
+                        <a href="javascript:void(0)" (click)="cambiarContrasena(true)" class="ms-1 fw-bold text-decoration-none">
+                            Personalizar contraseña
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Panel de Contraseña Personalizada -->
+            <div class="row wrap mt-2" *ngIf="panelContrasena">
+                <div class="col-md-12 p-3" style="border: 1.5px solid #cbd5e1; border-radius: 10px; background-color: #f8fafc;">
+                    <div style="font-weight: 700; font-size: 13px; color: #334155; margin-bottom: 8px;">
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;">key</mat-icon>
+                        {{ actualizar ? 'Cambio de Contraseña' : 'Establecer Contraseña Personalizada' }}
+                    </div>
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Nueva contraseña</mat-label>
+                        <input matInput type="password" placeholder="Mínimo 4 caracteres" formControlName="pass1" autocomplete="off">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="custom-input mb-2" style="width: 100%;">
+                        <mat-label class="labeltext">Confirmar nueva contraseña</mat-label>
+                        <input matInput type="password" placeholder="Repita la contraseña" formControlName="pass2" autocomplete="off">
+                    </mat-form-field>
+                    <button type="button" mat-button (click)="cambiarContrasena(false)" style="color: #64748b; font-size: 12px;">
+                        <mat-icon>cancel</mat-icon> Cancelar contraseña personalizada
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón Cambiar Contraseña si está en modo actualizar -->
+            <div class="row wrap mt-2" *ngIf="actualizar && !panelContrasena">
+                <div class="col-md-12">
+                    <button type="button" mat-stroked-button (click)="cambiarContrasena(true)" style="width: 100%; border-radius: 8px;">
+                        <mat-icon>lock_reset</mat-icon> Cambiar contraseña
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botones Guardar / Cancelar -->
+            <div class="button-container mt-3">
+                <hr style="margin-right: -15px;">
+                <button type="button" mat-raised-button color="accent" (click)="close()" class="btn_secondary btn_action_panel_secondary">
+                    <mat-icon>close</mat-icon> Cancelar
+                </button>
+                <button type="submit" mat-raised-button color="primary" (click)="save()" class="btn_action_panel" [disabled]="isButtonDisabled">
+                    <mat-icon>save</mat-icon> {{ actualizar ? 'Actualizar Usuario' : 'Registrar Usuario' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</mat-dialog-content>

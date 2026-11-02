@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MaterialModule } from '../../../material/material.module';
 import { PedidoService } from '../../../services/pedido.service';
+import { LoginService } from '../../../services/login.service';
 
 export interface PosItemCarrito {
   idProducto: number;
@@ -58,6 +59,7 @@ export class VentaPosComponent implements OnInit {
   idCajaSeleccionada: any = '';
   almacenPrincipal: any = null;
   pagoCon: string = 'EF';
+  nroOperacion: string = '';
   montoEfectivo: number | null = null;
 
   tiposComprobante: string[] = [
@@ -69,10 +71,10 @@ export class VentaPosComponent implements OnInit {
 
   mediosPago: { codigo: string; nombre: string; icon: string }[] = [
     { codigo: 'EF', nombre: 'Efectivo', icon: 'payments' },
-    { codigo: 'TJ', nombre: 'Tarjeta', icon: 'credit_card' },
+    { codigo: 'TA', nombre: 'Tarjeta Débito/Crédito', icon: 'credit_card' },
     // { codigo: 'YP', nombre: 'Yape', icon: 'phone_android' },
     // { codigo: 'PL', nombre: 'Plin', icon: 'phone_android' },
-    { codigo: 'TR', nombre: 'Transferencia', icon: 'account_balance' }
+    // { codigo: 'TR', nombre: 'Transferencia', icon: 'account_balance' }
   ];
 
   // Carrito de compras / Ticket
@@ -80,6 +82,7 @@ export class VentaPosComponent implements OnInit {
 
   constructor(
     private pedidoService: PedidoService,
+    private loginService: LoginService,
     private snackBar: MatSnackBar,
     private router: Router
   ) {}
@@ -114,7 +117,9 @@ export class VentaPosComponent implements OnInit {
           this.almacenPrincipal = res.data.almacenPrincipal || null;
 
           if (this.cajas.length > 0) {
-            this.idCajaSeleccionada = this.cajas[0].id;
+            const currentUser = this.loginService.getCurrentUser();
+            const miCaja = currentUser ? this.cajas.find(c => Number(c.idUsuarioApertura) === Number(currentUser.id)) : null;
+            this.idCajaSeleccionada = miCaja ? miCaja.id : this.cajas[0].id;
           } else {
             this.idCajaSeleccionada = '';
           }
@@ -271,6 +276,7 @@ export class VentaPosComponent implements OnInit {
     const payload = {
       montoTotal: this.totalVenta,
       pagoCon: this.pagoCon,
+      nroOperacion: this.pagoCon !== 'EF' ? (this.nroOperacion?.trim() || null) : null,
       montoEfectivo: this.pagoCon === 'EF' ? (this.montoEfectivo || this.totalVenta) : this.totalVenta,
       montoVuelto: this.pagoCon === 'EF' ? this.vuelto : 0,
       nombreCliente: (this.nombreCliente || '').trim() || 'CONSUMIDOR FINAL',
@@ -287,9 +293,12 @@ export class VentaPosComponent implements OnInit {
     this.guardando = true;
     this.pedidoService.registrarVentaDirecta(payload).subscribe({
       next: (res) => {
-        this.guardando = false;
+        // this.guardando = false;
         this.snackBar.open(res.message || 'Venta directa registrada con éxito.', 'Cerrar', { duration: 3500 });
-        this.regresar(true);
+        // this.regresar(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1700);
       },
       error: (err) => {
         this.guardando = false;

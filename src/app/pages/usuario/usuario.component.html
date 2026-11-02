@@ -1,0 +1,119 @@
+<div class="wrap-title-with-buttons m-layout-section section-home" style="padding-top: 10px;">
+    <div class="m-section-title">
+        <h4 class="m-title mb-1">Gestión de Usuarios</h4>
+        <div class="m-title-description">Administra los usuarios del sistema y sus perfiles de acceso (Administrador y Mesero).</div>
+    </div>
+    <div class="m-section-buttons" align="center">
+      <button mat-raised-button color="primary" (click)="openDialog()" class="btn_action_panel">
+        <mat-icon>person_add</mat-icon> Nuevo Usuario
+      </button>
+    </div>
+</div>  
+
+<br>
+<div class="content_body_web">
+  <div class="row m-2" style="justify-content: center;">
+    <div class="col-md-12">
+      <mat-card class="p-0 stable" style="background: #fff;">
+        <mat-card-content class="mt-1"> 
+          <mat-form-field style="width: 100%;">
+            <mat-label> <mat-icon>search</mat-icon> Buscar por nombre, documento o rol...</mat-label> 
+            <input matInput (keyup)="applyFilter($event)" placeholder="Escribir..." #input autocomplete="off" [value]="valsearchtxt">
+          </mat-form-field> 
+          <div class="table-container small-font-table" style="overflow-x: auto; border-radius: 4px;">
+            <table mat-table [dataSource]="dataSource" matSort>
+              <ng-container matColumnDef="#">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="width: 50px;"> # </th>
+                <td mat-cell *matCellDef="let row; let i = index"> {{getRowNumber(i)}} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nombres">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombres y Apellidos </th>
+                <td mat-cell *matCellDef="let row"> 
+                  <strong>{{row.nombres}}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nroDocumento">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Nro Documento / Usuario </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                  <span class="badge bg-light text-dark border px-2 py-1 font-monospace">{{row.nroDocumento}}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="rolNombre">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Perfil / Rol </th>
+                <td mat-cell *matCellDef="let row" style="text-align: center;"> 
+                  <span *ngIf="row.rolNombre === 'ADMINISTRADOR'" class="badge bg-primary text-white px-2 py-1">
+                    ADMINISTRADOR
+                  </span>
+                  <span *ngIf="row.rolNombre === 'MESERO'" class="badge bg-success text-white px-2 py-1">
+                    MESERO
+                  </span>
+                  <span *ngIf="row.rolNombre !== 'ADMINISTRADOR' && row.rolNombre !== 'MESERO'" class="badge bg-dark text-white px-2 py-1">
+                    {{row.rolNombre || 'USUARIO'}}
+                  </span>
+                </td>
+              </ng-container>
+   
+              <ng-container matColumnDef="active">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: center;"> Estado </th>
+                <td mat-cell *matCellDef="let row">
+                  <div [ngClass]="{ 
+                              'dat_anulado_user': row.active === 0, 
+                              'dat_activo_user': row.active === 1,
+                            }" style="text-align: center;">
+                    <span>
+                      {{ row.active === 0 ? 'ANULADO' : 'ACTIVO' }}
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;">Acciones</th>
+                <td mat-cell *matCellDef="let row">
+                  <div style="display: flex; justify-content: center; gap: 6px;">
+                    <!-- Editar -->
+                    <button mat-raised-button (click)="openDialog(row.id)" class="small-buttonc btn_action"
+                      matTooltip="Editar Usuario">
+                      <mat-icon class="m-0">edit_square</mat-icon>
+                    </button>
+
+                    <!-- Activar si está anulado -->
+                    <button mat-raised-button *ngIf="row.active == 0" (click)="activeDialog(row.id)" class="small-buttonc btn_action"
+                      matTooltip="Activar Usuario" style="background-color: #10b981; color: white;">
+                      <mat-icon class="m-0">check_circle</mat-icon>
+                    </button>
+
+                    <!-- Anular si está activo (excepto root) -->
+                    <button mat-raised-button *ngIf="row.active == 1 && row.id !== 1" (click)="openAnular(row.id)" class="small-buttonc btn_action"
+                      matTooltip="Desactivar / Anular Usuario" style="background-color: #f59e0b; color: white;">
+                      <mat-icon class="m-0">hide_source</mat-icon>
+                    </button>
+
+                    <!-- Eliminar definitivamente (excepto root) -->
+                    <button *ngIf="row.id !== 1" mat-raised-button (click)="deletDialog(row.id)" class="small-buttonc btn_delete"
+                      matTooltip="Eliminar Usuario">
+                      <mat-icon class="m-0">delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell text-center py-4" colspan="6">
+                  <mat-icon style="font-size: 36px; width: 36px; height: 36px; color: #94a3b8;">person_off</mat-icon>
+                  <p class="text-muted mt-2 mb-0">No se encontraron usuarios registrados.</p>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <mat-paginator [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons aria-label="Seleccionar página"></mat-paginator>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

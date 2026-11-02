@@ -86,7 +86,7 @@
             <mat-icon class="input-icon">point_of_sale</mat-icon>
             <select class="form-select form-cobro-control" [(ngModel)]="idCajaSeleccionada">
               <option *ngFor="let c of cajas" [value]="c.id">
-                {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+                {{ c.nombre }}  
               </option>
             </select>
           </div>
@@ -182,10 +182,34 @@
         </div>
       </div>
 
-      <!-- Tarjeta notice -->
-      <div *ngIf="pagoCon === 'TA'" class="card-notice-pill">
-        <mat-icon>credit_score</mat-icon>
-        <span>Procese la transacción bancaria en el terminal POS antes de confirmar la liberación de la mesa.</span>
+      <!-- Tarjeta notice y Nro de Operación Opcional -->
+      <div *ngIf="pagoCon === 'TA'" class="card-checkout-panel mb-3">
+        <div class="card-notice-pill mb-3">
+          <mat-icon>credit_score</mat-icon>
+          <span>Procese la transacción bancaria en el terminal POS antes de confirmar la liberación de la mesa.</span>
+        </div>
+
+        <div class="card-operation-box">
+          <label class="form-label-cobro d-flex justify-content-between align-items-center mb-1">
+            <span>
+              <mat-icon class="label-mini-icon">tag</mat-icon> Nro. de Operación / Referencia
+            </span>
+            <span class="badge-opcional">Opcional</span>
+          </label>
+          <div class="input-cobro-group">
+            <mat-icon class="input-icon">receipt_long</mat-icon>
+            <input 
+              type="text" 
+              class="form-control form-cobro-control" 
+              placeholder="Ej: 045912, REF-77123" 
+              [(ngModel)]="nroOperacion"
+              maxlength="50"
+            />
+          </div>
+          <small class="hint-op-text">
+            Si ingresa el número de operación del voucher, quedará registrado para la conciliación de caja.
+          </small>
+        </div>
       </div>
 
     </div>

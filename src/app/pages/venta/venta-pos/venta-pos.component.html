@@ -329,7 +329,7 @@
                   <mat-icon class="input-icon">point_of_sale</mat-icon>
                   <select class="form-select pos-form-control" [(ngModel)]="idCajaSeleccionada">
                     <option *ngFor="let c of cajas" [value]="c.id">
-                      {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+                      {{ c.nombre }}  
                     </option>
                   </select>
                 </div>
@@ -414,6 +414,29 @@
                 <mat-icon>warning</mat-icon>
                 <span>Faltan S/ {{ (totalVenta - montoEfectivo) | number:'1.2-2' }} para cubrir el total</span>
               </div>
+            </div>
+
+            <!-- Panel de Tarjeta / Nro de Operación Opcional -->
+            <div *ngIf="pagoCon !== 'EF'" class="card-calculator-card mb-3">
+              <div class="pos-card-notice mb-2">
+                <mat-icon>credit_score</mat-icon>
+                <span>Procese el cobro en el POS bancario (Izipay, Niubiz, etc.).</span>
+              </div>
+              <label class="form-label-pos d-flex justify-content-between align-items-center">
+                <span>Nro. de Operación / Referencia POS</span>
+                <span class="badge-opcional-pos">Opcional</span>
+              </label>
+              <div class="pos-input-group">
+                <mat-icon class="input-icon">tag</mat-icon>
+                <input 
+                  type="text" 
+                  class="form-control pos-form-control" 
+                  placeholder="Ej: 045912, REF-77123" 
+                  [(ngModel)]="nroOperacion"
+                  maxlength="50"
+                />
+              </div>
+              <small class="hint-op-pos">Permite conciliar el voucher del POS físico con la venta.</small>
             </div>
 
           </div>

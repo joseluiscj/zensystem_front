@@ -13,6 +13,7 @@ import { AlmacenComponent } from "./almacen/almacen.component";
 import { KardexComponent } from "./kardex/kardex.component";
 import { MovimientoCajaComponent } from "./movimiento-caja/movimiento-caja.component";
 import { PosComponent } from "./pos/pos.component";
+import { UsuarioComponent } from "./usuario/usuario.component";
 
 export const pagesRoutes: Routes = [
     {path: 'inicio', component:InicioComponent, canActivate: [certGuard]},
@@ -28,5 +29,6 @@ export const pagesRoutes: Routes = [
     {path: 'caja', component:CajaComponent, canActivate: [certGuard]},
     {path: 'apertura', component:AperturaCajaComponent, canActivate: [certGuard]},
     {path: 'movimiento-caja', component:MovimientoCajaComponent, canActivate: [certGuard]},
+    {path: 'usuario', component:UsuarioComponent, canActivate: [certGuard]},
     {path: 'not-404', component:Not404Component}
 ];

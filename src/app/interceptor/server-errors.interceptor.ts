@@ -27,6 +27,14 @@ export class ServerErrorsInterceptor implements HttpInterceptor {
             ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${authToken}`) })
             : req;
 
+        // Registrar actividad activa de usuario ante cualquier petición HTTP autenticada
+        if (authToken && !isLoginRequest) {
+            try {
+                const loginService = this.injector.get(LoginService);
+                loginService.recordActivity();
+            } catch {}
+        }
+
         return next.handle(authReq).pipe(
             retry({
                 count: environment.RETRY,

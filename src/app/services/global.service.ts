@@ -34,7 +34,9 @@ export class GlobalService extends GenericService<any>  {
   listSucursal(){
     return this.http.get<any>(`${this.url}/listSucursal`);
   }
-
+  getCboRol(){
+    return this.http.get<any>(`${this.url}/getCboRol`, );
+  }
 
 
 }

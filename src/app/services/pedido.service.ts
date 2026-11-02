@@ -18,6 +18,7 @@ export interface VentaItem {
   mesa_nombre: string;
   nombreCliente: string;
   pagoCon: string;
+  nroOperacion?: string;
   idCaja: number;
   caja_nombre: string;
   idCajero: number;

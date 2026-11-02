@@ -604,6 +604,57 @@
 .pay-cash { background: #ecfdf5; color: #059669; }
 .pay-card { background: #ede9fe; color: #7c3aed; }
 
+.op-subtext {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2563eb;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.op-mini-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+}
+
+.badge-opcional-sm {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.form-input.with-icon {
+  padding-left: 36px;
+}
+
+.field-hint {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
 .caja-subtext {
   font-size: 0.7rem;
   margin-top: 2px;
