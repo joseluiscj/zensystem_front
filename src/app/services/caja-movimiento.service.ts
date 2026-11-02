@@ -16,8 +16,12 @@ export interface CajaMovimientoItem {
   beneficiario: string;
   tipoComprobante: string;
   nroComprobante: string;
+  nroOperacion?: string;
   metodoPago: string;
   fecha: string;
+  origen?: string;
+  esEditable?: number | boolean;
+  origenModuloNombre?: string;
   active: number;
   status: number;
   usuario_nombre: string;

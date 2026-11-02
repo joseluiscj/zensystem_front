@@ -107,6 +107,19 @@
           <label class="form-label small fw-bold">Nro. de Operación (Opcional)</label>
           <input type="text" class="form-control form-control-sm" formControlName="nroOperacion" placeholder="Ej: OP-987654">
         </div>
+
+        <!-- Alerta de Saldo Insuficiente en Caja -->
+        <div class="col-12" *ngIf="saldoCajaInsuficiente">
+          <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-0 rounded-3">
+            <mat-icon class="text-danger flex-shrink-0">error</mat-icon>
+            <div class="small">
+              <strong>Saldo insuficiente en {{ cajaSeleccionada?.nombre }}:</strong>
+              Disponible: <strong>S/ {{ cajaSeleccionada?.saldo | number:'1.2-2' }}</strong>.
+              Total compra: <strong>S/ {{ totalCompra | number:'1.2-2' }}</strong> (Faltan: <strong class="text-danger">S/ {{ saldoFaltante | number:'1.2-2' }}</strong>).
+              Seleccione otra caja o elija pago a crédito.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -336,10 +349,10 @@
       <button type="button" class="btn btn-outline-secondary px-4" (click)="cancelar()" [disabled]="guardando">
         Cancelar
       </button>
-      <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-1" [disabled]="guardando || detalles.length === 0">
-        <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+      <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-1" [disabled]="guardando || detalles.length === 0 || saldoCajaInsuficiente">
+        <mat-icon *ngIf="!guardando">{{ saldoCajaInsuficiente ? 'block' : 'check_circle' }}</mat-icon>
         <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
-        <span>{{ guardando ? 'Registrando...' : 'Registrar Compra' }}</span>
+        <span>{{ guardando ? 'Registrando...' : (saldoCajaInsuficiente ? 'Saldo Insuficiente' : 'Registrar Compra') }}</span>
       </button>
     </div>
   </form>

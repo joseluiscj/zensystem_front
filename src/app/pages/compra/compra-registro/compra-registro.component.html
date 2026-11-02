@@ -53,11 +53,11 @@
         type="button" 
         class="btn-topbar-primary" 
         (click)="guardar()" 
-        [disabled]="guardando || detalles.length === 0"
-        matTooltip="Confirmar y registrar compra en el sistema">
-        <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+        [disabled]="guardando || detalles.length === 0 || saldoCajaInsuficiente"
+        [matTooltip]="saldoCajaInsuficiente ? 'Saldo insuficiente en la caja seleccionada' : 'Confirmar y registrar compra en el sistema'">
+        <mat-icon *ngIf="!guardando">{{ saldoCajaInsuficiente ? 'block' : 'check_circle' }}</mat-icon>
         <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
-        <span>{{ guardando ? 'Registrando...' : ('Registrar Compra ($/ ' + (totalCompra | number:'1.2-2') + ')') }}</span>
+        <span>{{ guardando ? 'Registrando...' : (saldoCajaInsuficiente ? 'Saldo Insuficiente' : ('Registrar Compra (S/ ' + (totalCompra | number:'1.2-2') + ')')) }}</span>
       </button>
     </div>
   </header>
@@ -147,6 +147,18 @@
         <div class="col-12 col-md-2" *ngIf="compraForm.get('metodoPago')?.value === 'TA' || compraForm.get('metodoPago')?.value === 'TR'">
           <label class="form-label small fw-bold mb-1">Nro. de Operación</label>
           <input type="text" class="form-control" formControlName="nroOperacion" placeholder="Ej: OP-987654">
+        </div>
+
+        <!-- Alerta de Saldo Insuficiente en Caja -->
+        <div class="col-12" *ngIf="saldoCajaInsuficiente">
+          <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-0 rounded-3 border-danger">
+            <mat-icon class="text-danger flex-shrink-0">error</mat-icon>
+            <div class="small">
+              <strong>Saldo insuficiente en {{ cajaSeleccionada?.nombre }}:</strong>
+              El saldo disponible es <strong>S/ {{ cajaSeleccionada?.saldo | number:'1.2-2' }}</strong> y el monto total de la compra requiere <strong>S/ {{ totalCompra | number:'1.2-2' }}</strong> (Faltan: <strong class="text-danger">S/ {{ saldoFaltante | number:'1.2-2' }}</strong>).
+              <span class="d-block text-secondary mt-1">Seleccione otra caja con fondos suficientes o elija forma de pago "A Crédito / Por pagar" si no se pagará en este momento.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -439,10 +451,11 @@
               <button 
                 type="submit" 
                 class="btn btn-primary w-50 py-2 fw-bold d-flex align-items-center justify-content-center gap-2" 
-                [disabled]="guardando || detalles.length === 0">
-                <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+                [disabled]="guardando || detalles.length === 0 || saldoCajaInsuficiente"
+                [matTooltip]="saldoCajaInsuficiente ? 'Saldo insuficiente en la caja seleccionada' : 'Registrar Compra'">
+                <mat-icon *ngIf="!guardando">{{ saldoCajaInsuficiente ? 'block' : 'check_circle' }}</mat-icon>
                 <span *ngIf="guardando" class="spinner-border spinner-border-sm"></span>
-                <span>{{ guardando ? 'Registrando...' : 'Registrar Compra' }}</span>
+                <span>{{ guardando ? 'Registrando...' : (saldoCajaInsuficiente ? 'Saldo Insuficiente' : 'Registrar Compra') }}</span>
               </button>
             </div>
           </div>

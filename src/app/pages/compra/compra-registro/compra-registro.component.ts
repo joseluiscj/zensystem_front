@@ -264,6 +264,30 @@ export class CompraRegistroComponent implements OnInit {
     return alm ? alm.nombre : 'Almacén Principal';
   }
 
+  get cajaSeleccionada(): CajaCatalogo | null {
+    const id = this.compraForm?.get('idCaja')?.value;
+    if (!id) return null;
+    return this.cajas.find(c => c.idCaja == id) || null;
+  }
+
+  get requiereCaja(): boolean {
+    const metodo = this.compraForm?.get('metodoPago')?.value;
+    const idCaja = this.compraForm?.get('idCaja')?.value;
+    return Boolean(idCaja && ['EF', 'TA', 'TR'].includes(metodo));
+  }
+
+  get saldoCajaInsuficiente(): boolean {
+    if (!this.requiereCaja || !this.cajaSeleccionada) return false;
+    const saldo = Number(this.cajaSeleccionada.saldo) || 0;
+    return this.totalCompra > saldo;
+  }
+
+  get saldoFaltante(): number {
+    if (!this.saldoCajaInsuficiente || !this.cajaSeleccionada) return 0;
+    const saldo = Number(this.cajaSeleccionada.saldo) || 0;
+    return Math.round((this.totalCompra - saldo) * 100) / 100;
+  }
+
   regresar(guardado: boolean = false): void {
     if (!guardado && this.detalles.length > 0) {
       const conf = confirm('Tiene productos agregados a la compra. ¿Está seguro de salir sin guardar?');
@@ -276,6 +300,22 @@ export class CompraRegistroComponent implements OnInit {
     if (this.compraForm.invalid) {
       this.compraForm.markAllAsTouched();
       this.snackBar.open('Complete los campos obligatorios del proveedor y comprobante', 'Aceptar', { duration: 3000 });
+      return;
+    }
+
+    if (this.detalles.length === 0) {
+      this.snackBar.open('Debe agregar al menos un producto a la compra', 'Aceptar', { duration: 3000 });
+      return;
+    }
+
+    // Validar saldo suficiente en caja si la forma de pago descuenta de caja
+    if (this.saldoCajaInsuficiente && this.cajaSeleccionada) {
+      const saldo = Number(this.cajaSeleccionada.saldo) || 0;
+      this.snackBar.open(
+        `Saldo insuficiente en la caja "${this.cajaSeleccionada.nombre}". Saldo disponible: S/ ${saldo.toFixed(2)}, Requerido: S/ ${this.totalCompra.toFixed(2)}. Faltan S/ ${this.saldoFaltante.toFixed(2)}.`,
+        'Entendido',
+        { duration: 6000 }
+      );
       return;
     }
 

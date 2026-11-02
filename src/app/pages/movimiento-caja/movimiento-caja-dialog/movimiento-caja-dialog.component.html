@@ -11,16 +11,19 @@
       </div>
       <div class="drawer-header-text">
         <h3 class="drawer-title">
-          <ng-container *ngIf="esEdicion">
+          <ng-container *ngIf="esSoloLectura">
+            Detalle de Movimiento
+          </ng-container>
+          <ng-container *ngIf="!esSoloLectura && esEdicion">
             {{ tipoActual === 'I' ? 'Actualizar Ingreso Extra' : 'Actualizar Gasto / Egreso' }}
           </ng-container>
-          <ng-container *ngIf="!esEdicion">
+          <ng-container *ngIf="!esSoloLectura && !esEdicion">
             {{ tipoActual === 'I' ? 'Ingreso Extraordinario' : 'Registrar Gasto / Egreso' }}
           </ng-container>
         </h3>
         <div class="drawer-subtitle-row">
           <span class="drawer-subtitle">
-            {{ esEdicion ? 'Modificación de registro contable en caja' : 'Control de flujos y caja en tiempo real' }}
+            {{ esSoloLectura ? ('Generado por: ' + (origenModuloNombre || 'Sistema') + ' (Solo lectura)') : (esEdicion ? 'Modificación de registro contable en caja' : 'Control de flujos y caja en tiempo real') }}
           </span>
         </div>
       </div>
@@ -36,6 +39,19 @@
   <!-- Formulario con Scroll Vertical -->
   <form [formGroup]="movimientoForm" (ngSubmit)="guardar()" class="drawer-form-content">
     <div class="drawer-body">
+
+      <!-- Notificación informativa cuando el movimiento es generado por otro módulo -->
+      <div class="readonly-origin-notice mb-3" *ngIf="esSoloLectura">
+        <div class="d-flex align-items-start gap-2">
+          <mat-icon class="notice-icon text-primary">lock</mat-icon>
+          <div class="notice-text">
+            <strong class="d-block text-dark mb-1">Registro de {{ origenModuloNombre || 'otro módulo' }}</strong>
+            <p class="mb-0 text-muted small">
+              Este movimiento contable fue generado automáticamente por transacciones del módulo de <strong>{{ origenModuloNombre }}</strong>. Se muestra únicamente como información para arqueo y trazabilidad contable. No puede ser modificado ni eliminado desde Caja.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <!-- 1. SELECTOR DE TIPO (Segmented Toggle) -->
       <div class="form-group-custom">
@@ -146,8 +162,8 @@
           <mat-icon matPrefix class="field-icon-prefix">edit_note</mat-icon>
         </mat-form-field>
 
-        <!-- Sugerencias en chips -->
-        <div class="quick-chips-wrapper">
+        <!-- Sugerencias en chips (solo si es editable) -->
+        <div class="quick-chips-wrapper" *ngIf="!esSoloLectura">
           <span class="chips-label">Sugerencias rápidas:</span>
           <div class="chips-list" *ngIf="tipoActual === 'E'">
             <button type="button" class="quick-chip" (click)="setDescripcionRapida('Compra urgente de insumos')">Insumos</button>
@@ -258,7 +274,7 @@
     <mat-divider></mat-divider>
 
     <!-- Pie Fijo de Acciones -->
-    <div class="drawer-footer">
+    <div class="drawer-footer" *ngIf="!esSoloLectura">
       <button type="button" class="btn-drawer-cancel" (click)="cerrar()" [disabled]="cargando">
         Cancelar
       </button>
@@ -271,6 +287,14 @@
         <span>
           {{ cargando ? 'Guardando...' : (esEdicion ? (tipoActual === 'I' ? 'Actualizar Ingreso' : 'Actualizar Gasto') : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto')) }}
         </span>
+      </button>
+    </div>
+
+    <!-- Pie cuando es solo lectura -->
+    <div class="drawer-footer" *ngIf="esSoloLectura">
+      <button type="button" class="btn-drawer-submit w-100 d-flex justify-content-center" (click)="cerrar()">
+        <mat-icon>check</mat-icon>
+        <span>Entendido / Cerrar</span>
       </button>
     </div>
   </form>

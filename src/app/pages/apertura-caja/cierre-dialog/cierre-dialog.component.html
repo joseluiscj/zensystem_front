@@ -117,7 +117,7 @@
         </div>
 
         <form [formGroup]="basicForm">
-          <div class="form-group-custom">
+          <div class="form-group-custom" style="margin-bottom: -33px;">
             <label class="form-label-custom">Efectivo Físico Contado (S/)</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <input 
@@ -190,7 +190,7 @@
 
           <div *ngIf="transferirEfectivo" class="transfer-inputs-block mt-2">
             <div class="row g-2">
-              <div class="col-12 col-sm-6">
+              <div class="col-12  " style="margin-bottom: -33px;">
                 <label class="form-label-custom">Caja Destino (Efectivo)</label>
                 <mat-form-field appearance="outline" class="w-100 drawer-field">
                   <mat-select [(ngModel)]="idCajaDestinoEfectivo" placeholder="Seleccione Caja Destino">
@@ -202,7 +202,7 @@
                 </mat-form-field>
               </div>
 
-              <div class="col-12 col-sm-6">
+              <div class="col-12  " style="margin-bottom: -33px;">
                 <label class="form-label-custom">Monto a Transferir (S/)</label>
                 <mat-form-field appearance="outline" class="w-100 drawer-field">
                   <input 
@@ -246,7 +246,7 @@
 
           <div *ngIf="transferirTarjeta" class="transfer-inputs-block mt-2">
             <div class="row g-2 align-items-center">
-              <div class="col-12 col-sm-7">
+              <div class="col-12 col-sm-12" style="margin-bottom: -33px;">
                 <label class="form-label-custom">Caja Destino (Tarjeta)</label>
                 <mat-form-field appearance="outline" class="w-100 drawer-field">
                   <mat-select [(ngModel)]="idCajaDestinoTarjeta" placeholder="Seleccione Caja Destino">
@@ -258,7 +258,7 @@
                 </mat-form-field>
               </div>
 
-              <div class="col-12 col-sm-5">
+              <div class="col-12 col-sm-12" style="margin-bottom: -33px;">
                 <div class="tarjeta-total-pill">
                   <span class="tarjeta-pill-lbl">Monto Tarjeta:</span>
                   <strong class="tarjeta-pill-val font-monospace">S/ {{ resumen.totalTarjeta | number:'1.2-2' }}</strong>

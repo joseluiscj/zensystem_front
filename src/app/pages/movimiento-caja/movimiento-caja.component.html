@@ -264,6 +264,10 @@
               <div class="desc-cell" [title]="m.descripcion">
                 {{ m.descripcion }}
               </div>
+              <div *ngIf="m.esEditable != 1" class="badge-origen-lock" [matTooltip]="'Movimiento generado automáticamente por ' + (m.origenModuloNombre || 'otro módulo')">
+                <mat-icon>lock</mat-icon>
+                <span>{{ m.origenModuloNombre || 'Automático' }}</span>
+              </div>
             </td>
 
             <!-- Beneficiario -->
@@ -298,7 +302,7 @@
             <!-- Monto -->
             <td class="text-end font-mono">
               <span class="monto-val" [ngClass]="m.tipo === 'I' ? 'monto-ingreso' : 'monto-gasto'">
-                {{ m.tipo === 'I' ? '+' : '-' }}S/ {{ m.monto | number:'1.2-2' }}
+                {{ m.tipo === 'I' ? '+' : '-' }}$/{{ m.monto | number:'1.2-2' }}
               </span>
             </td>
 
@@ -312,16 +316,26 @@
             <!-- Acciones -->
             <td class="text-center">
               <div class="action-buttons-group">
-                <button type="button" class="btn-action-edit" 
-                  matTooltip="Editar / Actualizar movimiento"
-                  (click)="abrirEditarMovimiento(m)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button type="button" class="btn-action-anular" 
-                  matTooltip="Anular movimiento y revertir saldo"
-                  (click)="anularMovimiento(m)">
-                  <mat-icon>delete_outline</mat-icon>
-                </button>
+                <ng-container *ngIf="m.esEditable == 1">
+                  <button type="button" class="btn-action-edit" 
+                    matTooltip="Editar / Actualizar movimiento"
+                    (click)="abrirEditarMovimiento(m)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button type="button" class="btn-action-anular" 
+                    matTooltip="Anular movimiento y revertir saldo"
+                    (click)="anularMovimiento(m)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </ng-container>
+
+                <ng-container *ngIf="m.esEditable != 1">
+                  <button type="button" class="btn-action-info" 
+                    [matTooltip]="'Ver detalle (' + (m.origenModuloNombre || 'Solo lectura') + ')'"
+                    (click)="abrirVerMovimiento(m)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </ng-container>
               </div>
             </td>
           </tr>

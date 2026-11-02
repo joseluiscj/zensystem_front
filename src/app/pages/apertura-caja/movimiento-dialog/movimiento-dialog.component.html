@@ -62,7 +62,7 @@
     </div>
 
     <!-- 2. BOTÓN DE ACCIÓN PARA NUEVO MOVIMIENTO -->
-    <div class="action-toggle-wrapper" *ngIf="data.state === 1">
+    <!-- <div class="action-toggle-wrapper" *ngIf="data.state === 1">
       <button 
         type="button" 
         class="btn-toggle-movement" 
@@ -71,7 +71,7 @@
         <mat-icon>{{ mostrarNuevoMovimiento ? 'expand_less' : 'add_circle' }}</mat-icon>
         <span>{{ mostrarNuevoMovimiento ? 'Ocultar Formulario' : '+ Registrar Movimiento Manual' }}</span>
       </button>
-    </div>
+    </div> -->
 
     <!-- 3. FORMULARIO VERTICAL DE NUEVO MOVIMIENTO (adaptado al drawer lateral) -->
     <div class="movement-form-card" *ngIf="mostrarNuevoMovimiento && data.state === 1">

@@ -668,6 +668,53 @@
   height: 17px;
 }
 
+.btn-action-info {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-info:hover {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.btn-action-info mat-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+}
+
+.badge-origen-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  margin-top: 4px;
+}
+
+.badge-origen-lock mat-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  color: #64748b;
+}
+
 /* EMPTY STATE */
 .empty-state {
   display: flex;

@@ -13,6 +13,8 @@ export interface MovimientoCajaDialogData {
   categoriasGastos: string[];
   categoriasIngresos: string[];
   movimiento?: CajaMovimientoItem;
+  esSoloLectura?: boolean;
+  origenModuloNombre?: string;
 }
 
 @Component({
@@ -37,6 +39,8 @@ export class MovimientoCajaDialogComponent implements OnInit {
   mostrarDetallesAvanzados: boolean = false;
 
   esEdicion: boolean = false;
+  esSoloLectura: boolean = false;
+  origenModuloNombre: string = '';
   idMovimiento: number | null = null;
   movimientoOriginal: CajaMovimientoItem | null = null;
 
@@ -87,6 +91,8 @@ export class MovimientoCajaDialogComponent implements OnInit {
     this.movimientoOriginal = mov || null;
     this.esEdicion = !!mov;
     this.idMovimiento = mov ? mov.idCajaMovimiento : null;
+    this.esSoloLectura = !!this.data?.esSoloLectura;
+    this.origenModuloNombre = this.data?.origenModuloNombre || mov?.origenModuloNombre || '';
 
     const tipo = mov ? mov.tipo : (this.data?.tipoInicial || 'E');
     const idCajaInicial = mov ? mov.idCaja : (this.cajas.length > 0 ? this.cajas[0].id : '');
@@ -108,6 +114,11 @@ export class MovimientoCajaDialogComponent implements OnInit {
     });
 
     if (mov && (mov.beneficiario || (mov.tipoComprobante && mov.tipoComprobante !== 'Sin Comprobante') || mov.nroComprobante)) {
+      this.mostrarDetallesAvanzados = true;
+    }
+
+    if (this.esSoloLectura) {
+      this.movimientoForm.disable();
       this.mostrarDetallesAvanzados = true;
     }
 
@@ -136,10 +147,12 @@ export class MovimientoCajaDialogComponent implements OnInit {
   }
 
   setTipo(t: 'I' | 'E'): void {
+    if (this.esSoloLectura) return;
     this.movimientoForm.get('tipo')?.setValue(t);
   }
 
   setDescripcionRapida(desc: string): void {
+    if (this.esSoloLectura) return;
     this.movimientoForm.get('descripcion')?.setValue(desc);
   }
 

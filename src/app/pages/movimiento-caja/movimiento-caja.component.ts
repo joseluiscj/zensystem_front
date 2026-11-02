@@ -167,6 +167,11 @@ export class MovimientoCajaComponent implements OnInit {
   }
 
   abrirEditarMovimiento(m: CajaMovimientoItem): void {
+    if (m.esEditable != 1 && m.esEditable !== true) {
+      this.abrirVerMovimiento(m);
+      return;
+    }
+
     const ref = this.dialog.open(MovimientoCajaDialogComponent, {
       disableClose: true,
       panelClass: 'modal-dialog-right',
@@ -175,7 +180,9 @@ export class MovimientoCajaComponent implements OnInit {
         cajas: this.cajas,
         categoriasGastos: this.categoriasGastos,
         categoriasIngresos: this.categoriasIngresos,
-        movimiento: m
+        movimiento: m,
+        esSoloLectura: false,
+        origenModuloNombre: m.origenModuloNombre
       }
     });
 
@@ -186,7 +193,32 @@ export class MovimientoCajaComponent implements OnInit {
     });
   }
 
+  abrirVerMovimiento(m: CajaMovimientoItem): void {
+    this.dialog.open(MovimientoCajaDialogComponent, {
+      disableClose: false,
+      panelClass: 'modal-dialog-right',
+      data: {
+        tipoInicial: m.tipo,
+        cajas: this.cajas,
+        categoriasGastos: this.categoriasGastos,
+        categoriasIngresos: this.categoriasIngresos,
+        movimiento: m,
+        esSoloLectura: true,
+        origenModuloNombre: m.origenModuloNombre
+      }
+    });
+  }
+
   anularMovimiento(m: CajaMovimientoItem): void {
+    if (m.esEditable != 1 && m.esEditable !== true) {
+      this.snackBar.open(
+        `Este movimiento fue generado por el módulo de ${m.origenModuloNombre || 'otro módulo'}. No se puede eliminar desde Caja.`,
+        'Entendido',
+        { duration: 4000 }
+      );
+      return;
+    }
+
     const esIngreso = m.tipo === 'I';
     const tipoTexto = esIngreso ? 'Ingreso' : 'Gasto / Egreso';
     const confirmacion = confirm(`¿Está seguro de anular este ${tipoTexto} por $${m.monto}?\n\n"${m.descripcion}"\n\nEl saldo de la caja será recalculado automáticamente.`);
