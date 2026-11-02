@@ -296,9 +296,11 @@ export class VentaPosComponent implements OnInit {
         // this.guardando = false;
         this.snackBar.open(res.message || 'Venta directa registrada con éxito.', 'Cerrar', { duration: 3500 });
         // this.regresar(true);
-        setTimeout(() => {
-          window.location.reload();
-        }, 1700);
+        // guardar la venta y luego limpiar el carrito para permitir registrar otra venta sin salir de la pantalla
+        this.carrito = [];
+        this.montoEfectivo = null;
+        this.nroOperacion = '';
+        this.guardando = false;
       },
       error: (err) => {
         this.guardando = false;

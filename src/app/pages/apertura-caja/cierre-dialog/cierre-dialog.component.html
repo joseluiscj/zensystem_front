@@ -51,7 +51,7 @@
           </div>
           <div class="col-6">
             <span class="info-label">Moneda</span>
-            <span class="info-value font-monospace">{{ resumen.detalle.moneda || 'SOL ($/)' }}</span>
+            <span class="info-value font-monospace">{{ resumen.detalle.moneda || 'SOL (S/)' }}</span>
           </div>
         </div>
       </div>
@@ -66,27 +66,22 @@
         <div class="breakdown-list">
           <div class="breakdown-row">
             <span class="row-label">Monto Inicial (Apertura)</span>
-            <span class="row-val font-monospace">$/ {{ resumen.aMonto | number:'1.2-2' }}</span>
+            <span class="row-val font-monospace">S/ {{ resumen.aMonto | number:'1.2-2' }}</span>
           </div>
 
           <div class="breakdown-row">
             <span class="row-label">Ventas en Efectivo (+)</span>
-            <span class="row-val font-monospace text-success">+$/ {{ resumen.totalEfectivo | number:'1.2-2' }}</span>
+            <span class="row-val font-monospace text-success">+S/ {{ resumen.totalEfectivo | number:'1.2-2' }}</span>
           </div>
-
-          <!-- <div class="breakdown-row" *ngIf="resumen.totalIngresos > 0">
-            <span class="row-label">Ingresos Manuales (+)</span>
-            <span class="row-val font-monospace text-success">+$/ {{ resumen.totalIngresos | number:'1.2-2' }}</span>
-          </div> -->
 
           <div class="breakdown-row" *ngIf="resumen.totalEgresos > 0">
             <span class="row-label">Egresos / Gastos (-)</span>
-            <span class="row-val font-monospace text-danger">-$/ {{ resumen.totalEgresos | number:'1.2-2' }}</span>
+            <span class="row-val font-monospace text-danger">-S/ {{ resumen.totalEgresos | number:'1.2-2' }}</span>
           </div>
 
           <div class="breakdown-row text-muted" *ngIf="resumen.totalTarjeta > 0">
             <span class="row-label">Ventas con Tarjeta (Info)</span>
-            <span class="row-val font-monospace text-primary">$/ {{ resumen.totalTarjeta | number:'1.2-2' }}</span>
+            <span class="row-val font-monospace text-primary">S/ {{ resumen.totalTarjeta | number:'1.2-2' }}</span>
           </div>
         </div>
 
@@ -99,7 +94,7 @@
             <span class="expected-hint">Apertura + Entradas - Salidas</span>
           </div>
           <div class="expected-amount">
-            $/ {{ resumen.saldoEsperadoEfectivo | number:'1.2-2' }}
+            S/ {{ resumen.saldoEsperadoEfectivo | number:'1.2-2' }}
           </div>
         </div>
       </div>
@@ -123,7 +118,7 @@
 
         <form [formGroup]="basicForm">
           <div class="form-group-custom">
-            <label class="form-label-custom">Efectivo Físico Contado ($/)</label>
+            <label class="form-label-custom">Efectivo Físico Contado (S/)</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <input 
                 matInput 
@@ -135,7 +130,7 @@
                 (input)="calcularDiferencia()" 
                 autocomplete="off"
                 required>
-              <span matPrefix class="currency-prefix">$/&nbsp;</span>
+              <span matPrefix class="currency-prefix">S/&nbsp;</span>
               <mat-icon matSuffix class="field-icon-suffix">point_of_sale</mat-icon>
             </mat-form-field>
           </div>
@@ -164,14 +159,118 @@
             </div>
             <div class="diff-right">
               <span class="diff-amount-tag font-monospace">
-                {{ esCuadreExacto ? '$/ 0.00' : (esSobrante ? '+$/ ' + (diferencia | number:'1.2-2') : '-$/ ' + ((diferencia * -1) | number:'1.2-2')) }}
+                {{ esCuadreExacto ? 'S/ 0.00' : (esSobrante ? '+S/ ' + (diferencia | number:'1.2-2') : '-S/ ' + ((diferencia * -1) | number:'1.2-2')) }}
               </span>
             </div>
           </div>
         </form>
       </div>
 
-      <!-- 4. Aviso Preventivo de Bloqueo -->
+      <!-- 4. Liquidación / Transferencia de Fondos al Cierre -->
+      <div *ngIf="!esCajaPrincipal && cajasDestino.length > 0" class="transfer-funds-card">
+        <div class="transfer-card-header">
+          <div class="transfer-title-group">
+            <mat-icon class="transfer-icon">swap_horiz</mat-icon>
+            <span class="transfer-title">Transferencia de Fondos al Cierre (Liquidación)</span>
+          </div>
+        </div>
+
+        <p class="transfer-help-text">
+          Pase la recaudación de este turno a una caja central (ej: Caja Principal) para consolidar el dinero y dejar el turno liquidado:
+        </p>
+
+        <!-- A. Transferencia de Efectivo -->
+        <div class="transfer-item-box mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <mat-checkbox [(ngModel)]="transferirEfectivo" color="primary">
+              <strong style="color: #0f172a;">Transferir Efectivo Recaudado</strong>
+            </mat-checkbox>
+            <span class="badge-op-type">Efectivo</span>
+          </div>
+
+          <div *ngIf="transferirEfectivo" class="transfer-inputs-block mt-2">
+            <div class="row g-2">
+              <div class="col-12 col-sm-6">
+                <label class="form-label-custom">Caja Destino (Efectivo)</label>
+                <mat-form-field appearance="outline" class="w-100 drawer-field">
+                  <mat-select [(ngModel)]="idCajaDestinoEfectivo" placeholder="Seleccione Caja Destino">
+                    <mat-option *ngFor="let c of cajasDestino" [value]="c.id">
+                      {{ c.nombre }} {{ c.principal ? '⭐ (Principal)' : '' }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matSuffix style="color: #10b981;">account_balance</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12 col-sm-6">
+                <label class="form-label-custom">Monto a Transferir (S/)</label>
+                <mat-form-field appearance="outline" class="w-100 drawer-field">
+                  <input 
+                    matInput 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    [(ngModel)]="montoTransferirEfectivo" 
+                    placeholder="0.00"
+                    class="text-end font-monospace"
+                  />
+                  <span matPrefix class="currency-prefix">S/&nbsp;</span>
+                  <mat-icon matSuffix style="color: #10b981;">payments</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Accesos rápidos para dejar sencillo / fondo fijo -->
+            <!-- <div class="quick-transfer-row mt-1">
+              <button type="button" class="btn-quick-transfer" (click)="setTransferenciaTodoEfectivo()">
+                Transferir Todo (S/ {{ basicForm.controls['cMonto'].value | number:'1.2-2' }})
+              </button>
+              <button type="button" class="btn-quick-transfer" (click)="setTransferenciaDejarFondo(50)">
+                Dejar S/ 50 de Fondo
+              </button>
+              <button type="button" class="btn-quick-transfer" (click)="setTransferenciaDejarFondo(100)">
+                Dejar S/ 100 de Fondo
+              </button>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- B. Transferencia de Ventas con Tarjeta (si hubo ventas con tarjeta) -->
+        <div *ngIf="resumen.totalTarjeta > 0" class="transfer-item-box">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <mat-checkbox [(ngModel)]="transferirTarjeta" color="primary">
+              <strong style="color: #0f172a;">Transferir Ventas con Tarjeta</strong>
+            </mat-checkbox>
+            <span class="badge-op-type tarjeta">Tarjeta</span>
+          </div>
+
+          <div *ngIf="transferirTarjeta" class="transfer-inputs-block mt-2">
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-sm-7">
+                <label class="form-label-custom">Caja Destino (Tarjeta)</label>
+                <mat-form-field appearance="outline" class="w-100 drawer-field">
+                  <mat-select [(ngModel)]="idCajaDestinoTarjeta" placeholder="Seleccione Caja Destino">
+                    <mat-option *ngFor="let c of cajasDestino" [value]="c.id">
+                      {{ c.nombre }} {{ c.principal ? '⭐ (Principal)' : '' }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matSuffix style="color: #6366f1;">credit_card</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="col-12 col-sm-5">
+                <div class="tarjeta-total-pill">
+                  <span class="tarjeta-pill-lbl">Monto Tarjeta:</span>
+                  <strong class="tarjeta-pill-val font-monospace">S/ {{ resumen.totalTarjeta | number:'1.2-2' }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 5. Aviso Preventivo de Bloqueo -->
       <div class="warning-alert-card">
         <mat-icon class="warning-icon">info</mat-icon>
         <span class="warning-text">

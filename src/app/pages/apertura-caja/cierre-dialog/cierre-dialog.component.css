@@ -541,3 +541,126 @@
   width: 18px;
   height: 18px;
 }
+
+
+/* ============================================================
+   CARD DE TRANSFERENCIA DE FONDOS AL CIERRE
+   ============================================================ */
+.transfer-funds-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+
+.transfer-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.transfer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transfer-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #16a34a;
+}
+
+.transfer-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #14532d;
+}
+
+.transfer-help-text {
+  font-size: 0.74rem;
+  color: #166534;
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+.transfer-item-box {
+  background: #ffffff;
+  border: 1px solid #dcfce7;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.badge-op-type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-op-type.tarjeta {
+  background: #ede9fe;
+  color: #6366f1;
+}
+
+.transfer-inputs-block {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.quick-transfer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn-quick-transfer {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-quick-transfer:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.tarjeta-total-pill {
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tarjeta-pill-lbl {
+  font-size: 0.65rem;
+  color: #6b21a8;
+  font-weight: 600;
+}
+
+.tarjeta-pill-val {
+  font-size: 1rem;
+  color: #581c87;
+  line-height: 1.2;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -30,7 +30,7 @@
             <mat-label>Seleccionar Caja</mat-label>
             <mat-select formControlName="idCaja" (valueChange)="onCajaSelected($event)">
               <mat-option *ngFor="let c of cajasDisponibles" [value]="c.id">
-                {{ c.nombre }} - {{ c.sucursal }} ({{ c.tipoCaja }})
+                {{ c.nombre }} - ({{ c.tipoCaja }})
               </mat-option>
             </mat-select>
             <mat-icon matSuffix>point_of_sale</mat-icon>
