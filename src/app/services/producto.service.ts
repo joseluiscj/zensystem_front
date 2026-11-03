@@ -11,15 +11,15 @@ import { environment } from '../../environments/environment.development';
 export class ProductoService extends GenericService<Producto> {
   private dataChange: Subject<Producto[]> = new Subject<Producto[]>();
 
-  constructor(protected override http:HttpClient) { 
+  constructor(protected override http: HttpClient) { 
     super(http, `${environment.HOST}/producto`);
   }
 
-  setDataChange(data :Producto[]){ 
-    this.dataChange.next(data)
+  setDataChange(data: Producto[]) { 
+    this.dataChange.next(data);
   }
 
-  getDataChange(){
+  getDataChange() {
     return this.dataChange.asObservable();
   }
 
@@ -27,17 +27,23 @@ export class ProductoService extends GenericService<Producto> {
     return this.findAllList(data);
   }
 
-  saveFile(obj :FormData){
-    return this.http.post<any>(`${this.url}/saveFile`, obj );
+  saveFile(obj: FormData) {
+    return this.http.post<any>(`${this.url}/saveFile`, obj);
   }
+
   cambioEstado(data: any) {
-    return this.http.post<any>(`${this.url}/cambioEstado`,data );
+    return this.http.post<any>(`${this.url}/cambioEstado`, data);
   }
+
   productoCbo(data: any) {
     return this.http.post<any>(`${this.url}/productoCbo`, data);
   }
+
   productoInfo(data: any) {
     return this.http.post<any>(`${this.url}/productoInfo`, data);
   }
-  
+
+  getSiguienteCodigo() {
+    return this.http.get<{ code: number; codigo: string }>(`${this.url}/siguiente-codigo`);
+  }
 }

@@ -71,10 +71,20 @@
             <mat-form-field appearance="outline" class="w-100 drawer-field" subscriptSizing="dynamic">
               <input 
                 matInput 
-                placeholder="Ej: PROD-001" 
+                placeholder="Ej: PROD_001" 
                 formControlName="codigo" 
                 autocomplete="off">
               <mat-icon matPrefix class="field-icon-prefix">qr_code</mat-icon>
+              <button 
+                *ngIf="!idProductoSelected"
+                matSuffix 
+                mat-icon-button 
+                type="button" 
+                [disabled]="cargandoCodigo"
+                matTooltip="Regenerar código autoincremental" 
+                (click)="generarSiguienteCodigo()">
+                <mat-icon [class.spin-icon]="cargandoCodigo" style="font-size: 18px; width: 18px; height: 18px; color: #0284c7;">autorenew</mat-icon>
+              </button>
             </mat-form-field>
           </div>
 

@@ -98,9 +98,9 @@
           <select class="form-select form-select-sm" formControlName="idCaja">
             <option [ngValue]="null">-- Sin egreso automático de caja --</option>
             <option *ngFor="let c of cajas" [value]="c.idCaja">
-              {{ c.nombre }} (Saldo: S/ {{ c.saldo | number:'1.2-2' }})
+              {{ c.nombre }} 
             </option>
-          </select>
+          </select> 
         </div>
 
         <div class="col-md-4 col-12" *ngIf="compraForm.get('metodoPago')?.value === 'TA' || compraForm.get('metodoPago')?.value === 'TR'">

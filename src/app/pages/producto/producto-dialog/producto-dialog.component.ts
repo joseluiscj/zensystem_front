@@ -38,6 +38,7 @@ export class ProductoDialogComponent implements OnInit {
   file_txt: string = "";
   download_link: string = "";
   ocultar_carga = "d-none";
+  cargandoCodigo: boolean = false;
 
   unidadesMedida: string[] = [
     'UNIDAD',
@@ -91,7 +92,25 @@ export class ProductoDialogComponent implements OnInit {
           this.ocultar = "d-none";
         }
       });
-    } 
+    } else {
+      // Al registrar un nuevo producto, autogenerar el código secuencial (ej: PROD_001)
+      this.generarSiguienteCodigo();
+    }
+  }
+
+  generarSiguienteCodigo(): void {
+    this.cargandoCodigo = true;
+    this.productoService.getSiguienteCodigo().subscribe({
+      next: (res) => {
+        this.cargandoCodigo = false;
+        if (res && res.codigo) {
+          this.basicForm.patchValue({ codigo: res.codigo });
+        }
+      },
+      error: () => {
+        this.cargandoCodigo = false;
+      }
+    });
   }
 
   private _filterCategoria(value: string): any[] {

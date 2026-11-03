@@ -139,7 +139,7 @@
           <select class="form-select" formControlName="idCaja">
             <option [ngValue]="null">-- Sin egreso automático de caja --</option>
             <option *ngFor="let c of cajas" [value]="c.idCaja">
-              {{ c.nombre }} (Saldo: $/ {{ c.saldo | number:'1.2-2' }})
+              {{ c.nombre }}  
             </option>
           </select>
         </div>
