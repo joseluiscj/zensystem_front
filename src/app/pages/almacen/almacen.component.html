@@ -26,7 +26,7 @@
         <span>Gestión de Almacenes</span>
       </button>
 
-      <button type="button" class="btn-hero-traspaso" (click)="abrirTraspaso()" matTooltip="Transferir stock de un almacén a otro">
+      <button type="button" class="btn-hero-traspaso" (click)="abrirTraspaso()" matTooltip="Transferir stock de un almacén a otro" *ngIf="almacenes.length>1">
         <mat-icon>swap_horiz</mat-icon>
         <span>Traspaso entre Almacenes</span>
       </button>

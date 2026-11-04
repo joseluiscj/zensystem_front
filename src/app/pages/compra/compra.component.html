@@ -115,24 +115,7 @@
   <!-- BARRA DE FILTROS -->
   <div class="card p-3 mb-4 shadow-sm border filter-card">
     <div class="row g-2 align-items-end">
-      <!-- Rango de Fechas -->
-      <div class="col-12 col-md-3">
-        <label class="form-label small fw-bold mb-1">Rango de Fechas</label>
-        <div class="d-flex gap-1">
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
-        </div>
-      </div>
-
-      <!-- Accesos Rápidos de Fecha -->
-      <div class="col-auto">
-        <label class="form-label small fw-bold mb-1 d-none d-md-block">&nbsp;</label>
-        <div class="d-flex gap-1">
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroHoy()">Hoy</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEsteMes()">Este Mes</button>
-        </div>
-      </div>
-
+      
       <!-- Almacén -->
       <div class="col-6 col-md-2">
         <label class="form-label small fw-bold mb-1">Almacén</label>
@@ -155,13 +138,31 @@
       </div>
 
       <!-- Estado -->
-      <div class="col-6 col-md-1">
+      <div class="col-6 col-md-2">
         <label class="form-label small fw-bold mb-1">Estado</label>
         <select class="form-select form-select-sm" [(ngModel)]="filtros.estado" (change)="cargarCompras()">
           <option value="todos">Todos</option>
           <option value="REGISTRADO">Activas</option>
           <option value="ANULADO">Anuladas</option>
         </select>
+      </div>
+      
+      <!-- Rango de Fechas -->
+      <div class="col-12 col-md-4">
+        <label class="form-label small fw-bold mb-1">Rango de Fechas</label>
+        <div class="d-flex gap-1">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
+        </div>
+      </div>
+
+      <!-- Accesos Rápidos de Fecha -->
+      <div class="col-auto ">
+        <label class="form-label small fw-bold mb-1 d-none d-md-block">&nbsp;</label>
+        <div class="d-flex gap-1">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroHoy()">Hoy</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEsteMes()">Este Mes</button>
+        </div>
       </div>
 
       <!-- Buscador -->
@@ -170,10 +171,10 @@
         <div class="input-group input-group-sm">
           <input type="text" class="form-control" [(ngModel)]="filtros.search" (keyup.enter)="cargarCompras()" placeholder="Código, proveedor, comprobante...">
           <button class="btn btn-primary" type="button" (click)="cargarCompras()">
-            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">search</mat-icon>
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">search</mat-icon> Buscar
           </button>
           <button class="btn btn-outline-secondary" type="button" (click)="limpiarFiltros()" title="Limpiar filtros">
-            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">clear</mat-icon>
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">clear</mat-icon> Limpiar
           </button>
         </div>
       </div>

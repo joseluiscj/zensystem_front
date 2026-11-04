@@ -116,7 +116,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.cerrarMenuMobile();
-    this.loginService.logout();
+    this.loginService.logout(false, '', 'Salió del sistema', true);
   }
 
   dataUser(): void {

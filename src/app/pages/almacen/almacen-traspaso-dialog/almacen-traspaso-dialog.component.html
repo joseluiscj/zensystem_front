@@ -24,7 +24,7 @@
       <mat-form-field appearance="outline" class="w-100 custom-field">
         <mat-select formControlName="idProducto" placeholder="Seleccione un producto">
           <mat-option *ngFor="let p of productos" [value]="p.idProducto">
-            <strong>[{{ p.codigo }}]</strong> {{ p.nombre }} - (Total Global: {{ p.stock }} {{ p.unidadMedida }})
+            <strong>[{{ p.codigo }}]</strong> {{ p.nombre }} 
           </mat-option>
         </mat-select>
       </mat-form-field>

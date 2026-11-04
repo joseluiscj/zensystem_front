@@ -19,16 +19,17 @@ export class ServerErrorsInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const loginUrl = `${environment.HOST}/login`;
-        const isLoginRequest = req.url === loginUrl;
+        const logoutUrl = `${environment.HOST}/logout`;
+        const isAuthRequest = req.url === loginUrl || req.url === logoutUrl;
 
         // Clona la solicitud y añade el encabezado de autorización solo si no es una solicitud de login
         const authToken = sessionStorage.getItem(environment.TOKEN_NAME);
-        const authReq = authToken && !isLoginRequest
+        const authReq = authToken && req.url !== loginUrl
             ? req.clone({ headers: req.headers.set('Authorization', `Bearer ${authToken}`) })
             : req;
 
-        // Registrar actividad activa de usuario ante cualquier petición HTTP autenticada
-        if (authToken && !isLoginRequest) {
+        // Registrar actividad activa de usuario ante cualquier petición HTTP autenticada (excepto login/logout)
+        if (authToken && !isAuthRequest) {
             try {
                 const loginService = this.injector.get(LoginService);
                 loginService.recordActivity();
@@ -72,10 +73,13 @@ export class ServerErrorsInterceptor implements HttpInterceptor {
                         duration: 5000
                     });
                 } else if (err.status === 401) {
+                    if (req.url.includes('/logout')) {
+                        return throwError(() => err);
+                    }
                     // Token o sesión expirada: cerrar sesión automáticamente y redirigir
                     try {
                         const loginService = this.injector.get(LoginService);
-                        loginService.logout(true, 'Su sesión ha expirado. Por favor, vuelva a iniciar sesión.');
+                        loginService.logout(true, 'Su sesión ha expirado. Por favor, vuelva a iniciar sesión.', 'Salió del sistema (Sesión expirada)', true);
                     } catch {
                         sessionStorage.clear();
                         this.snackBar.open('Su sesión ha expirado. Por favor, vuelva a iniciar sesión.', 'Cerrar', {

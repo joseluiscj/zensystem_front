@@ -30,7 +30,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loginService.logout(false);
+    // Limpieza pasiva de sesión residual sin disparar evento de salida
+    this.loginService.logout(false, '', '', false);
   }
 
   onSubmit(): void {
@@ -48,8 +49,8 @@ export class LoginComponent implements OnInit {
         }, 3000);
         this.ocultar = "";
         this.loginService.login(v_usuario, v_password).subscribe(data => {
-          this.loginService.setToken(data.access_token);
-          this.router.navigate(["pages/inicio"]);
+          this.loginService.setToken(data['access_token']);
+          this.router.navigate(['/pages/inicio']);
         });
       }
     }

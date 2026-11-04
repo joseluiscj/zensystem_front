@@ -135,9 +135,31 @@ export class LoginService {
 
   /**
    * Cierra la sesión, limpia los datos de sesión y redirige a la pantalla de login.
+   * Si registrarEnBd es true, envía al backend la notificación para registrar la salida en la tabla usuario_sesion.
    * Si notify es verdadero, muestra un mensaje de aviso al usuario.
    */
-  logout(notify: boolean = false, message: string = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.'): void {
+  logout(
+    notify: boolean = false, 
+    message: string = 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
+    descripcion: string = 'Salió del sistema',
+    registrarEnBd: boolean = true
+  ): void {
+    const currentUser = this.getCurrentUser();
+    const token = this.getToken();
+
+    // Notificar al backend para registrar en usuario_sesion
+    if (registrarEnBd && (token || currentUser)) {
+      const payload = {
+        idUser: currentUser?.id,
+        username: currentUser?.name,
+        descripcion: descripcion
+      };
+      this.http.post(`${environment.HOST}/logout`, payload).subscribe({
+        next: () => {},
+        error: () => {}
+      });
+    }
+
     this.stopInactivityMonitor();
 
     if (typeof sessionStorage !== 'undefined') {
@@ -162,12 +184,12 @@ export class LoginService {
     const token = this.getToken();
     if (token) {
       if (this.jwtHelper.isTokenExpired(token)) {
-        this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+        this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.', 'Salió del sistema (Sesión expirada)', true);
       } else {
         // Verificar si antes de recargar ya habían transcurrido 15 minutos de inactividad
         const lastAct = this.getLastActivityTime();
         if (Date.now() - lastAct >= this.INACTIVITY_LIMIT_MS) {
-          this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.');
+          this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 15 min)', true);
           return;
         }
         // Si el usuario recargó la página mientras está activo, refrescar actividad y arrancar monitor
@@ -219,7 +241,7 @@ export class LoginService {
     // Solo se cierra la sesión si han pasado 15 minutos continuos sin ninguna interacción
     if (idleMs >= this.INACTIVITY_LIMIT_MS) {
       this.ngZone.run(() => {
-        this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.');
+        this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 15 min)', true);
       });
       return;
     }
@@ -228,12 +250,12 @@ export class LoginService {
     try {
       if (this.jwtHelper.isTokenExpired(token)) {
         this.ngZone.run(() => {
-          this.logout(true, 'Su sesión ha expirado. Por favor, vuelva a iniciar sesión.');
+          this.logout(true, 'Su sesión ha expirado. Por favor, vuelva a iniciar sesión.', 'Salió del sistema (Sesión expirada)', true);
         });
       }
     } catch {
       this.ngZone.run(() => {
-        this.logout(true, 'Token inválido. Inicie sesión nuevamente.');
+        this.logout(true, 'Token inválido. Inicie sesión nuevamente.', 'Salió del sistema (Token inválido)', true);
       });
     }
   }

@@ -15,14 +15,14 @@ export const certGuard = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
     // 1) Verificar si existe token en la sesión
     const token = sessionStorage.getItem(environment.TOKEN_NAME);
     if (!token) {
-        loginService.logout(false);
+        loginService.logout(false, '', '', false);
         return false;
     }
 
     // 2) Verificar si el token no ha expirado
     const helper = new JwtHelperService();
     if (helper.isTokenExpired(token)) {
-        loginService.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+        loginService.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.', 'Salió del sistema (Token expirado)', true);
         return false;
     }
 
@@ -38,18 +38,20 @@ export const certGuard = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
                 cont++;
                 break;
             }
-            for (let m2 of m.subItems) {
-                if (url.startsWith(m2.route)) {
-                    cont++;
-                    break;
+            if (m.subItems && m.subItems.length > 0) {
+                for (let sub of m.subItems) {
+                    if (url.startsWith(sub.route)) {
+                        cont++;
+                        break;
+                    }
                 }
             }
         }
         if (cont > 0) {
             return true;
         } else {
-            router.navigate(['/pages/not-404']);
+            router.navigate(['/pages/not-403']);
             return false;
         }
     }));
-};
+}
