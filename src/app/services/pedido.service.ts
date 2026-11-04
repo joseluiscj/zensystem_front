@@ -20,6 +20,8 @@ export interface VentaItem {
   pagoCon: string;
   nroOperacion?: string;
   idCaja: number;
+  idCajaDetalle?: number;
+  caja_detalle_state?: number;
   caja_nombre: string;
   idCajero: number;
   cajero_nombre: string;
@@ -27,6 +29,10 @@ export interface VentaItem {
   montoEfectivo: string | number;
   montoVuelto: string | number;
   state: number;
+  estadoServicio?: string;
+  esEditable?: number | boolean;
+  motivoBloqueo?: string;
+  motivoActualizacion?: string;
   created_at: string;
   updated_at: string;
   items_count: number;

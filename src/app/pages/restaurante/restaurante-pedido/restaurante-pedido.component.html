@@ -247,26 +247,31 @@
               </div>
             </div>
 
-            <!-- Estado de Cocina / Comanda -->
+            <!-- Estado de Atención en Mesa / Restaurante -->
             <div class="pos-field-group mb-3">
-              <label class="pos-field-label">Estado de la Orden</label>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="pos-field-label mb-0">Estado de Atención en Mesa</label>
+                <span class="text-muted small" style="font-size: 0.72rem;">
+                  {{ estadoServicio === 'SERVIDO' ? '🍽️ Platos servidos' : '⏳ En preparación' }}
+                </span>
+              </div>
               <div class="segmented-status-pills">
                 <button 
                   type="button" 
                   class="status-pill-btn pill-pending" 
-                  [class.active-pending]="check_pendiente"
-                  (click)="seleccionarEstado('pendiente')">
+                  [class.active-pending]="estadoServicio === 'PENDIENTE'"
+                  (click)="seleccionarEstado('PENDIENTE')">
                   <mat-icon class="pill-icon">hourglass_empty</mat-icon>
-                  <span>Pendiente</span>
+                  <span>Pendiente (Cocina)</span>
                 </button>
 
                 <button 
                   type="button" 
                   class="status-pill-btn pill-served" 
-                  [class.active-served]="check_atendido"
-                  (click)="seleccionarEstado('atendido')">
-                  <mat-icon class="pill-icon">check_circle</mat-icon>
-                  <span>Atendido</span>
+                  [class.active-served]="estadoServicio === 'SERVIDO'"
+                  (click)="seleccionarEstado('SERVIDO')">
+                  <mat-icon class="pill-icon">room_service</mat-icon>
+                  <span>Servido en Mesa</span>
                 </button>
               </div>
             </div>

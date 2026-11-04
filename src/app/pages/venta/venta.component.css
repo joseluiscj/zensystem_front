@@ -560,6 +560,29 @@
   height: 14px;
 }
 
+.badge-service-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.service-servido {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.service-cocina {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
 .client-name {
   color: #0f172a;
 }
@@ -1284,4 +1307,1207 @@
   font-size: 18px;
   width: 18px;
   height: 18px;
+}
+
+
+/* ============================================================
+   ESTILOS PARA BOTÓN EDITAR DESHABILITADO POR CAJA CERRADA
+   ============================================================ */
+.btn-action.btn-edit-disabled {
+  background: #f1f5f9 !important;
+  color: #94a3b8 !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.65;
+}
+
+.btn-action.btn-edit-disabled:hover {
+  background: #fee2e2 !important;
+  color: #ef4444 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Badge de auditoría en listado */
+.audit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  max-width: 100%;
+}
+
+.audit-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+}
+
+.audit-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge-cobrada {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+.badge-ocupada {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+.audit-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #92400e;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.audit-callout mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+/* ============================================================
+   ESTILOS COMPARTIDOS POS & RESTAURANTE EN MODO EDICIÓN
+   ============================================================ */
+.pos-wrapper {
+  padding: 8px 0 24px 0;
+  background-color: transparent;
+  min-height: calc(100vh - 80px);
+  font-family: inherit;
+}
+
+.pos-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #ffffff;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
+}
+
+.pos-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-topbar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-topbar-back:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.pos-table-indicator, .pos-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-icon-box, .pos-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-icon-box mat-icon, .pos-brand-icon mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.table-title-text, .pos-title {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.table-badge-status, .pos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 2px;
+}
+
+.status-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.pos-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbar-total-pill, .pos-topbar-total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 6px 14px;
+  border-radius: 10px;
+}
+
+.pill-label, .total-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #166534;
+}
+
+.pill-val, .total-amount {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #15803d;
+}
+
+.btn-topbar-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-topbar-clear:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.btn-topbar-primary, .btn-guardar-venta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s;
+}
+
+.btn-topbar-primary:hover:not(:disabled), .btn-guardar-venta:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+}
+
+.btn-topbar-primary:disabled, .btn-guardar-venta:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.pos-loading-bar {
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   CATÁLOGO DE PRODUCTOS (COLUMNA IZQUIERDA)
+   ============================================================ */
+.pos-panel, .pos-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  padding: 18px;
+}
+
+.catalog-header {
+  margin-bottom: 14px;
+}
+
+.pos-search-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.pos-search-wrapper .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.pos-search-input {
+  padding-left: 40px !important;
+  padding-right: 36px !important;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.92rem;
+  transition: all 0.2s;
+}
+
+.pos-search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.btn-clear-search:hover {
+  color: #0f172a;
+}
+
+.pos-categories-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.cat-chip.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.cat-chip mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.cat-count {
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.cat-chip.active .cat-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.catalog-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.catalog-results-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.catalog-results-text mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #2563eb;
+}
+
+.empty-catalog-box {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.empty-catalog-box mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12);
+}
+
+.product-thumb-container {
+  height: 100px;
+  background: #f1f5f9;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-img-placeholder {
+  color: #94a3b8;
+}
+
+.product-img-placeholder mat-icon {
+  font-size: 38px;
+  width: 38px;
+  height: 38px;
+}
+
+.category-tag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.stock-tag {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.stock-ok {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.stock-out {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.stock-unlimited {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.product-info-box {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5em;
+}
+
+.product-code {
+  font-size: 0.7rem;
+  margin-bottom: 6px;
+}
+
+.product-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.btn-add-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.btn-add-circle mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.product-card:hover .btn-add-circle {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* ============================================================
+   PANEL LATERAL: COMANDA RESTAURANTE & TICKET POS
+   ============================================================ */
+.comanda-sidebar-form, .ticket-checkout-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.comanda-panel-header, .ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.comanda-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comanda-header-icon, .ticket-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comanda-header-title, .ticket-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.comanda-header-count, .ticket-items-count {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.btn-vaciar-link {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.btn-vaciar-link:hover {
+  background: #fee2e2;
+}
+
+.btn-vaciar-link mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.pos-field-group {
+  margin-bottom: 10px;
+}
+
+.pos-field-label, .form-label-pos {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.pos-input-container, .pos-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pos-input-container .input-icon, .pos-input-group .input-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  z-index: 2;
+}
+
+.currency-prefix {
+  position: absolute;
+  left: 12px;
+  font-weight: 700;
+  color: #475569;
+  z-index: 2;
+}
+
+.pos-control-input, .pos-form-control {
+  width: 100%;
+  padding-left: 36px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.88rem;
+}
+
+.currency-prefix ~ .pos-form-control {
+  padding-left: 38px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.segmented-status-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.status-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.status-pill-btn.active-pending {
+  background: #ffffff;
+  color: #d97706;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.status-pill-btn.active-served {
+  background: #ffffff;
+  color: #16a34a;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.comanda-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 12px 0;
+}
+
+/* LISTAS DE ITEMS */
+.comanda-items-scroll, .ticket-items-container {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-comanda-box, .ticket-empty-card {
+  text-align: center;
+  padding: 30px 14px;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px dashed #cbd5e1;
+}
+
+.empty-comanda-icon, .empty-cart-icon {
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.empty-comanda-icon mat-icon, .empty-cart-icon mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.empty-comanda-title, .ticket-empty-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0 0 4px 0;
+}
+
+.empty-comanda-subtitle, .ticket-empty-card p {
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.comanda-item-card, .ticket-row-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  transition: all 0.15s;
+}
+
+.comanda-item-card:hover, .ticket-row-card:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.comanda-item-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-visual-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #e2e8f0;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-placeholder-icon mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #94a3b8;
+}
+
+.item-info-col, .ticket-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-category-pill {
+  font-size: 0.65rem;
+  color: #64748b;
+  display: block;
+}
+
+.item-dish-name, .ticket-row-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-unit-price, .ticket-unit-price {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+/* Stepper (- 1 +) */
+.item-stepper-box, .ticket-stepper {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.stepper-btn, .btn-stepper {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: #f1f5f9;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s;
+}
+
+.stepper-btn:hover, .btn-stepper:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.stepper-btn mat-icon, .btn-stepper mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+.stepper-input {
+  width: 32px;
+  height: 26px;
+  border: none;
+  text-align: center;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.item-subtotal-box, .ticket-subtotal {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #059669;
+  min-width: 60px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.btn-item-delete, .btn-remove-row {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-item-delete:hover, .btn-remove-row:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.btn-item-delete mat-icon, .btn-remove-row mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* OBSERVACIONES DE COCINA */
+.item-observation-container {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.obs-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.obs-icon {
+  position: absolute;
+  left: 6px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+}
+
+.obs-input {
+  width: 100%;
+  padding-left: 26px;
+  padding-right: 24px;
+  height: 28px;
+  font-size: 0.76rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.btn-clear-obs {
+  position: absolute;
+  right: 4px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-clear-obs mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.quick-notes-pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.quick-notes-label {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.quick-note-chip {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  border-radius: 12px;
+  padding: 1px 7px;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.quick-note-chip:hover {
+  background: #e2e8f0;
+}
+
+.quick-note-chip.note-active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* FOOTER Y TOTALES */
+.comanda-footer-card, .pos-billing-summary {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.summary-row, .pos-billing-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.summary-total-row, .pos-billing-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1.5px solid #cbd5e1;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.summary-total-value, .total-big {
+  font-size: 1.35rem;
+  color: #059669;
+}
+
+.btn-comanda-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+  transition: all 0.2s;
+}
+
+.btn-comanda-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+}
+
+.btn-comanda-submit:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* COBRANZA POS */
+.checkout-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 12px 0 8px 0;
+}
+
+.checkout-section-title mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #2563eb;
+}
+
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-pay-method {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-pay-method mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-pay-method.pay-active {
+  background: #eff6ff;
+  border-color: #2563eb;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.change-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 10px;
+  height: 38px;
+}
+
+.change-label {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.change-val {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.change-display.has-change .change-val {
+  color: #059669;
+}
+
+.quick-cash-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-quick-cash {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-quick-cash:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

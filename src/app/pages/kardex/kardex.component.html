@@ -39,7 +39,7 @@
   </header>
 
   <!-- TARJETAS DE KPIS DE KARDEX -->
-  <div class="row g-3 mb-4">
+  <div class="row g-3 mb-4" style=" justify-content: center">
     <!-- Total Movimientos -->
     <div class="col-12 col-sm-6 col-xl-3">
       <div class="kpi-card kpi-total" (click)="filtrarPorTipo('todos')" [class.kpi-active]="filtros.tipo === 'todos'">
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Valor Total Entradas -->
-    <div class="col-12 col-sm-6 col-xl-3">
+    <!-- <div class="col-12 col-sm-6 col-xl-3">
       <div class="kpi-card kpi-valor">
         <div class="kpi-card-header">
           <span class="kpi-card-title">Valorizado Entradas</span>
@@ -114,7 +114,7 @@
           <span class="kpi-hint">Costo de reposición</span>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <!-- BARRA DE FILTROS AVANZADOS -->

@@ -48,6 +48,7 @@ export class RestaurantePedidoComponent implements OnInit {
   accion: string = "nuevo";
   id_pedido: number;
 
+  estadoServicio: 'PENDIENTE' | 'SERVIDO' = 'PENDIENTE';
   check_pendiente: boolean = true;
   check_atendido: boolean = false;
 
@@ -239,22 +240,26 @@ export class RestaurantePedidoComponent implements OnInit {
       montoTotal: new UntypedFormControl(this.pedido?.f_montoTotal || '0.00'),
     }); 
 
-    if (this.pedido?.f_state == 1) {
+    if (this.pedido?.f_estadoServicio === 'SERVIDO') {
+      this.estadoServicio = 'SERVIDO';
       this.check_atendido = true;
       this.check_pendiente = false;
     } else {
+      this.estadoServicio = 'PENDIENTE';
       this.check_pendiente = true;
       this.check_atendido = false;
     }
   }
 
-  seleccionarEstado(estado: 'pendiente' | 'atendido'): void {
-    if (estado === 'pendiente') {
-      this.check_pendiente = true;
-      this.check_atendido = false;
-    } else {
+  seleccionarEstado(estado: 'PENDIENTE' | 'SERVIDO' | 'pendiente' | 'atendido'): void {
+    if (estado === 'SERVIDO' || estado === 'atendido') {
+      this.estadoServicio = 'SERVIDO';
       this.check_pendiente = false;
       this.check_atendido = true;
+    } else {
+      this.estadoServicio = 'PENDIENTE';
+      this.check_pendiente = true;
+      this.check_atendido = false;
     }
   }
 
@@ -287,7 +292,8 @@ export class RestaurantePedidoComponent implements OnInit {
       objP.f_montoEfectivo = 0;
       objP.f_vuelto = 0;
       objP.f_pagoCon = 'EF';
-      objP.f_state = this.check_atendido ? 1 : 0;
+      objP.f_state = 0; // Mesa comanda siempre se mantiene pendiente de cobro (0) para pagarse en Ventas
+      objP.f_estadoServicio = this.estadoServicio;
       objP.f_detalle = this.listaDetalle;
 
       if (this.accion == 'nuevo') {

@@ -17,16 +17,13 @@
         </div>
         <div>
           <h3 class="header-title">Salón de Mesas & Restaurante</h3>
-          <p class="header-subtitle">Gestión en tiempo real de comandas, mesas y cobros en caja.</p>
+          <p class="header-subtitle">Gestión en tiempo real de comandas, servicio en mesa y cobros.</p>
         </div>
       </div>
       <div class="header-actions">
         <button mat-raised-button class="btn-refresh" (click)="listData()" matTooltip="Actualizar estado de mesas">
           <mat-icon>refresh</mat-icon> Actualizar
         </button>
-        <!-- <button mat-raised-button class="btn-caja" (click)="irAperturaCaja()" matTooltip="Gestionar turnos de caja">
-          <mat-icon>point_of_sale</mat-icon> Turnos de Caja
-        </button> -->
       </div>
     </div>
 
@@ -36,7 +33,7 @@
         <div class="kpi-content">
           <span class="kpi-label">Mesas Ocupadas</span>
           <span class="kpi-value">{{ mOcupadas }}</span>
-          <span class="kpi-hint">{{ mPendientes }} pendientes &bull; {{ mAtendidas }} atendidas</span>
+          <span class="kpi-hint">{{ mPendientes }} en cocina &bull; {{ mServidas }} servidas</span>
         </div>
         <div class="kpi-icon-circle">
           <mat-icon>restaurant_menu</mat-icon>
@@ -94,8 +91,8 @@
         <button type="button" class="tab-btn" [class.active]="filtroActual === 'pendientes'" (click)="setFiltro('pendientes')">
           <span class="dot dot-amber"></span> Pendientes <span class="tab-badge">{{ mPendientes }}</span>
         </button>
-        <button type="button" class="tab-btn" [class.active]="filtroActual === 'atendidas'" (click)="setFiltro('atendidas')">
-          <span class="dot dot-blue"></span> Atendidas <span class="tab-badge">{{ mAtendidas }}</span>
+        <button type="button" class="tab-btn" [class.active]="filtroActual === 'servidas'" (click)="setFiltro('servidas')">
+          <span class="dot dot-blue"></span> Servidas <span class="tab-badge">{{ mServidas }}</span>
         </button>
       </div>
 
@@ -136,8 +133,8 @@
         class="mesa-tile" 
         [ngClass]="{
           'tile-disponible': mesa.disponible === 1,
-          'tile-pendiente': mesa.disponible === 0 && mesa.state !== 1,
-          'tile-atendido': mesa.disponible === 0 && mesa.state === 1
+          'tile-pendiente': mesa.disponible === 0 && mesa.estadoServicio !== 'SERVIDO',
+          'tile-atendido': mesa.disponible === 0 && mesa.estadoServicio === 'SERVIDO'
         }"
         (click)="openDialog(mesa.id)">
 
@@ -152,11 +149,11 @@
             <span *ngIf="mesa.disponible === 1" class="badge-status badge-free">
               <span class="pulse-dot green-dot"></span> Libre
             </span>
-            <span *ngIf="mesa.disponible === 0 && mesa.state !== 1" class="badge-status badge-pending">
+            <span *ngIf="mesa.disponible === 0 && mesa.estadoServicio !== 'SERVIDO'" class="badge-status badge-pending">
               <span class="pulse-dot orange-dot"></span> Pendiente
             </span>
-            <span *ngIf="mesa.disponible === 0 && mesa.state === 1" class="badge-status badge-served">
-              <span class="pulse-dot blue-dot"></span> Atendido
+            <span *ngIf="mesa.disponible === 0 && mesa.estadoServicio === 'SERVIDO'" class="badge-status badge-served">
+              <span class="pulse-dot blue-dot"></span> Servido
             </span>
           </div>
         </div>

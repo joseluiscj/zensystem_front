@@ -1,0 +1,73 @@
+<div class="justificacion-modal">
+  <!-- Cabecera -->
+  <div class="modal-header">
+    <div class="header-icon-box">
+      <mat-icon>security_update_warning</mat-icon>
+    </div>
+    <div class="header-text">
+      <h3 class="modal-title">Justificación de Actualización</h3>
+      <span class="modal-subtitle">Venta Cobrada #{{ data.idPedido }} • {{ data.nombreCliente || 'Consumidor Final' }}</span>
+    </div>
+    <button type="button" class="btn-close-modal" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido -->
+  <div class="modal-body">
+    <!-- Aviso de Auditoría -->
+    <div class="audit-warning-box">
+      <mat-icon class="warning-icon">info</mat-icon>
+      <div class="warning-desc">
+        <strong>Atención:</strong> Esta venta ya fue cobrada y registrada en caja. Cualquier cambio en cantidades o productos ajustará automáticamente el stock en almacén, registrará movimientos de auditoría en el <strong>Kardex</strong> y actualizará el balance de caja.
+      </div>
+    </div>
+
+    <!-- Resumen del nuevo valor -->
+    <div class="sale-preview-row">
+      <span class="preview-label">Nuevo Total a Actualizar:</span>
+      <span class="preview-amount">S/ {{ data.montoTotal | number:'1.2-2' }}</span>
+    </div>
+
+    <!-- Campo obligatorio de Justificación -->
+    <div class="form-group mt-3">
+      <label class="field-label d-flex justify-content-between align-items-center">
+        <span>Motivo / Justificación de la modificación <span class="required">*</span></span>
+        <span class="char-count" [class.char-ok]="motivo.trim().length >= 5">
+          {{ motivo.trim().length }} / 300 caracteres
+        </span>
+      </label>
+      <textarea
+        class="form-control justification-textarea"
+        rows="4"
+        maxlength="300"
+        [(ngModel)]="motivo"
+        (input)="error = ''"
+        placeholder="Ej: Cliente solicitó cambiar el plato por confusión en la comanda..."
+        autofocus
+      ></textarea>
+      <div *ngIf="error" class="error-msg mt-1">
+        <mat-icon class="mini-icon">error_outline</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+      <small class="hint-text mt-1 d-block" *ngIf="!error">
+        Esta justificación quedará registrada permanentemente en la auditoría de ventas y en los movimientos de Kardex.
+      </small>
+    </div>
+  </div>
+
+  <!-- Pie / Acciones -->
+  <div class="modal-footer">
+    <button type="button" class="btn-cancel" (click)="cancelar()">
+      Cancelar
+    </button>
+    <button 
+      type="button" 
+      class="btn-confirm" 
+      [disabled]="!motivo || motivo.trim().length < 5" 
+      (click)="confirmar()">
+      <mat-icon>check_circle</mat-icon>
+      <span>Confirmar y Actualizar</span>
+    </button>
+  </div>
+</div>

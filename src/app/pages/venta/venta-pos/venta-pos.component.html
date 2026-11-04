@@ -43,7 +43,7 @@
       <!-- Indicador de Total Rápido -->
       <div class="topbar-total-pill">
         <span class="pill-label">Total:</span>
-        <span class="pill-val">S/ {{ totalVenta | number:'1.2-2' }}</span>
+        <span class="pill-val">$/ {{ totalVenta | number:'1.2-2' }}</span>
       </div>
 
       <!-- Botón de Cobro Directo en Cabecera -->
@@ -55,7 +55,7 @@
         [disabled]="!esValidoParaCobrar || guardando || !hayCajaAperturada"
         [matTooltip]="!hayCajaAperturada ? 'Debe aperturar una caja antes de cobrar' : 'Confirmar y procesar venta'">
         <mat-icon>{{ !hayCajaAperturada ? 'lock' : 'check_circle' }}</mat-icon>
-        <span>{{ !hayCajaAperturada ? 'Caja Cerrada' : ('Cobrar (S/ ' + (totalVenta | number:'1.2-2') + ')') }}</span>
+        <span>{{ !hayCajaAperturada ? 'Caja Cerrada' : ('Cobrar ($/ ' + (totalVenta | number:'1.2-2') + ')') }}</span>
       </button>
     </div>
   </header>
@@ -199,7 +199,7 @@
                 <div class="product-code text-muted" *ngIf="prod.codigo">{{ prod.codigo }}</div>
                 
                 <div class="product-footer">
-                  <div class="product-price">S/ {{ prod.precio | number:'1.2-2' }}</div>
+                  <div class="product-price">$/ {{ prod.precio | number:'1.2-2' }}</div>
                   <button type="button" class="btn-add-circle" matTooltip="Agregar al ticket">
                     <mat-icon>add</mat-icon>
                   </button>
@@ -254,7 +254,7 @@
               <div class="ticket-row-main">
                 <div class="ticket-row-title">{{ item.nombre }}</div>
                 <div class="ticket-row-meta">
-                  <span class="ticket-unit-price">S/ {{ item.precio | number:'1.2-2' }} c/u</span>
+                  <span class="ticket-unit-price">$/ {{ item.precio | number:'1.2-2' }} c/u</span>
                   <span *ngIf="item.controlStock" class="text-muted">&bull; Disp: {{ item.stock }}</span>
                 </div>
               </div>
@@ -278,7 +278,7 @@
 
               <!-- Subtotal -->
               <div class="ticket-subtotal">
-                S/ {{ item.subtotal | number:'1.2-2' }}
+                $/ {{ item.subtotal | number:'1.2-2' }}
               </div>
 
               <!-- Botón Eliminar -->
@@ -364,24 +364,24 @@
 
             <!-- Panel de Efectivo y Vuelto -->
             <div *ngIf="pagoCon === 'EF'" class="cash-calculator-card mb-3">
-              <label class="form-label-pos">Monto Recibido en Efectivo (S/)</label>
+              <label class="form-label-pos">Monto Recibido en Efectivo ($/)</label>
 
               <!-- Botones sugeridos -->
               <div class="quick-cash-buttons mb-2">
                 <button type="button" class="btn-quick-cash exact" (click)="setMontoSugerido(totalVenta)">
-                  Exacto (S/ {{ totalVenta | number:'1.2-2' }})
+                  Exacto ($/ {{ totalVenta | number:'1.2-2' }})
                 </button>
                 <button *ngIf="totalVenta <= 20" type="button" class="btn-quick-cash" (click)="setMontoSugerido(20)">
-                  S/ 20
+                  $/ 20
                 </button>
                 <button *ngIf="totalVenta <= 50" type="button" class="btn-quick-cash" (click)="setMontoSugerido(50)">
-                  S/ 50
+                  $/ 50
                 </button>
                 <button *ngIf="totalVenta <= 100" type="button" class="btn-quick-cash" (click)="setMontoSugerido(100)">
-                  S/ 100
+                  $/ 100
                 </button>
                 <button type="button" class="btn-quick-cash" (click)="setMontoSugerido(200)">
-                  S/ 200
+                  $/ 200
                 </button>
               </div>
 
@@ -404,7 +404,7 @@
                   <div class="change-display-box" [class.change-positive]="vuelto > 0" [class.change-negative]="montoEfectivo !== null && montoEfectivo < totalVenta">
                     <span class="change-label">Vuelto a entregar:</span>
                     <span class="change-amount">
-                      S/ {{ (montoEfectivo !== null && montoEfectivo >= totalVenta ? vuelto : 0) | number:'1.2-2' }}
+                      $/ {{ (montoEfectivo !== null && montoEfectivo >= totalVenta ? vuelto : 0) | number:'1.2-2' }}
                     </span>
                   </div>
                 </div>
@@ -412,7 +412,7 @@
 
               <div *ngIf="montoEfectivo !== null && montoEfectivo < totalVenta" class="alert-insufficient-cash mt-2">
                 <mat-icon>warning</mat-icon>
-                <span>Faltan S/ {{ (totalVenta - montoEfectivo) | number:'1.2-2' }} para cubrir el total</span>
+                <span>Faltan $/ {{ (totalVenta - montoEfectivo) | number:'1.2-2' }} para cubrir el total</span>
               </div>
             </div>
 
@@ -445,7 +445,7 @@
           <div class="checkout-footer-card">
             <div class="checkout-total-row">
               <span class="label">TOTAL A COBRAR</span>
-              <span class="val">S/ {{ totalVenta | number:'1.2-2' }}</span>
+              <span class="val">$/ {{ totalVenta | number:'1.2-2' }}</span>
             </div>
 
             <button 
@@ -457,7 +457,7 @@
               <mat-icon *ngIf="!guardando && hayCajaAperturada">check_circle</mat-icon>
               <mat-icon *ngIf="!guardando && !hayCajaAperturada">lock</mat-icon>
               <mat-icon *ngIf="guardando" class="spin-icon">refresh</mat-icon>
-              <span *ngIf="!guardando && hayCajaAperturada">COBRAR Y REGISTRAR VENTA (S/ {{ totalVenta | number:'1.2-2' }})</span>
+              <span *ngIf="!guardando && hayCajaAperturada">COBRAR Y REGISTRAR VENTA ($/ {{ totalVenta | number:'1.2-2' }})</span>
               <span *ngIf="!guardando && !hayCajaAperturada">VENTAS DESHABILITADAS: APERTURAR CAJA</span>
               <span *ngIf="guardando">PROCESANDO COBRO...</span>
             </button>

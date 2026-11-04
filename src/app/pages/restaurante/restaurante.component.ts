@@ -18,6 +18,7 @@ export interface MesaItem {
   cliente: string;
   montoTotal: number;
   state: number;
+  estadoServicio?: 'PENDIENTE' | 'SERVIDO' | string;
 }
 
 @Component({
@@ -48,7 +49,7 @@ export class RestauranteComponent implements OnInit {
   mDisponible: number = 0;
   mTotal: number = 0;
   mPendientes: number = 0;
-  mAtendidas: number = 0;
+  mServidas: number = 0;
   tasaOcupacion: number = 0;
 
   filtroActual: string = 'todas';
@@ -81,7 +82,7 @@ export class RestauranteComponent implements OnInit {
     this.mOcupadas = 0;
     this.mDisponible = 0;
     this.mPendientes = 0;
-    this.mAtendidas = 0;
+    this.mServidas = 0;
 
     this.mesaService.listMesas().subscribe({
       next: (data: MesaItem[]) => {
@@ -92,8 +93,8 @@ export class RestauranteComponent implements OnInit {
         this.mesas.forEach((item) => {
           if (item.disponible === 0) {
             this.mOcupadas++;
-            if (item.state === 1) {
-              this.mAtendidas++;
+            if (item.estadoServicio === 'SERVIDO') {
+              this.mServidas++;
             } else {
               this.mPendientes++;
             }
@@ -133,9 +134,9 @@ export class RestauranteComponent implements OnInit {
     } else if (this.filtroActual === 'ocupadas') {
       resultado = resultado.filter(m => m.disponible === 0);
     } else if (this.filtroActual === 'pendientes') {
-      resultado = resultado.filter(m => m.disponible === 0 && m.state !== 1);
-    } else if (this.filtroActual === 'atendidas') {
-      resultado = resultado.filter(m => m.disponible === 0 && m.state === 1);
+      resultado = resultado.filter(m => m.disponible === 0 && m.estadoServicio !== 'SERVIDO');
+    } else if (this.filtroActual === 'servidas') {
+      resultado = resultado.filter(m => m.disponible === 0 && m.estadoServicio === 'SERVIDO');
     }
 
     // Filtro por texto de búsqueda (nombre de mesa o cliente)
