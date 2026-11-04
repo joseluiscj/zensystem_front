@@ -100,9 +100,9 @@ padding: 8px 16px;
     display: none;
 }
 @media (max-width: 600px){
-    .content_body_web{
+    /* .content_body_web{
         display: none;
-    }
+    } */
     .content_body_movil{
         display: block;
     }
