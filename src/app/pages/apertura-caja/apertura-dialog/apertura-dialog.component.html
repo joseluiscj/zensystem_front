@@ -60,8 +60,9 @@
         <div class="col-12 mb-3">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Monto Inicial de Apertura</mat-label>
-            <input matInput type="number" step="0.01" min="0" placeholder="0.00" formControlName="aMonto" autocomplete="off">
-            <mat-icon matSuffix>attach_money</mat-icon>
+            <input matInput type="text" inputmode="decimal" placeholder="0.00" formControlName="aMonto" (blur)="formatearAMonto()" autocomplete="off" class="text-end font-monospace">
+            <span matPrefix class="currency-prefix">S/&nbsp;</span>
+            <mat-icon matSuffix>point_of_sale</mat-icon>
             <mat-hint>Efectivo inicial en gaveta para dar vuelto.</mat-hint>
             <mat-error *ngIf="basicForm.controls['aMonto'].hasError('required')">
               El monto inicial es obligatorio.

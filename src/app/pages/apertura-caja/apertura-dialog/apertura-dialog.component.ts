@@ -46,7 +46,7 @@ export class AperturaDialogComponent implements OnInit {
     this.basicForm = new UntypedFormGroup({
       idCaja: new UntypedFormControl('', [Validators.required]),
       idUsuario: new UntypedFormControl('', [Validators.required]),
-      aMonto: new UntypedFormControl(0.00, [Validators.required, Validators.min(0)]),
+      aMonto: new UntypedFormControl('0.00', [Validators.required, Validators.min(0)]),
     });
   }
 
@@ -63,8 +63,8 @@ export class AperturaDialogComponent implements OnInit {
           if (this.cajasDisponibles.length > 0) {
             this.basicForm.controls['idCaja'].setValue(this.cajasDisponibles[0].id);
             // Prellenar saldo anterior de la caja si existe
-            if (this.cajasDisponibles[0].saldo) {
-              this.basicForm.controls['aMonto'].setValue(parseFloat(this.cajasDisponibles[0].saldo));
+            if (this.cajasDisponibles[0].saldo !== undefined && this.cajasDisponibles[0].saldo !== null) {
+              this.basicForm.controls['aMonto'].setValue(parseFloat(this.cajasDisponibles[0].saldo || 0).toFixed(2));
             }
           }
 
@@ -87,9 +87,15 @@ export class AperturaDialogComponent implements OnInit {
 
   onCajaSelected(idCaja: number) {
     const seleccionada = this.cajasDisponibles.find(c => c.id === idCaja);
-    if (seleccionada && seleccionada.saldo) {
-      this.basicForm.controls['aMonto'].setValue(parseFloat(seleccionada.saldo));
+    if (seleccionada && seleccionada.saldo !== undefined && seleccionada.saldo !== null) {
+      this.basicForm.controls['aMonto'].setValue(parseFloat(seleccionada.saldo || 0).toFixed(2));
     }
+  }
+
+  formatearAMonto(): void {
+    const raw = this.basicForm.controls['aMonto'].value;
+    const val = parseFloat(String(raw !== null && raw !== undefined ? raw : 0).replace(',', '.'));
+    this.basicForm.controls['aMonto'].setValue((isNaN(val) || val < 0 ? 0 : val).toFixed(2));
   }
 
   save() {
@@ -98,11 +104,12 @@ export class AperturaDialogComponent implements OnInit {
       return;
     }
 
+    const aMontoVal = parseFloat(String(this.basicForm.controls['aMonto'].value || 0).replace(',', '.'));
     this.isButtonDisabled = true;
     const payload = {
       idCaja: this.basicForm.controls['idCaja'].value,
       idUsuario: this.basicForm.controls['idUsuario'].value,
-      aMonto: parseFloat(this.basicForm.controls['aMonto'].value || 0)
+      aMonto: Math.round((isNaN(aMontoVal) || aMontoVal < 0 ? 0 : aMontoVal) * 100) / 100
     };
 
     this.aperturaService.aperturar(payload).subscribe({

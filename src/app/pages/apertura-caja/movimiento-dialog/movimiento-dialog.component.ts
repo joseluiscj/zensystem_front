@@ -120,17 +120,28 @@ export class MovimientoDialogComponent implements OnInit {
     this.mostrarNuevoMovimiento = !this.mostrarNuevoMovimiento;
   }
 
+  formatearMonto(): void {
+    const raw = this.movimientoForm.controls['monto'].value;
+    if (raw !== null && raw !== undefined && String(raw).trim() !== '') {
+      const val = parseFloat(String(raw).replace(',', '.'));
+      if (!isNaN(val) && val >= 0) {
+        this.movimientoForm.controls['monto'].setValue(val.toFixed(2));
+      }
+    }
+  }
+
   guardarMovimiento() {
     if (this.movimientoForm.invalid) {
       this.snackBar.open('Complete los datos del movimiento', 'Aviso', { duration: 3000 });
       return;
     }
 
+    const montoVal = parseFloat(String(this.movimientoForm.controls['monto'].value || 0).replace(',', '.'));
     this.isSaving = true;
     const payload = {
       idCajaDetalle: this.data.idCajaDetalle,
       tipo: this.movimientoForm.controls['tipo'].value,
-      monto: parseFloat(this.movimientoForm.controls['monto'].value),
+      monto: Math.round((isNaN(montoVal) || montoVal < 0 ? 0 : montoVal) * 100) / 100,
       descripcion: this.movimientoForm.controls['descripcion'].value,
       metodoPago: this.movimientoForm.controls['metodoPago'].value
     };

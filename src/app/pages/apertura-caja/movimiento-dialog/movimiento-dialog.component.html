@@ -34,7 +34,7 @@
           <span class="kpi-mini-label">Ingresos (+)</span>
           <mat-icon class="kpi-mini-icon">south_west</mat-icon>
         </div>
-        <div class="kpi-mini-val text-success">+S/ {{ totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-val text-success">+$/{{ totalIngresos | number:'1.2-2' }}</div>
         <div class="kpi-mini-sub">{{ conteoIngresos }} registro(s)</div>
       </div>
 
@@ -44,7 +44,7 @@
           <span class="kpi-mini-label">Egresos (-)</span>
           <mat-icon class="kpi-mini-icon">north_east</mat-icon>
         </div>
-        <div class="kpi-mini-val text-danger">-S/ {{ totalEgresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-val text-danger">-$/{{ totalEgresos | number:'1.2-2' }}</div>
         <div class="kpi-mini-sub">{{ conteoEgresos }} registro(s)</div>
       </div>
 
@@ -55,7 +55,7 @@
           <mat-icon class="kpi-mini-icon">account_balance_wallet</mat-icon>
         </div>
         <div class="kpi-mini-val" [ngClass]="{'text-success': balanceNeto >= 0, 'text-danger': balanceNeto < 0}">
-          S/ {{ balanceNeto | number:'1.2-2' }}
+          $/{{ balanceNeto | number:'1.2-2' }}
         </div>
         <div class="kpi-mini-sub">En este turno</div>
       </div>
@@ -109,17 +109,18 @@
         <!-- Fila: Monto y Método de Pago -->
         <div class="row g-2 mb-2">
           <div class="col-6">
-            <label class="form-label-custom">Monto (S/)</label>
+            <label class="form-label-custom">Monto ($/)</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <input 
                 matInput 
-                type="number" 
-                step="0.01" 
-                min="0.01" 
+                type="text" 
+                inputmode="decimal" 
                 placeholder="0.00" 
                 formControlName="monto"
+                (blur)="formatearMonto()"
+                class="text-end font-monospace"
                 required>
-              <span matPrefix class="currency-prefix">S/&nbsp;</span>
+              <span matPrefix class="currency-prefix">$/&nbsp;</span>
             </mat-form-field>
           </div>
           <div class="col-6">
@@ -184,7 +185,7 @@
         <span class="history-title">Historial</span>
       </div>
 
-      <!-- Filtro tipo pestañas/chips -->
+      <!-- Filtro tipo pestaña$/chips -->
       <div class="filter-chips-group">
         <button 
           type="button" 
@@ -257,7 +258,7 @@
         <!-- Monto a la derecha -->
         <div class="movement-right-amount">
           <span class="amount-text" [ngClass]="{'amount-in': m.tipo === 'I', 'amount-out': m.tipo === 'E'}">
-            {{ m.tipo === 'I' ? '+' : '-' }}S/ {{ m.monto | number:'1.2-2' }}
+            {{ m.tipo === 'I' ? '+' : '-' }}$/ {{ m.monto | number:'1.2-2' }}
           </span>
           <span class="amount-date-sub">{{ m.created_at | date:'dd/MM' }}</span>
         </div>

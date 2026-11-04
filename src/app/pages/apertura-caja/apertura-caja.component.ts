@@ -111,12 +111,18 @@ export class AperturaCajaComponent implements OnInit {
   }
 
   createTable(data: CajaDetalle[]): void {
-    this.dataSource = new MatTableDataSource(data);
+    const list = (data || []).map(item => ({
+      ...item,
+      cajaNombre: item.cajaNombre || (item as any).caja || 'Caja',
+      usuarioNombre: item.usuarioNombre || (item as any).usuario || 'Sistema',
+      sucursalNombre: item.sucursalNombre || ''
+    }));
+    this.dataSource = new MatTableDataSource(list);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.dataMovil = data;
+    this.dataMovil = list;
     this.cargaContenido = false;
-    this.calcularTotales(data);
+    this.calcularTotales(list);
     this.updatePaginatedItems();
   }
 
@@ -146,7 +152,7 @@ export class AperturaCajaComponent implements OnInit {
       disableClose: true,
       data: { 
         idCajaDetalle: item.id || item.idCajaDetalle,
-        cajaNombre: item.cajaNombre,
+        cajaNombre: item.cajaNombre || (item as any).caja,
         aMonto: item.aMonto
       },
       panelClass: 'modal-dialog-right'
@@ -165,7 +171,7 @@ export class AperturaCajaComponent implements OnInit {
       disableClose: false,
       data: {
         idCajaDetalle: item.id || item.idCajaDetalle,
-        cajaNombre: item.cajaNombre,
+        cajaNombre: item.cajaNombre || (item as any).caja,
         state: item.state
       },
       // panelClass: 'modal-dialog-responsive'

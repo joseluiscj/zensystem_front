@@ -2,10 +2,14 @@ export interface CajaDetalle {
     id?: number;
     idCajaDetalle?: number;
     idCaja: number;
+    caja?: string;
     cajaNombre?: string;
     moneda?: string;
+    tipoCaja?: string;
     idUsuario?: number;
+    usuario?: string;
     usuarioNombre?: string;
+    rolNombre?: string;
     sucursalNombre?: string;
     aFecha: string;
     aMonto: number;
