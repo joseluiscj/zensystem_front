@@ -426,14 +426,14 @@
         <!-- Tarjeta de Totales y Botón de Registro -->
         <div class="col-12 col-lg-5">
           <div class="totals-summary-box p-3 rounded bg-light border">
-            <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
+            <!-- <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
               <span class="text-muted">Subtotal (sin IGV):</span>
               <span class="fw-semibold">$/ {{ subtotalSinIgv | number:'1.2-2' }}</span>
             </div>
             <div class="d-flex justify-content-between mb-1" *ngIf="compraForm.get('tipoComprobante')?.value === 'FACTURA'">
               <span class="text-muted">IGV (18%):</span>
               <span class="fw-semibold">$/ {{ igvMonto | number:'1.2-2' }}</span>
-            </div>
+            </div> -->
             <div class="d-flex justify-content-between fs-4 border-top pt-2 mb-3">
               <span class="fw-bold text-dark">TOTAL COMPRA:</span>
               <span class="fw-bold text-primary">$/ {{ totalCompra | number:'1.2-2' }}</span>

@@ -207,7 +207,7 @@
               </div>
             </th>
             <th class="text-center">Stock Alm. Principal</th>
-            <th class="text-center">Stock Total</th>
+            <th class="text-center" *ngIf="almacenes.length>1">Stock Total</th>
             <th class="text-center">Mínimo (Alm. Principal)</th>
             <th class="text-center">Acciones ERP</th>
           </tr>
@@ -265,7 +265,7 @@
             </td>
 
             <!-- Stock Total (Suma de todo lo que hay en todos los almacenes) -->
-            <td class="text-center">
+            <td class="text-center" *ngIf="almacenes.length>1">
               <div class="stock-total-badge" matTooltip="Suma de existencias de este producto en todos los almacenes">
                 <mat-icon>inventory_2</mat-icon>
                 <strong>{{ getStockTotal(prod) | number:'1.2-2' }}</strong>
@@ -298,6 +298,7 @@
               <div class="actions-group">
                 <!-- Botón Traspaso entre almacenes -->
                 <button type="button" class="btn-action-mini btn-traspaso" 
+                  *ngIf="almacenes.length>1"
                   matTooltip="Traspasar este producto entre Almacén A y B" 
                   [disabled]="prod.stock <= 0"
                   (click)="abrirTraspaso(prod)">
