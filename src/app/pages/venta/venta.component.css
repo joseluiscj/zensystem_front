@@ -2511,3 +2511,414 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+
+/* ============================================================
+   OPTIMIZACIONES PARA LAPTOPS Y PANTALLAS REDUCIDAS
+   BOTÓN DE COBRO DIRECTO AL ENTRAR AL LISTADO (SIN SCROLL)
+   ============================================================ */
+
+/* 1. Columna de Cobro Directo (Extremo Izquierdo & Sticky) */
+.th-cobro-directo,
+.td-cobro-directo {
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 5;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.05);
+  min-width: 110px;
+  width: 110px;
+}
+
+.ventas-modern-table thead .th-cobro-directo {
+  background: #f8fafc;
+  z-index: 6;
+}
+
+.table-row-item:hover .td-cobro-directo {
+  background: #f8fafc;
+}
+
+.table-row-item.row-por-cobrar .td-cobro-directo {
+  background: #fffdf5;
+}
+
+.table-row-item.row-por-cobrar:hover .td-cobro-directo {
+  background: #fef9e7;
+}
+
+/* Botón Prominente "PAGAR" */
+.btn-cobrar-inmediato {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.btn-cobrar-inmediato:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 5px 12px rgba(16, 185, 129, 0.45);
+}
+
+.icon-cobrar-btn {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+}
+
+.txt-cobrar-btn {
+  line-height: 1;
+}
+
+/* Botón Pill "Cobrado" */
+.btn-pagado-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-pagado-pill:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.icon-check-btn {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  color: #16a34a;
+}
+
+.txt-pagado-btn {
+  line-height: 1;
+}
+
+/* 2. Columna de Opciones Secundarias (Extremo Derecho & Sticky) */
+.th-acciones,
+.td-acciones {
+  position: sticky;
+  right: 0;
+  background: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.ventas-modern-table thead .th-acciones {
+  background: #f8fafc;
+  z-index: 5;
+}
+
+.table-row-item:hover .td-acciones {
+  background: #f8fafc;
+}
+
+.table-row-item.row-por-cobrar .td-acciones {
+  background: #fffdf5;
+}
+
+.table-row-item.row-por-cobrar:hover .td-acciones {
+  background: #fef9e7;
+}
+
+/* Fila de Venta Pendiente */
+.table-row-item.row-por-cobrar {
+  background: #fffdf5;
+  cursor: pointer;
+}
+
+.table-row-item.row-por-cobrar:hover {
+  background: #fef9e7 !important;
+}
+
+.amount-pending {
+  color: #d97706 !important;
+  font-size: 1.05rem;
+}
+
+/* 3. Barra de Filtros Compacta / Rápida */
+.filter-quick-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-chips-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.chip-btn.chip-active {
+  background: #113c68;
+  color: #ffffff;
+  border-color: #113c68;
+  box-shadow: 0 2px 6px rgba(17, 60, 104, 0.25);
+}
+
+.chip-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Chip de Pendientes Resaltado */
+.chip-pendientes.chip-has-pendientes {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.chip-pendientes.chip-has-pendientes.chip-active {
+  background: #d97706;
+  color: #ffffff;
+  border-color: #d97706;
+}
+
+.chip-badge {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 2px;
+}
+
+/* Buscador Rápido */
+.quick-search-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  transition: all 0.2s;
+}
+
+.quick-search-wrapper:focus-within {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.search-lead-icon {
+  color: #94a3b8;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.quick-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 0.82rem;
+  color: #1e293b;
+}
+
+.btn-clear-quick {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.btn-clear-quick mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.btn-quick-go {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-quick-go mat-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+}
+
+/* Herramientas Rápidas */
+.quick-actions-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-toggle-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-toggle-filters:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.btn-toggle-filters.btn-filters-open {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.toggle-arrow {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-reset-quick {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reset-quick:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.btn-reset-quick mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Panel Avanzado */
+.filter-advanced-panel {
+  border-top: 1px dashed #e2e8f0;
+}
+
+/* 4. Adaptaciones Específicas para Laptops y Pantallas Pequeñas */
+@media (max-width: 1400px), (max-height: 850px) {
+  .ventas-hero-banner {
+    padding: 12px 18px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .hero-icon-box {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .hero-icon-box mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .hero-title {
+    font-size: 1.22rem !important;
+  }
+
+  .hero-subtitle {
+    display: none !important;
+  }
+
+  .ventas-filter-card {
+    padding: 10px 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .ventas-modern-table th,
+  .ventas-modern-table td {
+    padding: 8px 10px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .btn-cobrar-inmediato {
+    padding: 5px 11px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .btn-action {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .btn-action mat-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+  }
+}

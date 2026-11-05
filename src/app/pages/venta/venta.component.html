@@ -122,96 +122,139 @@
       </div> -->
     </div>
 
-    <!-- BARRA DE FILTROS AVANZADOS -->
-    <div class="ventas-filter-card mb-4">
-      <div class="filter-card-header">
-        <div class="filter-header-left">
-          <mat-icon class="filter-icon">tune</mat-icon>
-          <span class="filter-header-title">Filtros de Búsqueda</span>
-        </div>
-        <div class="filter-header-right">
+    <!-- BARRA DE FILTROS OPTIMIZADA Y COMPACTA (APTA PARA LAPTOPS) -->
+    <div class="ventas-filter-card mb-3">
+      <!-- Fila de Acceso Rápido (Compacta) -->
+      <div class="filter-quick-bar">
+        <!-- Chips de Acceso Rápido -->
+        <div class="quick-chips-group">
           <button 
             type="button" 
-            class="btn-today-quick" 
-            [class.btn-today-active]="esFiltroHoy" 
-            (click)="filtrarHoy()">
-            <mat-icon>today</mat-icon> Hoy
+            class="chip-btn" 
+            [class.chip-active]="filtros.state === 'todos' && !esFiltroHoy" 
+            (click)="filtrarTodos()">
+            <mat-icon class="chip-icon">list_alt</mat-icon>
+            <span>Todas</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="chip-btn chip-pendientes" 
+            [class.chip-active]="filtros.state === '0'" 
+            [class.chip-has-pendientes]="(resumen.totalPendientes || 0) > 0" 
+            (click)="filtrarPendientes()"
+            matTooltip="Ver solo ventas y comandas pendientes de cobro">
+            <mat-icon class="chip-icon">hourglass_top</mat-icon>
+            <span>Por Cobrar</span>
+            <span class="chip-badge" *ngIf="(resumen.totalPendientes || 0) > 0">{{ resumen.totalPendientes }}</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="chip-btn" 
+            [class.chip-active]="esFiltroHoy && filtros.state === 'todos'" 
+            (click)="filtrarHoy()"
+            matTooltip="Ver ventas de hoy">
+            <mat-icon class="chip-icon">today</mat-icon>
+            <span>Hoy</span>
+          </button>
+        </div>
+
+        <!-- Buscador Rápido -->
+        <div class="quick-search-wrapper">
+          <mat-icon class="search-lead-icon">search</mat-icon>
+          <input 
+            type="text" 
+            class="quick-search-input" 
+            [(ngModel)]="filtros.search" 
+            (keyup.enter)="aplicarFiltros()" 
+            placeholder="Buscar por cliente o # orden..." />
+          <button type="button" class="btn-clear-quick" *ngIf="filtros.search" (click)="filtros.search = ''; aplicarFiltros()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <button type="button" class="btn-quick-go" (click)="aplicarFiltros()" matTooltip="Buscar">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+
+        <!-- Botones de Utilidad -->
+        <div class="quick-actions-tools">
+          <button 
+            type="button" 
+            class="btn-toggle-filters" 
+            [class.btn-filters-open]="mostrarFiltrosAvanzados" 
+            (click)="toggleFiltrosAvanzados()" 
+            matTooltip="Filtros avanzados (Fechas, Mesas, Pago)">
+            <mat-icon>tune</mat-icon>
+            <span class="d-none d-md-inline">Filtros</span>
+            <mat-icon class="toggle-arrow">{{ mostrarFiltrosAvanzados ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+
+          <button type="button" class="btn-reset-quick" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+            <mat-icon>restart_alt</mat-icon>
           </button>
         </div>
       </div>
 
-      <div class="filter-grid-layout">
-        <!-- Rango de Fechas -->
-        <div class="filter-field">
-          <label class="field-label">
-            <mat-icon>calendar_today</mat-icon> Desde
-          </label>
-          <input type="date" class="form-input" [(ngModel)]="filtros.fechaInicio" (change)="aplicarFiltros()" />
-        </div>
+      <!-- Sección Desplegable de Filtros Avanzados -->
+      <div class="filter-advanced-panel mt-3 pt-3" *ngIf="mostrarFiltrosAvanzados">
+        <div class="filter-grid-layout">
+          <!-- Rango de Fechas -->
+          <div class="filter-field">
+            <label class="field-label">
+              <mat-icon>calendar_today</mat-icon> Desde
+            </label>
+            <input type="date" class="form-input" [(ngModel)]="filtros.fechaInicio" (change)="aplicarFiltros()" />
+          </div>
 
-        <div class="filter-field">
-          <label class="field-label">
-            <mat-icon>event</mat-icon> Hasta
-          </label>
-          <input type="date" class="form-input" [(ngModel)]="filtros.fechaFin" (change)="aplicarFiltros()" />
-        </div>
+          <div class="filter-field">
+            <label class="field-label">
+              <mat-icon>event</mat-icon> Hasta
+            </label>
+            <input type="date" class="form-input" [(ngModel)]="filtros.fechaFin" (change)="aplicarFiltros()" />
+          </div>
 
-        <!-- Estado de la Venta -->
-        <div class="filter-field">
-          <label class="field-label">
-            <mat-icon>flag</mat-icon> Estado Cobranza
-          </label>
-          <select class="form-select" [(ngModel)]="filtros.state" (change)="aplicarFiltros()">
-            <option value="todos">Todos los Estados</option>
-            <option value="1">Cobrado / Atendido</option>
-            <option value="0">Pendiente por Cobrar</option>
-          </select>
-        </div>
+          <!-- Estado de la Venta -->
+          <div class="filter-field">
+            <label class="field-label">
+              <mat-icon>flag</mat-icon> Estado Cobranza
+            </label>
+            <select class="form-select" [(ngModel)]="filtros.state" (change)="aplicarFiltros()">
+              <option value="todos">Todos los Estados</option>
+              <option value="1">Cobrado / Atendido</option>
+              <option value="0">Pendiente por Cobrar</option>
+            </select>
+          </div>
 
-        <!-- Método de Pago -->
-        <div class="filter-field">
-          <label class="field-label">
-            <mat-icon>payments</mat-icon> Medio de Pago
-          </label>
-          <select class="form-select" [(ngModel)]="filtros.pagoCon" (change)="aplicarFiltros()">
-            <option value="todos">Todos los Medios</option>
-            <option value="EF">💵 Efectivo en Caja</option>
-            <option value="TA">💳 Tarjeta Débito/Crédito</option>
-          </select>
-        </div>
+          <!-- Método de Pago -->
+          <div class="filter-field">
+            <label class="field-label">
+              <mat-icon>payments</mat-icon> Medio de Pago
+            </label>
+            <select class="form-select" [(ngModel)]="filtros.pagoCon" (change)="aplicarFiltros()">
+              <option value="todos">Todos los Medios</option>
+              <option value="EF">💵 Efectivo en Caja</option>
+              <option value="TA">💳 Tarjeta Débito/Crédito</option>
+            </select>
+          </div>
 
-        <!-- Mesa -->
-        <div class="filter-field" *ngIf="mesasCatalogo.length > 0">
-          <label class="field-label">
-            <mat-icon>table_restaurant</mat-icon> Mesa
-          </label>
-          <select class="form-select" [(ngModel)]="filtros.idMesa" (change)="aplicarFiltros()">
-            <option value="todos">Todas las Mesas</option>
-            <option *ngFor="let m of mesasCatalogo" [value]="m.id || m.idMesa">{{ m.nombre || m.f_nombre }}</option>
-          </select>
-        </div>
+          <!-- Mesa -->
+          <div class="filter-field" *ngIf="mesasCatalogo.length > 0">
+            <label class="field-label">
+              <mat-icon>table_restaurant</mat-icon> Mesa
+            </label>
+            <select class="form-select" [(ngModel)]="filtros.idMesa" (change)="aplicarFiltros()">
+              <option value="todos">Todas las Mesas</option>
+              <option *ngFor="let m of mesasCatalogo" [value]="m.id || m.idMesa">{{ m.nombre || m.f_nombre }}</option>
+            </select>
+          </div>
 
-        <!-- Búsqueda por texto -->
-        <div class="filter-field field-search">
-          <label class="field-label">
-            <mat-icon>search</mat-icon> Buscar Cliente / # Orden
-          </label>
-          <div class="search-input-wrap">
-            <input type="text" class="form-input search-box" [(ngModel)]="filtros.search" (keyup.enter)="aplicarFiltros()" placeholder="Nombre de cliente o # orden..." />
-            <button type="button" class="btn-clear-search" *ngIf="filtros.search" (click)="filtros.search = ''; aplicarFiltros()">
-              <mat-icon>close</mat-icon>
+          <!-- Botón Aplicar en panel avanzado -->
+          <div class="filter-actions-col">
+            <button type="button" class="btn-apply-filter" (click)="aplicarFiltros()">
+              <mat-icon>filter_alt</mat-icon> Aplicar
             </button>
           </div>
-        </div>
-
-        <!-- Botones de Acción -->
-        <div class="filter-actions-col">
-          <button type="button" class="btn-apply-filter" (click)="aplicarFiltros()">
-            <mat-icon>filter_alt</mat-icon> Filtrar
-          </button>
-          <button type="button" class="btn-reset-filter" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
-            <mat-icon>restart_alt</mat-icon>
-          </button>
         </div>
       </div>
     </div>
@@ -228,31 +271,48 @@
         <table class="ventas-modern-table">
           <thead>
             <tr>
-              <th class="th-id">Orden</th>
-              <th class="th-fecha">Fecha y Hora</th>
-              <th class="th-mesa">Mesa</th>
-              <th class="th-cliente">Cliente</th>
-              <th class="th-productos">Comanda / Platos</th>
-              <th class="th-pago">Medio Pago</th>
+              <!-- COLUMNA 1: COBRAR DIRECTO (EXTREMO IZQUIERDO Y STICKY) -->
+              <th class="th-cobro-directo text-center">Cobro</th>
+              <th class="th-mesa">Mesa / Canal</th>
               <th class="th-total text-right">Total</th>
               <th class="th-estado text-center">Estado</th>
-              <th class="th-acciones text-center">Acciones</th>
+              <th class="th-cliente">Cliente</th>
+              <th class="th-id">Orden</th>
+              <th class="th-productos">Comanda / Platos</th>
+              <th class="th-pago">Medio Pago</th>
+              <th class="th-fecha">Fecha y Hora</th>
+              <th class="th-acciones text-center">Opciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let v of ventasPaginadas" class="table-row-item">
-              <!-- ID -->
-              <td class="td-id">
-                <span class="badge-order-id">#{{ v.idPedido }}</span>
+            <tr *ngFor="let v of ventasPaginadas" class="table-row-item" [class.row-por-cobrar]="v.state !== 1" (click)="onRowClick(v)">
+              
+              <!-- 1. BOTÓN DE COBRO DIRECTO (EXTREMO IZQUIERDO) -->
+              <td class="td-cobro-directo text-center" (click)="$event.stopPropagation()">
+                <!-- Si está pendiente: Botón prominente de Pagar -->
+                <button 
+                  *ngIf="v.state !== 1" 
+                  type="button" 
+                  class="btn-cobrar-inmediato" 
+                  (click)="abrirCobroMesa(v)" 
+                  matTooltip="Pagar / Cobrar comanda y liberar mesa">
+                  <mat-icon class="icon-cobrar-btn">point_of_sale</mat-icon>
+                  <span class="txt-cobrar-btn">PAGAR</span>
+                </button>
+
+                <!-- Si ya fue cobrado: Indicador de cobrado con acceso directo al ticket -->
+                <button 
+                  *ngIf="v.state === 1" 
+                  type="button" 
+                  class="btn-pagado-pill"
+                  (click)="verDetalle(v.idPedido)"
+                  matTooltip="Venta cobrada - Clic para ver comprobante">
+                  <mat-icon class="icon-check-btn">check_circle</mat-icon>
+                  <span class="txt-pagado-btn">Cobrado</span>
+                </button>
               </td>
 
-              <!-- Fecha -->
-              <td class="td-fecha">
-                <span class="fecha-main">{{ v.created_at | date:'dd/MM/yyyy' }}</span>
-                <span class="hora-sub">{{ v.created_at | date:'shortTime':'':'es-ES' }}</span>
-              </td>
-
-              <!-- Mesa -->
+              <!-- 2. Mesa -->
               <td class="td-mesa">
                 <div *ngIf="v.idMesa && v.mesa_nombre !== 'Sin Mesa'" class="d-flex flex-column align-items-start gap-1">
                   <span class="badge-table-name">
@@ -269,7 +329,22 @@
                 </span>
               </td>
 
-              <!-- Cliente -->
+              <!-- 3. Total (Al lado de Mesa y Cobro) -->
+              <td class="td-total text-right">
+                <div class="amount-val font-bold" [class.amount-pending]="v.state !== 1">
+                  $/{{ (v.montoTotal || 0) | number:'1.2-2' }}
+                </div>
+              </td>
+
+              <!-- 4. Estado -->
+              <td class="td-estado text-center">
+                <span class="status-pill" [class.pill-atendido]="v.state === 1" [class.pill-pendiente]="v.state !== 1">
+                  <span class="pill-dot"></span>
+                  {{ v.state === 1 ? 'Cobrado' : 'Por Cobrar' }}
+                </span>
+              </td>
+
+              <!-- 5. Cliente -->
               <td class="td-cliente">
                 <div class="client-name font-bold">{{ v.nombreCliente || 'CONSUMIDOR FINAL' }}</div>
                 <div class="cajero-name text-muted" *ngIf="v.cajero_nombre" style="font-size: 11px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;">
@@ -277,7 +352,12 @@
                 </div>
               </td>
 
-              <!-- Comanda / Platos -->
+              <!-- 6. ID Orden -->
+              <td class="td-id">
+                <span class="badge-order-id">#{{ v.idPedido }}</span>
+              </td>
+
+              <!-- 7. Comanda / Platos -->
               <td class="td-productos">
                 <div class="order-items-summary" [title]="v.resumen_productos || ''">
                   <span class="badge-items-count">{{ v.items_count }} {{ v.items_count === 1 ? 'item' : 'items' }}</span>
@@ -289,7 +369,7 @@
                 </div>
               </td>
 
-              <!-- Medio Pago -->
+              <!-- 8. Medio Pago -->
               <td class="td-pago">
                 <span class="pay-badge" [class.pay-card]="v.pagoCon === 'TA'" [class.pay-cash]="v.pagoCon !== 'TA'">
                   {{ v.pagoCon === 'TA' ? '💳 Tarjeta' : '💵 Efectivo' }}
@@ -300,34 +380,16 @@
                 <div *ngIf="v.caja_nombre" class="caja-subtext text-muted">{{ v.caja_nombre }}</div>
               </td>
 
-              <!-- Total -->
-              <td class="td-total text-right">
-                <div class="amount-val font-bold">$/{{ (v.montoTotal || 0) | number:'1.2-2' }}</div>
+              <!-- 9. Fecha -->
+              <td class="td-fecha">
+                <span class="fecha-main">{{ v.created_at | date:'dd/MM/yyyy' }}</span>
+                <span class="hora-sub">{{ v.created_at | date:'shortTime':'':'es-ES' }}</span>
               </td>
 
-              <!-- Estado -->
-              <td class="td-estado text-center">
-                <span class="status-pill" [class.pill-atendido]="v.state === 1" [class.pill-pendiente]="v.state !== 1">
-                  <span class="pill-dot"></span>
-                  {{ v.state === 1 ? 'Cobrado' : 'Por Cobrar' }}
-                </span>
-              </td>
-
-              <!-- Acciones -->
-              <td class="td-acciones text-center">
+              <!-- 10. Opciones / Acciones Secundarias (Sticky Right) -->
+              <td class="td-acciones text-center" (click)="$event.stopPropagation()">
                 <div class="action-buttons-wrap">
-                  <!-- Cobrar y Liberar Mesa (Directo si está pendiente) -->
-                  <button 
-                    *ngIf="v.state !== 1" 
-                    type="button" 
-                    class="btn-action btn-cobrar-pill" 
-                    (click)="abrirCobroMesa(v)" 
-                    matTooltip="Cobrar consumo y liberar mesa">
-                    <mat-icon>point_of_sale</mat-icon>
-                    <span class="btn-cobrar-txt">Cobrar</span>
-                  </button>
-
-                  <!-- Ver Detalle -->
+                  <!-- Ver Detalle / Ticket -->
                   <button type="button" class="btn-action btn-view" (click)="verDetalle(v.idPedido)" matTooltip="Ver detalle completo / Ticket">
                     <mat-icon>visibility</mat-icon>
                   </button>

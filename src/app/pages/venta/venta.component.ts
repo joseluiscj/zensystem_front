@@ -61,6 +61,7 @@ export class VentaComponent implements OnInit {
   };
 
   esFiltroHoy: boolean = false;
+  mostrarFiltrosAvanzados: boolean = false;
 
   // Catálogo de mesas para el selector de filtros
   mesasCatalogo: any[] = [];
@@ -196,6 +197,26 @@ export class VentaComponent implements OnInit {
     const hoy = this.obtenerFechaHoy();
     this.esFiltroHoy = (this.filtros.fechaInicio === hoy && this.filtros.fechaFin === hoy);
     this.cargarVentas();
+  }
+
+  toggleFiltrosAvanzados(): void {
+    this.mostrarFiltrosAvanzados = !this.mostrarFiltrosAvanzados;
+  }
+
+  filtrarPendientes(): void {
+    this.filtros.state = '0';
+    this.aplicarFiltros();
+  }
+
+  filtrarTodos(): void {
+    this.filtros.state = 'todos';
+    this.aplicarFiltros();
+  }
+
+  onRowClick(v: VentaItem): void {
+    if (v.state !== 1) {
+      this.abrirCobroMesa(v);
+    }
   }
 
   limpiarFiltros(): void {
