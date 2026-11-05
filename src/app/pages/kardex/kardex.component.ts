@@ -9,6 +9,7 @@ import { MaterialModule } from '../../material/material.module';
 import { AlmacenService, KpisKardex, MovimientoAlmacen } from '../../services/almacen.service';
 import { AlmacenMovimientoDialogComponent } from '../almacen/almacen-movimiento-dialog/almacen-movimiento-dialog.component';
 import { AlmacenTraspasoDialogComponent } from '../almacen/almacen-traspaso-dialog/almacen-traspaso-dialog.component';
+import { KardexDetalleDialogComponent } from './kardex-detalle-dialog/kardex-detalle-dialog.component';
 
 @Component({
   selector: 'app-kardex',
@@ -195,5 +196,12 @@ export class KardexComponent implements OnInit {
 
   irAlmacenStock(): void {
     this.router.navigate(['/pages/almacen']);
+  }
+
+  verDetalleMovimiento(movimiento: MovimientoAlmacen): void {
+    this.dialog.open(KardexDetalleDialogComponent, {
+      panelClass: ['modal-dialog-right', 'modal-dialog-right-kardex'],
+      data: movimiento
+    });
   }
 }

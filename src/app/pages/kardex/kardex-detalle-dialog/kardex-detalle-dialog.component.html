@@ -1,0 +1,208 @@
+<div class="side-drawer-container">
+  <!-- Cabecera del Panel Lateral -->
+  <div class="drawer-header">
+    <div class="drawer-header-main">
+      <div class="drawer-icon-circle" [ngClass]="{
+        'icon-entrada': mov.tipo === 'E',
+        'icon-salida': mov.tipo === 'S',
+        'icon-ajuste': mov.tipo === 'A'
+      }">
+        <mat-icon *ngIf="mov.tipo === 'E'">arrow_downward</mat-icon>
+        <mat-icon *ngIf="mov.tipo === 'S'">arrow_upward</mat-icon>
+        <mat-icon *ngIf="mov.tipo === 'A'">sync</mat-icon>
+      </div>
+      <div class="drawer-header-text">
+        <h3 class="drawer-title">Detalle de Movimiento</h3>
+        <div class="drawer-subtitle-row">
+          <span class="drawer-id-badge">ID #{{ mov.idMovimiento }}</span>
+          <span class="drawer-date">{{ mov.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-drawer-close" (click)="cerrar()" matTooltip="Cerrar panel">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Contenido con Scroll -->
+  <div class="drawer-body">
+    <!-- Banner de Tipo de Movimiento -->
+    <div class="mov-status-banner" [ngClass]="{
+      'banner-entrada': mov.tipo === 'E',
+      'banner-salida': mov.tipo === 'S',
+      'banner-ajuste': mov.tipo === 'A'
+    }">
+      <div class="banner-top">
+        <span class="badge-type-pill">
+          <mat-icon>{{ mov.tipo === 'E' ? 'add_circle' : (mov.tipo === 'S' ? 'remove_circle' : 'published_with_changes') }}</mat-icon>
+          {{ mov.tipo === 'E' ? 'ENTRADA DE INVENTARIO' : (mov.tipo === 'S' ? 'SALIDA DE INVENTARIO' : 'AJUSTE DE INVENTARIO') }}
+        </span>
+        <span class="banner-code">{{ mov.almacen_codigo || 'ALM-01' }}</span>
+      </div>
+      <div class="banner-motivo">
+        <span class="motivo-title">{{ mov.motivo }}</span>
+      </div>
+      <div class="banner-doc" *ngIf="mov.documento">
+        <mat-icon>receipt</mat-icon>
+        <span>Doc: {{ mov.documento }}</span>
+      </div>
+    </div>
+
+    <!-- 1. Producto Involucrado -->
+    <div class="section-card">
+      <div class="section-header">
+        <mat-icon class="section-icon">inventory_2</mat-icon>
+        <span class="section-title">Producto del Movimiento</span>
+      </div>
+      <div class="product-info-box">
+        <div class="prod-badge-row">
+          <span class="sku-pill">{{ mov.producto_codigo || 'SIN CÓDIGO' }}</span>
+          <span class="cat-pill" *ngIf="mov.categoria_nombre">{{ mov.categoria_nombre }}</span>
+          <span class="unit-pill">{{ mov.unidadMedida || 'UNIDAD' }}</span>
+        </div>
+        <div class="prod-fullname">{{ mov.producto_nombre }}</div>
+      </div>
+    </div>
+
+    <!-- 2. Almacén -->
+    <div class="section-card">
+      <div class="section-header">
+        <mat-icon class="section-icon">warehouse</mat-icon>
+        <span class="section-title">Almacén de Operación</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="item-label">Almacén</span>
+          <span class="item-value font-semibold">{{ mov.almacen_nombre }}</span>
+        </div>
+        <div class="info-item">
+          <span class="item-label">Código Almacén</span>
+          <span class="item-value font-mono">{{ mov.almacen_codigo || 'ALM-01' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Flujo de Stock / Cantidades (Visual Transition) -->
+    <div class="section-card">
+      <div class="section-header">
+        <mat-icon class="section-icon">swap_horizontal_circle</mat-icon>
+        <span class="section-title">Transición de Stock</span>
+      </div>
+      <div class="stock-flow-container">
+        <!-- Stock Anterior -->
+        <div class="stock-step-box step-prev">
+          <span class="step-label">Stock Anterior</span>
+          <div class="step-val">{{ mov.stockAnterior | number:'1.2-2' }}</div>
+          <span class="step-unit">{{ mov.unidadMedida }}</span>
+        </div>
+
+        <!-- Delta / Variación -->
+        <div class="stock-step-arrow" [ngClass]="{
+          'delta-entrada': mov.tipo === 'E',
+          'delta-salida': mov.tipo === 'S',
+          'delta-ajuste': mov.tipo === 'A'
+        }">
+          <mat-icon>{{ mov.tipo === 'E' ? 'arrow_forward' : (mov.tipo === 'S' ? 'arrow_forward' : 'sync_alt') }}</mat-icon>
+          <span class="delta-amount">
+            {{ mov.tipo === 'E' ? '+' : (mov.tipo === 'S' ? '-' : '') }}{{ mov.cantidad | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <!-- Stock Resultante -->
+        <div class="stock-step-box step-result" [ngClass]="{
+          'result-up': mov.tipo === 'E',
+          'result-down': mov.tipo === 'S',
+          'result-neutral': mov.tipo === 'A'
+        }">
+          <span class="step-label">Stock Resultante</span>
+          <div class="step-val">{{ mov.stockActual | number:'1.2-2' }}</div>
+          <span class="step-unit">{{ mov.unidadMedida }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Valorización Económica -->
+    <div class="section-card">
+      <div class="section-header">
+        <mat-icon class="section-icon">monetization_on</mat-icon>
+        <span class="section-title">Valorización Económica</span>
+      </div>
+      <div class="valuation-cards-row">
+        <div class="val-card">
+          <span class="val-label">Cantidad Transada</span>
+          <span class="val-num">{{ mov.cantidad | number:'1.2-2' }} {{ mov.unidadMedida }}</span>
+        </div>
+        <div class="val-card">
+          <span class="val-label">Costo Unitario</span>
+          <span class="val-num">S/ {{ mov.costoUnitario | number:'1.2-2' }}</span>
+        </div>
+        <div class="val-card val-total" [ngClass]="{
+          'total-entrada': mov.tipo === 'E',
+          'total-salida': mov.tipo === 'S',
+          'total-ajuste': mov.tipo === 'A'
+        }">
+          <span class="val-label">Total Valorizado</span>
+          <span class="val-num font-bold">
+            S/ {{ (mov.totalValorizado || (mov.cantidad * mov.costoUnitario)) | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Comprobante / Referencia / Observación -->
+    <div class="section-card" *ngIf="mov.documento || mov.observacion">
+      <div class="section-header">
+        <mat-icon class="section-icon">notes</mat-icon>
+        <span class="section-title">Comprobante y Observaciones</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item col-span-2" *ngIf="mov.documento">
+          <span class="item-label">Nro. Documento / Referencia</span>
+          <div class="doc-reference-box">
+            <mat-icon>receipt_long</mat-icon>
+            <span class="doc-text">{{ mov.documento }}</span>
+          </div>
+        </div>
+        <div class="info-item col-span-2" *ngIf="mov.observacion">
+          <span class="item-label">Observación / Glosa</span>
+          <div class="obs-box">
+            <mat-icon>info_outline</mat-icon>
+            <span class="obs-text">{{ mov.observacion }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Auditoría y Registro -->
+    <div class="section-card audit-card">
+      <div class="section-header">
+        <mat-icon class="section-icon">admin_panel_settings</mat-icon>
+        <span class="section-title">Datos de Auditoría</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="item-label">Usuario Operador</span>
+          <div class="user-audit-pill">
+            <mat-icon>account_circle</mat-icon>
+            <span>{{ mov.usuario_nombre || 'Sistema' }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="item-label">Fecha y Hora de Registro</span>
+          <span class="item-value font-mono">{{ mov.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Pie del Drawer -->
+  <div class="drawer-footer">
+    <button type="button" class="btn-drawer-close-action" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+      Cerrar
+    </button>
+  </div>
+</div>

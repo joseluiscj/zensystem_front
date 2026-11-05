@@ -224,6 +224,7 @@
             <th class="text-end">Costo Unit.</th>
             <th class="text-end">Total Val.</th>
             <th>Usuario</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -325,11 +326,18 @@
                 <span>{{ m.usuario_nombre }}</span>
               </span>
             </td>
+
+            <!-- Acciones -->
+            <td class="text-center">
+              <button type="button" class="btn-action-view" (click)="verDetalleMovimiento(m)" matTooltip="Ver detalle completo del movimiento">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
           </tr>
 
           <!-- Vacío -->
           <tr *ngIf="movimientos.length === 0 && !cargando">
-            <td colspan="10" class="text-center py-5">
+            <td colspan="11" class="text-center py-5">
               <div class="empty-state">
                 <mat-icon class="empty-icon">history_edu</mat-icon>
                 <h4 class="empty-title">No hay movimientos en el Kardex</h4>
