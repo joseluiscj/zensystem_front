@@ -13,7 +13,7 @@
     <ul class="navbar-nav ml-auto d-flex align-items-center">
 
       <!-- BOTÓN SWITCH MODO OSCURO / MODO CLARO -->
-      <li class="nav-item mr-3">
+      <li class="nav-item mr-2">
         <button 
           type="button" 
           class="btn-theme-nav" 
@@ -25,6 +25,139 @@
         </button>
       </li>
 
+      <!-- BOTÓN NOTIFICACIONES EN EL NAVBAR (STOCK BAJO) -->
+      <li class="nav-item mr-3 notif-nav-item">
+        <button 
+          type="button" 
+          class="btn-notif-nav" 
+          [matMenuTriggerFor]="notifMenu" 
+          [matTooltip]="totalNotificaciones > 0 ? (totalNotificaciones + ' productos con stock bajo') : 'Sin alertas de stock'"
+          aria-label="Alertas de stock bajo">
+          <mat-icon class="notif-bell-icon" [class.bell-has-items]="totalNotificaciones > 0">
+            {{ totalNotificaciones > 0 ? 'notifications_active' : 'notifications' }}
+          </mat-icon>
+          <span *ngIf="totalNotificaciones > 0" class="notif-badge-pill badge-danger">
+            {{ totalNotificaciones > 99 ? '99+' : totalNotificaciones }}
+          </span>
+        </button>
+      </li>
+
+      <!-- MENÚ DESPLEGABLE DE NOTIFICACIONES DE STOCK -->
+      <mat-menu #notifMenu="matMenu" xPosition="before" class="notif-custom-mat-menu">
+        <div class="notif-panel-container" (click)="$event.stopPropagation()">
+
+          <!-- Encabezado del Panel -->
+          <div class="notif-header">
+            <div class="notif-header-title">
+              <div class="header-bell-wrapper">
+                <mat-icon class="header-bell">inventory_2</mat-icon>
+              </div>
+              <div>
+                <span class="title-text">Alertas </span>
+                <!-- <span class="subtitle-text">Productos por debajo del stock mínimo</span> -->
+              </div>
+            </div>
+            <div class="notif-header-actions">
+              <span *ngIf="totalNotificaciones > 0" class="badge-count-pill">
+                {{ totalNotificaciones }} {{ totalNotificaciones === 1 ? 'producto' : 'productos' }}
+              </span>
+              <button 
+                type="button" 
+                class="btn-icon-refresh" 
+                (click)="recargarNotificaciones($event)" 
+                [disabled]="cargandoNotif" 
+                matTooltip="Actualizar datos">
+                <mat-icon [class.spin-anim]="cargandoNotif">refresh</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Loader de actualización -->
+          <div *ngIf="cargandoNotif" class="notif-loading-bar">
+            <div class="loading-line"></div>
+          </div>
+
+          <!-- CUERPO: PRODUCTOS CON STOCK BAJO -->
+          <div class="notif-body">
+            <!-- Alerta resumen -->
+            <div *ngIf="notificaciones?.stockBajo && notificaciones!.stockBajo.length > 0" class="alert-summary-banner">
+              <mat-icon class="banner-icon">warning</mat-icon>
+              <div class="banner-text">
+                <strong>{{ notificaciones!.totales.totalStockBajo }} productos</strong> por debajo del stock mínimo establecido.
+              </div>
+            </div>
+
+            <!-- Lista de items con stock bajo -->
+            <div class="notif-items-list" *ngIf="notificaciones?.stockBajo && notificaciones!.stockBajo.length > 0; else noStockAlerts">
+              <div 
+                *ngFor="let item of notificaciones!.stockBajo.slice(0, 5)" 
+                class="notif-item-row"
+                [class.item-exhausted]="+item.stock <= 0"
+                (click)="abrirModalStockBajo($event)">
+                <div class="item-avatar-box">
+                  <img *ngIf="item.imgId; else fallbackItemIcon" [src]="item.imgId" alt="prod" class="item-thumb" />
+                  <ng-template #fallbackItemIcon>
+                    <mat-icon class="item-icon-default">inventory_2</mat-icon>
+                  </ng-template>
+                </div>
+                <div class="item-info">
+                  <div class="item-title-line">
+                    <span class="item-name">{{ item.nombre }}</span>
+                    <span class="item-badge" [ngClass]="+item.stock <= 0 ? 'badge-pill-danger' : 'badge-pill-warning'">
+                      {{ +item.stock <= 0 ? 'AGOTADO' : 'STOCK BAJO' }}
+                    </span>
+                  </div>
+                  <div class="item-meta-line">
+                    <span class="item-sku">{{ item.codigo }} &bull; {{ item.categoria }}</span>
+                  </div>
+                  <div class="item-stock-comparison">
+                    <span class="stock-current" [ngClass]="+item.stock <= 0 ? 'text-danger' : 'text-warning'">
+                      Actual: <strong>{{ item.stock | number:'1.0-2' }} {{ item.unidadMedida }}</strong>
+                    </span>
+                    <span class="stock-min">Mín: {{ item.stockMinimo | number:'1.0-2' }}</span>
+                    <span class="stock-deficit" *ngIf="item.deficit > 0">Falta: +{{ item.deficit | number:'1.0-2' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado vacío de stock -->
+            <ng-template #noStockAlerts>
+              <div class="notif-empty-state">
+                <mat-icon class="empty-state-icon text-success">check_circle</mat-icon>
+                <span class="empty-state-title">¡Inventario en regla!</span>
+                <span class="empty-state-desc">Todos los productos controlados cuentan con stock suficiente.</span>
+              </div>
+            </ng-template>
+
+            <!-- Botones de Acción para Stock -->
+            <div class="notif-footer-actions" *ngIf="notificaciones?.stockBajo && notificaciones!.stockBajo.length > 0">
+              <button type="button" class="btn-action-primary" (click)="abrirModalStockBajo($event)">
+                <mat-icon>zoom_in</mat-icon> Ver detalle de stock bajo ({{ notificaciones!.stockBajo.length }})
+              </button>
+              <!-- <div class="actions-split-links">
+                <a class="action-sublink" (click)="irARuta('/almacen', $event)">
+                  <mat-icon>warehouse</mat-icon> Almacén
+                </a>
+                <a class="action-sublink" (click)="irARuta('/compra', $event)">
+                  <mat-icon>shopping_cart</mat-icon> Compras
+                </a>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- Pie del Menú -->
+          <div class="notif-menu-footer">
+            <span class="footer-status-label">
+              <span class="live-dot"></span> Actualización cada 45s
+            </span>
+            <!-- <span class="footer-role-badge">ZenSystem Inventario</span> -->
+          </div>
+
+        </div>
+      </mat-menu>
+
+      <!-- USUARIO PERFIL -->
       <li class="nav-item" style="margin-right: -12px;" [matMenuTriggerFor]="menu">
         <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button" style="padding-top: 15px;">
           <span style="font-weight: 500;color: #fff;">{{ username || 'Usuario' }}</span>

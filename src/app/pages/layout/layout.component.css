@@ -67,11 +67,6 @@
     --mat-toolbar-container-text-color: none;
 }
 
-/* .active[_ngcontent-ng-c1724745955] {
-    background-color: #2F87E5 !important;
-    color: #ffff;
-} */
-
 /* Estilos para la opción activa */
 .active-link {
     background-color: #02AFCC; /* Color de fondo para la opción activa */
@@ -92,25 +87,19 @@
     z-index: 1000;
 }
 
-/* .cdk-overlay-pane{
-    margin-right: 10px !important;
-} */
-
 [class*=sidebar-dark-] .sidebar a {
     color: #ffffffe0 !important;
 }
 ::ng-deep .mat-expansion-indicator::after {
 	color: white !important; /* Cambia la flecha a blanco */
-  }
+}
 
 .nav_icon{
     color: #223580;
-    /* box-shadow: 0 0px 4px rgba(0, 0, 0, .16), 0 2px 4px rgba(0, 0, 0, .23) !important; */
     box-shadow: 0px 0px 0px 0px !important;
     border-radius: 2px;
     font-weight: bold;
 }
-
 
 .sidenav-container {
     height: 100vh;
@@ -143,7 +132,6 @@ mat-list-item a {
     align-items: center;
     justify-content: center;
 }
-
 
 /* BOTÓN DE TEMA MODO OSCURO / MODO CLARO */
 .btn-theme-nav {
@@ -186,4 +174,619 @@ mat-list-item a {
 
 .btn-theme-nav .icon-moon {
   color: #e0f2fe;
+}
+
+/* =========================================================
+   BOTÓN E ICONO DE NOTIFICACIONES EN NAVBAR (STOCK BAJO)
+   ========================================================= */
+.notif-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btn-notif-nav {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  backdrop-filter: blur(8px);
+  padding: 0;
+}
+
+.btn-notif-nav:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notif-bell-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.btn-notif-nav:hover .notif-bell-icon {
+  transform: scale(1.1);
+}
+
+/* Animación sutil de campana cuando hay alertas de stock bajo */
+.bell-has-items {
+  animation: bell-subtle-ring 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes bell-subtle-ring {
+  0%, 75%, 100% {
+    transform: rotate(0);
+  }
+  80% {
+    transform: rotate(14deg);
+  }
+  85% {
+    transform: rotate(-14deg);
+  }
+  90% {
+    transform: rotate(10deg);
+  }
+  95% {
+    transform: rotate(-6deg);
+  }
+}
+
+/* Insignia / Badge con el nro de productos con stock bajo */
+.notif-badge-pill {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 20px;
+  height: 20px;
+  line-height: 18px;
+  text-align: center;
+  padding: 0 5px;
+  border-radius: 10px;
+  border: 2px solid #144c85;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.45);
+  animation: badge-pulse 2s infinite;
+}
+
+.notif-badge-pill.badge-danger {
+  background: #dc2626;
+}
+
+@keyframes badge-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* =========================================================
+   MENÚ DESPLEGABLE DE NOTIFICACIONES (CUSTOM MAT-MENU)
+   ========================================================= */
+::ng-deep .notif-custom-mat-menu {
+  max-width: none !important;
+  width: 410px !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.notif-panel-container {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #1e293b;
+  cursor: default;
+}
+
+/* Encabezado */
+.notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #113c68 0%, #1e5288 100%);
+  color: #ffffff;
+}
+
+.notif-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-bell-wrapper {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-bell {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.title-text {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitle-text {
+  display: block;
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.notif-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-count-pill {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.btn-icon-refresh {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #ffffff;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-icon-refresh:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-icon-refresh mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.spin-anim {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Barra de carga */
+.notif-loading-bar {
+  height: 3px;
+  width: 100%;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.loading-line {
+  height: 100%;
+  background: #2563eb;
+  animation: indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+    width: 30%;
+  }
+  50% {
+    transform: translateX(30%);
+    width: 60%;
+  }
+  100% {
+    transform: translateX(100%);
+    width: 30%;
+  }
+}
+
+/* Cuerpo de Notificaciones */
+.notif-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-summary-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.77rem;
+}
+
+.banner-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.banner-text {
+  line-height: 1.3;
+}
+
+/* Lista de Notificaciones de Stock */
+.notif-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.notif-items-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.notif-items-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.notif-items-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.notif-item-row {
+  display: flex;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notif-item-row:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateX(2px);
+}
+
+.notif-item-row.item-exhausted {
+  border-left: 3px solid #ef4444;
+  background: #fffafa;
+}
+
+/* Miniatura / Avatar */
+.item-avatar-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.item-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-icon-default {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #94a3b8;
+}
+
+/* Info del Producto */
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.item-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-name {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.badge-pill-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-pill-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.item-meta-line {
+  font-size: 0.71rem;
+  color: #64748b;
+}
+
+.item-stock-comparison {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+.text-danger {
+  color: #dc2626 !important;
+}
+
+.text-warning {
+  color: #d97706 !important;
+}
+
+.stock-min {
+  color: #64748b;
+}
+
+.stock-deficit {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+/* Estado Vacío */
+.notif-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 14px;
+  text-align: center;
+  gap: 6px;
+}
+
+.empty-state-icon {
+  font-size: 38px;
+  width: 38px;
+  height: 38px;
+}
+
+.text-success {
+  color: #10b981 !important;
+}
+
+.empty-state-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.empty-state-desc {
+  font-size: 0.74rem;
+  color: #64748b;
+  max-width: 240px;
+}
+
+/* Acciones en el pie del panel */
+.notif-footer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-action-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #113c68 0%, #1a5694 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(17, 60, 104, 0.25);
+}
+
+.btn-action-primary:hover {
+  background: linear-gradient(135deg, #0d2e50 0%, #154577 100%);
+  transform: translateY(-1px);
+}
+
+.btn-action-primary mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.actions-split-links {
+  display: flex;
+  gap: 8px;
+}
+
+.action-sublink {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.action-sublink:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.action-sublink mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+/* Pie del Menú */
+.notif-menu-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.69rem;
+  color: #64748b;
+}
+
+.footer-status-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  animation: live-blink 2s infinite;
+}
+
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.footer-role-badge {
+  background: #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Adaptación a Modo Oscuro */
+:host-context(.dark-theme) .notif-panel-container,
+.dark-theme .notif-panel-container {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+:host-context(.dark-theme) .notif-item-row,
+.dark-theme .notif-item-row {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:host-context(.dark-theme) .notif-item-row:hover,
+.dark-theme .notif-item-row:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+:host-context(.dark-theme) .item-name,
+.dark-theme .item-name {
+  color: #f8fafc;
+}
+
+:host-context(.dark-theme) .notif-menu-footer,
+.dark-theme .notif-menu-footer {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+:host-context(.dark-theme) .action-sublink,
+.dark-theme .action-sublink {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+:host-context(.dark-theme) .action-sublink:hover,
+.dark-theme .action-sublink:hover {
+  background: #334155;
+  color: #f8fafc;
 }

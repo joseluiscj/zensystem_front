@@ -1,0 +1,166 @@
+<div class="stock-dialog-container">
+  <!-- Cabecera del Diálogo -->
+  <div class="dialog-header">
+    <div class="dialog-header-left">
+      <div class="header-icon-box alert-icon">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div>
+        <h3 class="dialog-title">Productos con Stock Bajo o Crítico</h3>
+        <p class="dialog-subtitle">Alertas automáticas de inventario por debajo del stock mínimo</p>
+      </div>
+    </div>
+    <button type="button" class="btn-close-dialog" (click)="cerrar()" matTooltip="Cerrar ventana">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <!-- Métricas Resumen -->
+    <div class="summary-cards-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-icon-wrapper">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ productos.length }}</span>
+          <span class="stat-label">En Alerta de Stock</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-danger">
+        <div class="stat-icon-wrapper">
+          <mat-icon>remove_shopping_cart</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalAgotados }}</span>
+          <span class="stat-label">Agotados (Stock &le; 0)</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-warning">
+        <div class="stat-icon-wrapper">
+          <mat-icon>production_quantity_limits</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalCriticos }}</span>
+          <span class="stat-label">Nivel Crítico (&le; Mínimo)</span>
+        </div>
+      </div>
+
+      <!-- <div class="stat-card stat-deficit">
+        <div class="stat-icon-wrapper">
+          <mat-icon>shopping_bag</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalDeficit | number:'1.0-2' }}</span>
+          <span class="stat-label">Unidades Faltantes</span>
+        </div>
+      </div> -->
+    </div>
+
+    <!-- Barra de Búsqueda y Filtro Rápido -->
+    <div class="search-filter-box">
+      <div class="search-input-wrapper">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input 
+          type="text" 
+          [(ngModel)]="filtroTexto" 
+          (ngModelChange)="filtrar()" 
+          placeholder="Buscar producto por nombre, código SKU o categoría..." 
+          class="custom-search-input" />
+        <button *ngIf="filtroTexto" mat-icon-button (click)="limpiarFiltro()" class="btn-clear-search">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </div>
+      <span class="items-found-tag">
+        {{ productosFiltrados.length }} {{ productosFiltrados.length === 1 ? 'producto' : 'productos' }}
+      </span>
+    </div>
+
+    <!-- Tabla de Productos en Alerta -->
+    <div class="table-responsive-wrapper">
+      <table class="custom-table" *ngIf="productosFiltrados.length > 0">
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th class="text-center">Stock Actual</th>
+            <th class="text-center">Stock Mínimo</th>
+            <!-- <th class="text-center">Faltante</th> -->
+            <th class="text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of productosFiltrados; let i = index" [class.row-exhausted]="+p.stock <= 0">
+            <td class="text-muted font-mono">{{ i + 1 }}</td>
+            <td>
+              <div class="product-cell">
+                <div class="product-avatar">
+                  <img *ngIf="p.imgId; else defaultIcon" [src]="p.imgId" alt="img" class="prod-thumb" />
+                  <ng-template #defaultIcon>
+                    <mat-icon class="avatar-fallback">local_dining</mat-icon>
+                  </ng-template>
+                </div>
+                <div class="product-details">
+                  <span class="product-name">{{ p.nombre }}</span>
+                  <span class="product-sku"><mat-icon class="sku-icon">qr_code</mat-icon> {{ p.codigo }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="category-badge">{{ p.categoria || 'General' }}</span>
+            </td>
+            <td class="text-center">
+              <span class="stock-pill" [ngClass]="+p.stock <= 0 ? 'pill-danger' : 'pill-warning'">
+                <mat-icon class="pill-icon">{{ +p.stock <= 0 ? 'error' : 'warning' }}</mat-icon>
+                {{ p.stock | number:'1.0-2' }} {{ p.unidadMedida }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="min-stock-tag">{{ p.stockMinimo | number:'1.0-2' }} {{ p.unidadMedida }}</span>
+            </td>
+            <!-- <td class="text-center">
+              <span class="deficit-tag">
+                +{{ p.deficit | number:'1.0-2' }} {{ p.unidadMedida }}
+              </span>
+            </td> -->
+            <td class="text-center">
+              <span class="status-badge" [ngClass]="+p.stock <= 0 ? 'badge-exhausted' : 'badge-low'">
+                {{ +p.stock <= 0 ? 'AGOTADO' : 'STOCK BAJO' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Estado Vacío Si el Filtro no arroja resultados -->
+      <div *ngIf="productosFiltrados.length === 0" class="empty-state-dialog">
+        <mat-icon class="empty-icon">check_circle_outline</mat-icon>
+        <h4>No se encontraron productos</h4>
+        <p>No hay coincidencias para el criterio de búsqueda ingresado.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie del Diálogo con Acciones Rápidas -->
+  <div class="dialog-footer">
+    <div class="footer-left">
+      <span class="footer-hint">
+        <mat-icon class="hint-icon">info</mat-icon> Puedes realizar compras o ajustes de stock desde los módulos de Almacén y Compras.
+      </span>
+    </div>
+    <div class="footer-buttons">
+      <!-- <button type="button" class="btn-footer-link" (click)="navegarA('/almacen')">
+        <mat-icon>warehouse</mat-icon> Ir a Almacén
+      </button>
+      <button type="button" class="btn-footer-link" (click)="navegarA('/compra')">
+        <mat-icon>shopping_cart</mat-icon> Ir a Compras
+      </button> -->
+      <button type="button" class="btn-footer-close" (click)="cerrar()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

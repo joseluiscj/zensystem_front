@@ -2,21 +2,35 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular
 import { MaterialModule } from '../../material/material.module';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { CommonModule, DecimalPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { MenuService } from '../../services/menu.service';
 import { LoginService } from '../../services/login.service';
 import { LocalstorageService } from '../../services/localstorage.service';
 import { ThemeService } from '../../services/theme.service';
+import { NotificacionService } from '../../services/notificacion.service';
 import { MatDialog } from '@angular/material/dialog';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../../environments/environment.development';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { NotificacionData, ProductoStockBajo } from '../../../model/notificacion';
+import { NotificacionStockDialogComponent } from './notificacion-stock-dialog/notificacion-stock-dialog.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [MaterialModule, RouterOutlet, NgIf, RouterLink, RouterLinkActive, MatTooltipModule, NgFor],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    RouterOutlet,
+    NgIf,
+    NgFor,
+    NgClass,
+    RouterLink,
+    RouterLinkActive,
+    MatTooltipModule,
+    DecimalPipe
+  ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
 })
@@ -27,11 +41,21 @@ export class LayoutComponent implements OnInit, OnDestroy {
   isMenuOpen = true;
   menuItems = [];
 
+  // Estado del módulo de notificaciones (alertas de stock bajo)
+  notificaciones: NotificacionData | null = null;
+  totalNotificaciones: number = 0;
+  cargandoNotif: boolean = false;
+
+  private subNotificaciones?: Subscription;
+  private subTotalNotificaciones?: Subscription;
+  private subCargandoNotif?: Subscription;
+
   constructor(
     private menuService: MenuService,
     private loginService: LoginService,
     private localStorage: LocalstorageService,
     public themeService: ThemeService,
+    public notificacionService: NotificacionService,
     private router: Router,
     private _dialog: MatDialog,
   ) {}
@@ -49,7 +73,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     const token = sessionStorage.getItem(environment.TOKEN_NAME);
     const decodeToken = helper.decodeToken(token);
 
-    this.username = decodeToken.subn;
+    this.username = decodeToken?.subn || '';
     this.localStorage.setItem("user_storage", this.username);
 
     this.menuService.getMenusByUser(this.username).subscribe(data => {
@@ -64,6 +88,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.cerrarMenuMobile();
     });
+
+    // Iniciar el monitoreo de alertas de stock bajo
+    this.iniciarNotificaciones();
   }
 
   ngOnDestroy(): void {
@@ -71,31 +98,93 @@ export class LayoutComponent implements OnInit, OnDestroy {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+    if (this.subNotificaciones) {
+      this.subNotificaciones.unsubscribe();
+    }
+    if (this.subTotalNotificaciones) {
+      this.subTotalNotificaciones.unsubscribe();
+    }
+    if (this.subCargandoNotif) {
+      this.subCargandoNotif.unsubscribe();
+    }
+    this.notificacionService.detenerPolling();
+  }
+
+  /**
+   * Conecta y escucha el servicio reactivo de notificaciones de stock bajo
+   */
+  private iniciarNotificaciones(): void {
+    this.notificacionService.iniciarPolling();
+
+    this.subNotificaciones = this.notificacionService.notificaciones$.subscribe((data) => {
+      this.notificaciones = data;
+    });
+
+    this.subTotalNotificaciones = this.notificacionService.totalNotificaciones$.subscribe((total) => {
+      this.totalNotificaciones = total;
+    });
+
+    this.subCargandoNotif = this.notificacionService.cargando$.subscribe((cargando) => {
+      this.cargandoNotif = cargando;
+    });
+  }
+
+  /**
+   * Recarga manualmente las alertas de stock bajo desde el menú desplegable
+   */
+  recargarNotificaciones(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.notificacionService.cargarNotificaciones().subscribe();
+  }
+
+  /**
+   * Abre el modal detallado de productos con stock bajo o crítico
+   */
+  abrirModalStockBajo(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this._dialog.open(NotificacionStockDialogComponent, {
+      width: '940px',
+      maxWidth: '96vw',
+      panelClass: 'modal-responsive-clean',
+      data: {
+        productos: this.notificaciones?.stockBajo || []
+      }
+    });
+  }
+
+  /**
+   * Navega a una ruta específica de la aplicación
+   */
+  irARuta(ruta: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.router.navigate([ruta]);
   }
 
   /**
    * Cierra automáticamente el menú lateral cuando se selecciona una opción en modo celular (< 992px)
    */
   cerrarMenuMobile(): void {
-    // Solo aplica cuando la pantalla está en modo celular / móvil (< 992px)
-    // o cuando el menú lateral está abierto en modo flotante (sidebar-open)
     const isMobile = window.innerWidth < 992 || document.body.classList.contains('sidebar-open');
 
     if (!isMobile) {
-      return; // En pantallas de escritorio no se altera el menú lateral
+      return;
     }
 
-    // 1. Invocar API de AdminLTE PushMenu si jQuery está disponible
     try {
       const $ = (window as any).$;
       if ($ && typeof $.fn?.PushMenu !== 'undefined') {
         $('[data-widget="pushmenu"]').PushMenu('collapse');
       }
     } catch (e) {
-      // Ignorar si jQuery o PushMenu no están cargados
+      // Ignorar
     }
 
-    // 2. Manipular clases de document.body para asegurar el cierre inmediato
     const body = document.body;
     if (body) {
       body.classList.remove('sidebar-open');
@@ -104,7 +193,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
       body.classList.add('sidebar-collapse');
     }
 
-    // 3. Ocultar el overlay oscuro de AdminLTE si está presente en el DOM
     const overlay = document.getElementById('sidebar-overlay');
     if (overlay) {
       overlay.style.display = 'none';
