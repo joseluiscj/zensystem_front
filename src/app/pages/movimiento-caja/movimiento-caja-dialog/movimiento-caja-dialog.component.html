@@ -227,7 +227,8 @@
       </div>
 
       <!-- 7. SIMULADOR DE IMPACTO EN EL SALDO DE CAJA -->
-      <div class="saldo-impact-card" [ngClass]="{
+      <div class="saldo-impact-card" *ngIf="!esEdicion"  
+       [ngClass]="{
         'impact-card-in': tipoActual === 'I',
         'impact-card-out': tipoActual === 'E'
       }">

@@ -743,6 +743,24 @@
   color: #64748b;
 }
 
+.badge-origen-lock.clickable-origin {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.badge-origen-lock.clickable-origin:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.badge-origen-lock.clickable-origin mat-icon {
+  color: #2563eb;
+}
+
 /* EMPTY STATE */
 .empty-state {
   display: flex;

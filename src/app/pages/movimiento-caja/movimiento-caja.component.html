@@ -282,8 +282,11 @@
               <div class="desc-cell" [title]="m.descripcion">
                 {{ m.descripcion }}
               </div>
-              <div *ngIf="m.esEditable != 1" class="badge-origen-lock" [matTooltip]="'Movimiento generado automáticamente por ' + (m.origenModuloNombre || 'otro módulo')">
-                <mat-icon>lock</mat-icon>
+              <div *ngIf="m.esEditable != 1" 
+                class="badge-origen-lock clickable-origin" 
+                (click)="abrirVerMovimiento(m)"
+                [matTooltip]="m.origen === 'COMPRAS' ? 'Ver comprobante de compra' : ((m.origen === 'VENTAS' || m.origen === 'RESTAURANTE') ? 'Ver ticket de venta / consumo' : (m.origen === 'CIERRE' ? 'Ver acta de cierre y arqueo de caja' : 'Ver detalle (' + (m.origenModuloNombre || 'Solo lectura') + ')'))">
+                <mat-icon>{{ m.origen === 'COMPRAS' ? 'receipt_long' : ((m.origen === 'VENTAS' || m.origen === 'RESTAURANTE') ? 'point_of_sale' : (m.origen === 'CIERRE' ? 'fact_check' : 'lock')) }}</mat-icon>
                 <span>{{ m.origenModuloNombre || 'Automático' }}</span>
               </div>
             </td>
@@ -331,7 +334,7 @@
 
                 <ng-container *ngIf="m.esEditable != 1">
                   <button type="button" class="btn-action-info" 
-                    [matTooltip]="'Ver detalle (' + (m.origenModuloNombre || 'Solo lectura') + ')'"
+                    [matTooltip]="m.origen === 'COMPRAS' ? 'Ver comprobante de compra' : ((m.origen === 'VENTAS' || m.origen === 'RESTAURANTE') ? 'Ver ticket de venta / consumo' : (m.origen === 'CIERRE' ? 'Ver acta de cierre y arqueo de caja' : 'Ver detalle (' + (m.origenModuloNombre || 'Solo lectura') + ')'))"
                     (click)="abrirVerMovimiento(m)">
                     <mat-icon>visibility</mat-icon>
                   </button>

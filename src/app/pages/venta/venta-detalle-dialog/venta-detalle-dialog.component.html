@@ -6,7 +6,7 @@
         <mat-icon>receipt_long</mat-icon>
       </div>
       <div>
-        <h3 class="modal-title">Detalle de Comanda #{{ idPedido }}</h3>
+        <h3 class="modal-title">Detalle de la venta #{{ idPedido }}</h3>
         <p class="modal-subtitle">Resumen completo de consumo y cobranza</p>
       </div>
     </div>
@@ -138,12 +138,15 @@
 
   <!-- Botones de Acción -->
   <div class="ticket-modal-actions">
-    <!-- Botón Cobrar y Liberar si está pendiente -->
-    <button *ngIf="pedido.f_state !== 1" type="button" class="btn-action-cobrar" (click)="cobrar()" matTooltip="Cobrar comanda y liberar mesa">
+    <!-- Botón Cobrar y Liberar si está pendiente (solo modo editable) -->
+    <button *ngIf="!soloLectura && pedido?.f_state !== 1" type="button" class="btn-action-cobrar" (click)="cobrar()" matTooltip="Cobrar comanda y liberar mesa">
       <mat-icon>point_of_sale</mat-icon> Cobrar y Liberar Mesa
     </button>
-    <button mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
+    <button *ngIf="!soloLectura" mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
       <mat-icon>edit</mat-icon> Editar Comanda
+    </button>
+    <button mat-stroked-button class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir comprobante">
+      <mat-icon>print</mat-icon> Imprimir
     </button>
     <button mat-button class="btn-action-close" (click)="cerrar()">
       Cerrar

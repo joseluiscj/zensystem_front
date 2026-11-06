@@ -7,6 +7,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MaterialModule } from '../../material/material.module';
 import { CajaCatalogo, CajaMovimientoItem, CajaMovimientoService, KpisCajaMovimiento } from '../../services/caja-movimiento.service';
 import { MovimientoCajaDialogComponent } from './movimiento-caja-dialog/movimiento-caja-dialog.component';
+import { VentaDetalleDialogComponent } from '../venta/venta-detalle-dialog/venta-detalle-dialog.component';
+import { CompraDetalleDialogComponent } from '../compra/compra-detalle-dialog/compra-detalle-dialog.component';
+import { CierreArqueoDialogComponent } from './cierre-arqueo-dialog/cierre-arqueo-dialog.component';
 
 @Component({
   selector: 'app-movimiento-caja',
@@ -194,6 +197,77 @@ export class MovimientoCajaComponent implements OnInit {
   }
 
   abrirVerMovimiento(m: CajaMovimientoItem): void {
+    const origen = (m.origen || '').toUpperCase();
+
+    // 1. Si el movimiento proviene de Compras
+    let idCompra = m.idCompra;
+    if (!idCompra && origen === 'COMPRAS') {
+      if (m.idReferencia) {
+        idCompra = m.idReferencia;
+      }
+    }
+
+    if (origen === 'COMPRAS' && idCompra) {
+      this.dialog.open(CompraDetalleDialogComponent, {
+        width: '850px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        data: { idCompra: Number(idCompra) }
+      });
+      return;
+    }
+
+    // 2. Si el movimiento proviene de Ventas o Restaurante / Mesas
+    let idPedido = m.idPedido;
+    if (!idPedido && (origen === 'VENTAS' || origen === 'RESTAURANTE')) {
+      if (m.idReferencia) {
+        idPedido = m.idReferencia;
+      } else {
+        const matchVenta = (m.nroComprobante || '').match(/VENTA-(\d+)/i) || (m.descripcion || '').match(/#VENTA-(\d+)/i);
+        const matchComanda = (m.descripcion || '').match(/Comanda\s*#(\d+)/i);
+        if (matchVenta) idPedido = parseInt(matchVenta[1], 10);
+        else if (matchComanda) idPedido = parseInt(matchComanda[1], 10);
+      }
+    }
+
+    if ((origen === 'VENTAS' || origen === 'RESTAURANTE') && idPedido) {
+      this.dialog.open(VentaDetalleDialogComponent, {
+        width: '580px',
+        maxWidth: '95vw',
+        panelClass: 'modal-dialog-center',
+        data: {
+          idPedido: Number(idPedido),
+          soloLectura: true
+        }
+      });
+      return;
+    }
+
+    // 3. Si el movimiento proviene de Cierre y Arqueo de Caja
+    let idCajaDetalle = m.idCajaDetalleCierre || m.idCajaDetalle;
+    if (!idCajaDetalle && origen === 'CIERRE') {
+      if (m.idReferencia) {
+        idCajaDetalle = m.idReferencia;
+      } else {
+        const matchCierre = (m.nroComprobante || '').match(/TRANSF-CIERRE-(\d+)/i) || (m.descripcion || '').match(/Cierre\s*#(\d+)/i);
+        if (matchCierre) idCajaDetalle = parseInt(matchCierre[1], 10);
+      }
+    }
+
+    if (origen === 'CIERRE' && idCajaDetalle) {
+      this.dialog.open(CierreArqueoDialogComponent, {
+        width: '820px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        data: {
+          idCajaDetalle: Number(idCajaDetalle),
+          movimiento: m
+        }
+      });
+      return;
+    }
+
+    // 4. Otros movimientos (Apertura, Movimiento Directo en Caja)
     this.dialog.open(MovimientoCajaDialogComponent, {
       disableClose: false,
       panelClass: 'modal-dialog-right',

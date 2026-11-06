@@ -21,17 +21,19 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class VentaDetalleDialogComponent implements OnInit {
   idPedido: number;
+  soloLectura: boolean = false;
   cargando: boolean = true;
   pedido: any = null;
   detalle: any[] = [];
 
   constructor(
     private dialogRef: MatDialogRef<VentaDetalleDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { idPedido: number },
+    @Inject(MAT_DIALOG_DATA) public data: { idPedido: number; soloLectura?: boolean },
     private pedidoService: PedidoService,
     private snackBar: MatSnackBar
   ) {
     this.idPedido = data?.idPedido;
+    this.soloLectura = !!data?.soloLectura;
   }
 
   ngOnInit(): void {

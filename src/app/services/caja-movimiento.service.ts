@@ -20,6 +20,10 @@ export interface CajaMovimientoItem {
   metodoPago: string;
   fecha: string;
   origen?: string;
+  idReferencia?: number;
+  idCompra?: number;
+  idPedido?: number;
+  idCajaDetalleCierre?: number;
   esEditable?: number | boolean;
   origenModuloNombre?: string;
   active: number;

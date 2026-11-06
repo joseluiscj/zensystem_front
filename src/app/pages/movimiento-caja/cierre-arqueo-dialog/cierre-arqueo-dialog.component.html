@@ -1,0 +1,279 @@
+<div class="arqueo-modal-wrapper">
+  <!-- Cabecera del Diálogo -->
+  <div class="arqueo-modal-header">
+    <div class="header-title-box">
+      <div class="header-icon-circle">
+        <mat-icon>fact_check</mat-icon>
+      </div>
+      <div>
+        <h3 class="modal-title">Acta de Cierre & Arqueo de Caja</h3>
+        <p class="modal-subtitle">
+          Auditoría de turno de caja y liquidación de fondos
+        </p>
+      </div>
+    </div>
+    <div class="header-right-actions">
+      <span class="badge-estado-cerrado">
+        <mat-icon>lock</mat-icon> TURNO CERRADO
+      </span>
+      <button mat-icon-button class="btn-close-modal" (click)="cerrar()" matTooltip="Cerrar ventana">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de progreso si está cargando -->
+  <mat-progress-bar *ngIf="cargando" mode="indeterminate" class="arqueo-loader"></mat-progress-bar>
+
+  <div *ngIf="!cargando && resumen" class="arqueo-modal-body">
+    
+    <!-- Aviso si se ingresó desde un movimiento de transferencia específico -->
+    <!-- <div *ngIf="movimientoOriginal" class="mov-origen-banner mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <mat-icon class="banner-icon">{{ movimientoOriginal.tipo === 'I' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+        <div>
+          <span class="banner-title">Movimiento de Caja Seleccionado (#{{ movimientoOriginal.idCajaMovimiento }}):</span>
+          <div class="banner-desc">
+            <strong>{{ movimientoOriginal.descripcion }}</strong>
+            <span class="banner-amount font-mono ms-2">
+              {{ movimientoOriginal.tipo === 'I' ? '+' : '-' }}$ {{ movimientoOriginal.monto | number:'1.2-2' }}
+            </span>
+            <span *ngIf="movimientoOriginal.nroComprobante" class="banner-tag ms-2">
+              {{ movimientoOriginal.nroComprobante }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- 1. Tarjeta Informativa del Turno -->
+    <div class="card-section info-turno-card mb-3">
+      <div class="turno-grid">
+        <div class="turno-item">
+          <span class="item-label">Caja:</span>
+          <span class="item-val fw-bold text-dark">
+            <mat-icon class="mini-icon">point_of_sale</mat-icon> {{ detalle?.cajaNombre }}
+          </span>
+        </div>
+        <div class="turno-item">
+          <span class="item-label">Cajero Responsable:</span>
+          <span class="item-val fw-bold text-dark">
+            <mat-icon class="mini-icon">person</mat-icon> {{ detalle?.usuarioNombre }}
+          </span>
+        </div>
+        <div class="turno-item">
+          <span class="item-label">Moneda:</span>
+          <span class="item-val badge-moneda">{{ detalle?.moneda || 'DOLAR' }}</span>
+        </div>
+        <div class="turno-item">
+          <span class="item-label">Apertura:</span>
+          <span class="item-val">
+            <mat-icon class="mini-icon text-muted">login</mat-icon> {{ detalle?.aFecha | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+        <div class="turno-item">
+          <span class="item-label">Cierre:</span>
+          <span class="item-val">
+            <mat-icon class="mini-icon text-muted">logout</mat-icon> {{ detalle?.cFecha | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+        <!-- <div class="turno-item">
+          <span class="item-label">Sucursal:</span>
+          <span class="item-val">{{ detalle?.sucursalNombre || 'Principal' }}</span>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- 2. Tarjeta Principal: Cuadre y Arqueo de Efectivo Físico -->
+    <div class="card-section arqueo-cuadre-card mb-3">
+      <div class="section-header">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-success">account_balance_wallet</mat-icon>
+          <h4 class="section-title mb-0">Arqueo de Efectivo Físico</h4>
+        </div>
+        <span class="section-tag">Liquidación de Caja</span>
+      </div>
+
+      <div class="cuadre-rows-container">
+        <!-- Saldo Inicial -->
+        <div class="cuadre-row">
+          <div class="cuadre-concept">
+            <span class="row-num">1</span>
+            <div>
+              <span class="concept-name">Fondo Inicial de Apertura</span>
+              <span class="concept-sub">Monto con el que se abrió la caja</span>
+            </div>
+          </div>
+          <div class="cuadre-amount font-mono">$ {{ resumen.aMonto | number:'1.2-2' }}</div>
+        </div>
+
+        <!-- Cobros Efectivo -->
+        <div class="cuadre-row">
+          <div class="cuadre-concept">
+            <span class="row-num row-plus">+</span>
+            <div>
+              <span class="concept-name text-success">Ventas y Cobros en Efectivo</span>
+              <span class="concept-sub">Ingresos en efectivo generados durante el turno</span>
+            </div>
+          </div>
+          <div class="cuadre-amount font-mono text-success">+ $ {{ resumen.totalEfectivo | number:'1.2-2' }}</div>
+        </div>
+
+        <!-- Egresos Efectivo -->
+        <div class="cuadre-row">
+          <div class="cuadre-concept">
+            <span class="row-num row-minus">-</span>
+            <div>
+              <span class="concept-name text-danger">Gastos y Salidas de Efectivo</span>
+              <span class="concept-sub">Egresos registrados en caja durante el turno</span>
+            </div>
+          </div>
+          <div class="cuadre-amount font-mono text-danger">- $ {{ resumen.totalEgresos | number:'1.2-2' }}</div>
+        </div>
+
+        <div class="cuadre-divider"></div>
+
+        <!-- Saldo Teórico Esperado -->
+        <div class="cuadre-row row-esperado">
+          <div class="cuadre-concept">
+            <mat-icon class="text-primary">calculate</mat-icon>
+            <div>
+              <span class="concept-name fw-bold text-dark">Saldo Teórico Esperado en Caja</span>
+              <span class="concept-sub">Calculado por sistema (Apertura + Cobros - Egresos)</span>
+            </div>
+          </div>
+          <div class="cuadre-amount font-mono fw-bold fs-5 text-primary">
+            $ {{ resumen.saldoEsperadoEfectivo | number:'1.2-2' }}
+          </div>
+        </div>
+
+        <!-- Efectivo Físico Contado -->
+        <div class="cuadre-row row-contado">
+          <div class="cuadre-concept">
+            <mat-icon class="text-dark">payments</mat-icon>
+            <div>
+              <span class="concept-name fw-bold text-dark">Efectivo Físico Contado (Arqueo)</span>
+              <span class="concept-sub">Monto físico real contado y declarado en el arqueo</span>
+            </div>
+          </div>
+          <div class="cuadre-amount font-mono fw-bold fs-4 text-dark">
+            $ {{ (resumen.cMonto || 0) | number:'1.2-2' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER DE RESULTADO DEL ARQUEO (DIFERENCIA) -->
+      <div class="resultado-banner mt-3" [ngClass]="{
+        'banner-exacto': estadoDiferencia === 'exacto',
+        'banner-sobrante': estadoDiferencia === 'sobrante',
+        'banner-faltante': estadoDiferencia === 'faltante'
+      }">
+        <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon class="res-icon" *ngIf="estadoDiferencia === 'exacto'">check_circle</mat-icon>
+            <mat-icon class="res-icon" *ngIf="estadoDiferencia === 'sobrante'">trending_up</mat-icon>
+            <mat-icon class="res-icon" *ngIf="estadoDiferencia === 'faltante'">warning</mat-icon>
+            <div>
+              <div class="res-title">
+                {{ estadoDiferencia === 'exacto' ? 'CUADRE EXACTO DE CAJA' : (estadoDiferencia === 'sobrante' ? 'SOBRANTE DE CAJA' : 'FALTANTE DE CAJA') }}
+              </div>
+              <div class="res-subtitle">
+                {{ estadoDiferencia === 'exacto' ? 'El efectivo físico contado coincide exactamente con el sistema.' : (estadoDiferencia === 'sobrante' ? 'Se contó más dinero físico del saldo calculado por sistema.' : 'Se contó menos dinero físico que el saldo calculado por sistema.') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="res-diff-box font-mono">
+            <span class="diff-label">Diferencia:</span>
+            <span class="diff-val">
+              {{ diferenciaMonto > 0 ? '+' : '' }}$ {{ diferenciaMonto | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Cobros con Tarjeta & Otros Medios -->
+    <div class="card-section mb-3">
+      <div class="section-header">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-info">credit_card</mat-icon>
+          <h4 class="section-title mb-0">Ventas con Tarjeta & Resumen de Ingresos</h4>
+        </div>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-sm-6 col-12">
+          <div class="sub-kpi-box">
+            <span class="sub-kpi-label">Ventas con Tarjeta (POS):</span>
+            <span class="sub-kpi-val font-mono text-dark">$ {{ resumen.totalTarjeta | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-12">
+          <div class="sub-kpi-box">
+            <span class="sub-kpi-label">Total Ingresos Turno (Efectivo + Tarjeta):</span>
+            <span class="sub-kpi-val font-mono text-primary">$ {{ resumen.totalIngresos | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Transferencias de Fondos Registradas al Cierre -->
+    <div class="card-section mb-2" *ngIf="transferencias && transferencias.length > 0">
+      <div class="section-header">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-primary">swap_horiz</mat-icon>
+          <h4 class="section-title mb-0">Transferencias Realizadas al Cierre</h4>
+        </div>
+        <span class="badge bg-light text-muted border">{{ transferencias.length }} movimientos</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0 transf-table">
+          <thead>
+            <tr>
+              <th>Caja / Cuenta</th>
+              <th>Tipo</th>
+              <th>Medio</th>
+              <th>Detalle de Transferencia</th>
+              <th>Comprobante</th>
+              <th class="text-end">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of transferencias" [class.highlight-row]="movimientoOriginal && movimientoOriginal.idCajaMovimiento === t.idCajaMovimiento">
+              <td class="fw-bold">{{ t.cajaNombre }}</td>
+              <td>
+                <span class="badge" [ngClass]="t.tipo === 'E' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'">
+                  {{ t.tipo === 'E' ? 'Salida / Egreso' : 'Recepción / Ingreso' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ t.metodoPago === 'EF' ? 'Efectivo' : 'Tarjeta' }}</span>
+              </td>
+              <td class="small text-muted">{{ t.descripcion }}</td>
+              <td>
+                <span class="badge bg-light text-secondary border font-mono small">{{ t.nroComprobante }}</span>
+              </td>
+              <td class="text-end font-mono fw-bold" [ngClass]="t.tipo === 'E' ? 'text-danger' : 'text-success'">
+                {{ t.tipo === 'E' ? '-' : '+' }}$ {{ t.monto | number:'1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="arqueo-modal-actions">
+    <button type="button" class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir acta de arqueo y cierre">
+      <mat-icon>print</mat-icon>
+      <span>Imprimir Acta</span>
+    </button>
+    <button mat-button class="btn-action-close" (click)="cerrar()">
+      Cerrar
+    </button>
+  </div>
+</div>
