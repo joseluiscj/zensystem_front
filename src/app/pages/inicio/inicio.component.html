@@ -128,7 +128,7 @@
   <div *ngIf="!cargando && dashboard" class="dashboard-body">
 
     <!-- FILA 1: 4 TARJETAS KPI DE ALTO IMPACTO -->
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4"  >
       <!-- KPI 1: Ventas Totales -->
       <div class="col-12 col-sm-6 col-xl-3">
         <div class="kpi-metric-card kpi-sales"  >
@@ -215,7 +215,7 @@
         </div>
 
         <!-- Vista para Administrador / Cajero -->
-        <div *ngIf="!dashboard.usuario?.esMesero && dashboard.usuario?.rol !== 'MESERO'" class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
+        <!-- <div *ngIf="!dashboard.usuario?.esMesero && dashboard.usuario?.rol !== 'MESERO'" class="kpi-metric-card kpi-register" (click)="irAperturaCaja()">
           <div class="kpi-card-header">
             <span class="kpi-card-title">Turnos de Caja</span>
             <div class="kpi-icon-circle register-circle">
@@ -234,7 +234,7 @@
             </span>
             <span class="kpi-hint">Saldo en gaveta</span>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
