@@ -215,12 +215,12 @@
             <th>Fecha & Hora</th>
             <th>Tipo</th>
             <th>Caja</th>
+            <th class="text-end">Monto ($)</th>
+            <th>Medio Pago</th>
             <th>Concepto / Categoría</th>
             <th>Descripción / Glosa</th>
             <th>Beneficiario / Proveedor</th>
             <th>Comprobante</th>
-            <th>Medio Pago</th>
-            <th class="text-end">Monto ($)</th>
             <th>Usuario</th>
             <th class="text-center th-acciones">Acciones</th>
           </tr>
@@ -252,6 +252,24 @@
                 <mat-icon>point_of_sale</mat-icon>
                 <span>{{ m.caja_nombre }}</span>
               </div>
+            </td>
+
+            <!-- Monto -->
+            <td class="text-end font-mono">
+              <span class="monto-val" [ngClass]="m.tipo === 'I' ? 'monto-ingreso' : 'monto-gasto'">
+                {{ m.tipo === 'I' ? '+' : '-' }}$/{{ m.monto | number:'1.2-2' }}
+              </span>
+            </td>
+
+            <!-- Medio Pago -->
+            <td>
+              <span class="pago-pill" [ngClass]="'pago-' + m.metodoPago.toLowerCase()">
+                <mat-icon *ngIf="m.metodoPago === 'EF'">payments</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'TJ' || m.metodoPago === 'TA'">credit_card</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'TR'">account_balance</mat-icon>
+                <mat-icon *ngIf="m.metodoPago === 'YP' || m.metodoPago === 'PL'">phone_android</mat-icon>
+                <span>{{ obtenerNombreMedioPago(m.metodoPago) }}</span>
+              </span>
             </td>
 
             <!-- Categoría -->
@@ -286,24 +304,6 @@
                 <span class="doc-nro" *ngIf="m.nroComprobante">{{ m.nroComprobante }}</span>
               </div>
               <span *ngIf="!m.tipoComprobante || m.tipoComprobante === 'Sin Comprobante'" class="text-muted small">Sin comprobante</span>
-            </td>
-
-            <!-- Medio Pago -->
-            <td>
-              <span class="pago-pill" [ngClass]="'pago-' + m.metodoPago.toLowerCase()">
-                <mat-icon *ngIf="m.metodoPago === 'EF'">payments</mat-icon>
-                <mat-icon *ngIf="m.metodoPago === 'TJ' || m.metodoPago === 'TA'">credit_card</mat-icon>
-                <mat-icon *ngIf="m.metodoPago === 'TR'">account_balance</mat-icon>
-                <mat-icon *ngIf="m.metodoPago === 'YP' || m.metodoPago === 'PL'">phone_android</mat-icon>
-                <span>{{ obtenerNombreMedioPago(m.metodoPago) }}</span>
-              </span>
-            </td>
-
-            <!-- Monto -->
-            <td class="text-end font-mono">
-              <span class="monto-val" [ngClass]="m.tipo === 'I' ? 'monto-ingreso' : 'monto-gasto'">
-                {{ m.tipo === 'I' ? '+' : '-' }}$/{{ m.monto | number:'1.2-2' }}
-              </span>
             </td>
 
             <!-- Usuario -->

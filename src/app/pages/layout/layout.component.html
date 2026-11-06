@@ -115,7 +115,7 @@
                       Actual: <strong>{{ item.stock | number:'1.0-2' }} {{ item.unidadMedida }}</strong>
                     </span>
                     <span class="stock-min">Mín: {{ item.stockMinimo | number:'1.0-2' }}</span>
-                    <span class="stock-deficit" *ngIf="item.deficit > 0">Falta: +{{ item.deficit | number:'1.0-2' }}</span>
+                    <!-- <span class="stock-deficit" *ngIf="item.deficit > 0">Falta: +{{ item.deficit | number:'1.0-2' }}</span> -->
                   </div>
                 </div>
               </div>

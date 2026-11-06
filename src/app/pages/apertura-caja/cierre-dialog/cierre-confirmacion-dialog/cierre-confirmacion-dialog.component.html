@@ -1,0 +1,158 @@
+<div class="confirm-modal-wrapper">
+  <!-- Cabecera -->
+  <div class="modal-header">
+    <div class="header-icon-box">
+      <mat-icon>security_update_good</mat-icon>
+    </div>
+    <div class="header-text">
+      <h3 class="modal-title">Confirmar Cierre y Liquidación</h3>
+      <span class="modal-subtitle">{{ data.cajaNombre }} • Cajero: {{ data.usuarioNombre }}</span>
+    </div>
+    <button type="button" class="btn-close-modal" (click)="cancelar()" [disabled]="guardando" matTooltip="Cerrar y volver">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido -->
+  <div class="modal-body">
+
+    <!-- 1. RESUMEN DEL ARQUEO DE CAJA -->
+    <div class="summary-card">
+      <div class="card-section-title">
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Arqueo Físico de Cierre</span>
+      </div>
+
+      <div class="summary-figures-grid">
+        <div class="figure-item main-figure">
+          <span class="figure-label">Efectivo Físico Contado</span>
+          <div class="figure-val text-primary font-monospace">
+            $/ {{ data.conteoReal | number:'1.2-2' }}
+          </div>
+          <span class="figure-sub">Dinero real en gaveta</span>
+        </div>
+
+        <div class="figure-item">
+          <span class="figure-label">Saldo Esperado Sistema</span>
+          <div class="figure-val text-dark font-monospace">
+            $/ {{ data.saldoEsperado | number:'1.2-2' }}
+          </div>
+          <span class="figure-sub">Apertura + Ventas - Egresos</span>
+        </div>
+      </div>
+
+      <!-- Badge de Estado de Cuadre -->
+      <div class="diff-badge-bar" [ngClass]="{
+        'diff-exacto': data.esCuadreExacto,
+        'diff-sobrante': data.esSobrante,
+        'diff-faltante': data.esFaltante
+      }">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon *ngIf="data.esCuadreExacto">check_circle</mat-icon>
+          <mat-icon *ngIf="data.esSobrante">add_circle</mat-icon>
+          <mat-icon *ngIf="data.esFaltante">warning</mat-icon>
+          <span class="diff-title">
+            {{ data.esCuadreExacto ? 'Cuadre Perfecto' : (data.esSobrante ? 'Sobrante en Caja' : 'Faltante en Caja') }}
+          </span>
+        </div>
+        <span class="diff-amount font-monospace">
+          {{ data.esCuadreExacto ? '$/ 0.00' : (data.esSobrante ? '+$/ ' + (data.diferencia | number:'1.2-2') : '-$/ ' + ((data.diferencia * -1) | number:'1.2-2')) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 2. TRANSFERENCIAS A CAJAS MAYORES -->
+    <div class="transfer-summary-card">
+      <div class="card-section-title">
+        <mat-icon class="text-success">swap_horiz</mat-icon>
+        <span>Transferencia a Cajas Mayores / Destino</span>
+      </div>
+
+      <!-- A. Si hay transferencia de Efectivo -->
+      <div *ngIf="data.transferirEfectivo" class="transfer-flow-box flow-efectivo mb-2">
+        <div class="flow-badge-type">
+          <mat-icon>payments</mat-icon>
+          <span>Transferencia de Efectivo</span>
+        </div>
+
+        <div class="flow-route">
+          <div class="route-point">
+            <span class="point-lbl">Caja Origen</span>
+            <strong class="point-name">{{ data.cajaNombre }}</strong>
+          </div>
+          <div class="route-arrow">
+            <span class="arrow-amount font-monospace">$/ {{ data.montoTransferirEfectivo | number:'1.2-2' }}</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+          <div class="route-point dest">
+            <span class="point-lbl">Caja Mayor Destino</span>
+            <strong class="point-name">{{ data.cajaDestinoEfectivoNombre }}</strong>
+          </div>
+        </div>
+
+        <div class="flow-footer-info">
+          <span *ngIf="data.saldoRemanenteEfectivo > 0" class="remanente-text">
+            ℹ️ Queda en esta caja como fondo: <strong class="font-monospace">$/ {{ data.saldoRemanenteEfectivo | number:'1.2-2' }}</strong>
+          </span>
+          <span *ngIf="data.saldoRemanenteEfectivo === 0" class="remanente-text text-success">
+            ✓ Se transfiere el 100% del efectivo contado a la caja mayor.
+          </span>
+        </div>
+      </div>
+
+      <!-- B. Si hay transferencia de Tarjeta -->
+      <div *ngIf="data.transferirTarjeta" class="transfer-flow-box flow-tarjeta mb-2">
+        <div class="flow-badge-type tarjeta-badge">
+          <mat-icon>credit_card</mat-icon>
+          <span>Transferencia de Ventas con Tarjeta</span>
+        </div>
+
+        <div class="flow-route">
+          <div class="route-point">
+            <span class="point-lbl">Caja Origen</span>
+            <strong class="point-name">{{ data.cajaNombre }}</strong>
+          </div>
+          <div class="route-arrow tarjeta-arrow">
+            <span class="arrow-amount font-monospace">$/ {{ data.montoTransferirTarjeta | number:'1.2-2' }}</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+          <div class="route-point dest">
+            <span class="point-lbl">Caja Destino</span>
+            <strong class="point-name">{{ data.cajaDestinoTarjetaNombre }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- C. Si NO se seleccionó transferir nada -->
+      <div *ngIf="!data.transferirEfectivo && !data.transferirTarjeta" class="no-transfer-box">
+        <mat-icon class="no-trans-icon">savings</mat-icon>
+        <div class="no-trans-text">
+          <strong>Sin transferencias a cajas mayores</strong>
+          <p>El efectivo total contado ($/ {{ data.conteoReal | number:'1.2-2' }}) permanecerá registrado en esta caja.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AVISO DE ACCIÓN DEFINITIVA -->
+    <div class="warning-callout">
+      <mat-icon class="warning-callout-icon">info</mat-icon>
+      <div class="warning-callout-text">
+        Al confirmar, la caja quedará oficialmente <strong>Cerrada</strong> y los movimientos de egreso/ingreso quedarán asentados en el sistema de manera definitiva.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Pie con Botones -->
+  <div class="modal-footer">
+    <button type="button" class="btn-cancel" (click)="cancelar()" [disabled]="guardando">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Volver a Modificar</span>
+    </button>
+    <button type="button" class="btn-confirm" (click)="confirmar()" [disabled]="guardando">
+      <mat-icon *ngIf="!guardando">check_circle</mat-icon>
+      <i class="fas fa-spinner fa-spin" *ngIf="guardando"></i>
+      <span>{{ guardando ? 'Registrando Cierre...' : 'Sí, Confirmar Cierre y Transferir' }}</span>
+    </button>
+  </div>
+</div>

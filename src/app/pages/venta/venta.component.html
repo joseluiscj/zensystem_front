@@ -273,14 +273,14 @@
             <tr>
               <!-- COLUMNA 1: COBRAR DIRECTO (EXTREMO IZQUIERDO Y STICKY) -->
               <th class="th-cobro-directo text-center">Cobro</th>
+              <th class="th-fecha">Fecha y Hora</th>
               <th class="th-mesa">Mesa / Canal</th>
               <th class="th-total text-right">Total</th>
+              <th class="th-pago">Medio Pago</th>
               <th class="th-estado text-center">Estado</th>
+              <th class="th-productos">Comanda / Platos</th>
               <th class="th-cliente">Cliente</th>
               <th class="th-id">Orden</th>
-              <th class="th-productos">Comanda / Platos</th>
-              <th class="th-pago">Medio Pago</th>
-              <th class="th-fecha">Fecha y Hora</th>
               <th class="th-acciones text-center">Opciones</th>
             </tr>
           </thead>
@@ -312,6 +312,12 @@
                 </button>
               </td>
 
+
+              <!-- 9. Fecha -->
+              <td class="td-fecha">
+                <span class="fecha-main">{{ v.created_at | date:'dd/MM/yyyy' }}</span>
+                <span class="hora-sub">{{ v.created_at | date:'shortTime':'':'es-ES' }}</span>
+              </td>
               <!-- 2. Mesa -->
               <td class="td-mesa">
                 <div *ngIf="v.idMesa && v.mesa_nombre !== 'Sin Mesa'" class="d-flex flex-column align-items-start gap-1">
@@ -336,25 +342,23 @@
                 </div>
               </td>
 
+              <!-- 8. Medio Pago -->
+              <td class="td-pago">
+                <span class="pay-badge" [class.pay-card]="v.pagoCon === 'TA'" [class.pay-cash]="v.pagoCon !== 'TA'">
+                  {{ v.pagoCon === 'TA' ? '💳 Tarjeta' : '💵 Efectivo' }}
+                </span>
+                <div *ngIf="v.nroOperacion" class="op-subtext text-muted" title="Nro. de Operación Bancaria">
+                  <mat-icon class="op-mini-icon">tag</mat-icon> Op: {{ v.nroOperacion }}
+                </div>
+                <div *ngIf="v.caja_nombre" class="caja-subtext text-muted">{{ v.caja_nombre }}</div>
+              </td>
+
               <!-- 4. Estado -->
               <td class="td-estado text-center">
                 <span class="status-pill" [class.pill-atendido]="v.state === 1" [class.pill-pendiente]="v.state !== 1">
                   <span class="pill-dot"></span>
                   {{ v.state === 1 ? 'Cobrado' : 'Por Cobrar' }}
                 </span>
-              </td>
-
-              <!-- 5. Cliente -->
-              <td class="td-cliente">
-                <div class="client-name font-bold">{{ v.nombreCliente || 'CONSUMIDOR FINAL' }}</div>
-                <div class="cajero-name text-muted" *ngIf="v.cajero_nombre" style="font-size: 11px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;">
-                  <mat-icon class="mini-icon" style="font-size: 18px;margin-right: -8px;">person</mat-icon> {{ v.cajero_nombre }}
-                </div>
-              </td>
-
-              <!-- 6. ID Orden -->
-              <td class="td-id">
-                <span class="badge-order-id">#{{ v.idPedido }}</span>
               </td>
 
               <!-- 7. Comanda / Platos -->
@@ -369,21 +373,17 @@
                 </div>
               </td>
 
-              <!-- 8. Medio Pago -->
-              <td class="td-pago">
-                <span class="pay-badge" [class.pay-card]="v.pagoCon === 'TA'" [class.pay-cash]="v.pagoCon !== 'TA'">
-                  {{ v.pagoCon === 'TA' ? '💳 Tarjeta' : '💵 Efectivo' }}
-                </span>
-                <div *ngIf="v.nroOperacion" class="op-subtext text-muted" title="Nro. de Operación Bancaria">
-                  <mat-icon class="op-mini-icon">tag</mat-icon> Op: {{ v.nroOperacion }}
+              <!-- 5. Cliente -->
+              <td class="td-cliente">
+                <div class="client-name font-bold">{{ v.nombreCliente || 'CONSUMIDOR FINAL' }}</div>
+                <div class="cajero-name text-muted" *ngIf="v.cajero_nombre" style="font-size: 11px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: flex;">
+                  <mat-icon class="mini-icon" style="font-size: 18px;margin-right: -8px;">person</mat-icon> {{ v.cajero_nombre }}
                 </div>
-                <div *ngIf="v.caja_nombre" class="caja-subtext text-muted">{{ v.caja_nombre }}</div>
               </td>
 
-              <!-- 9. Fecha -->
-              <td class="td-fecha">
-                <span class="fecha-main">{{ v.created_at | date:'dd/MM/yyyy' }}</span>
-                <span class="hora-sub">{{ v.created_at | date:'shortTime':'':'es-ES' }}</span>
+              <!-- 6. ID Orden -->
+              <td class="td-id">
+                <span class="badge-order-id">#{{ v.idPedido }}</span>
               </td>
 
               <!-- 10. Opciones / Acciones Secundarias (Sticky Right) -->

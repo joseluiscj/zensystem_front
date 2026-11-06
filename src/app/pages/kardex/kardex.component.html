@@ -216,13 +216,13 @@
           <tr>
             <th>Fecha & Hora</th>
             <th>Tipo</th>
-            <th>Almacén</th>
             <th>Producto</th>
             <th>Motivo / Referencia</th>
             <th class="text-end">Cantidad</th>
             <th class="text-center">Stock: Ant. → Result.</th>
             <th class="text-end">Costo Unit.</th>
             <th class="text-end">Total Val.</th>
+            <th>Almacén</th>
             <th>Usuario</th>
             <th class="text-center th-acciones">Acciones</th>
           </tr>
@@ -252,13 +252,6 @@
               </span>
             </td>
 
-            <!-- Almacén -->
-            <td>
-              <div class="almacen-cell">
-                <span class="alm-code">{{ m.almacen_codigo || 'ALM-01' }}</span>
-                <span class="alm-name">{{ m.almacen_nombre }}</span>
-              </div>
-            </td>
 
             <!-- Producto -->
             <td>
@@ -317,6 +310,14 @@
               <span class="total-val" [ngClass]="m.tipo === 'E' ? 'text-success' : (m.tipo === 'S' ? 'text-danger' : 'text-slate')">
                 $/ {{ (m.totalValorizado || (m.cantidad * m.costoUnitario)) | number:'1.2-2' }}
               </span>
+            </td>
+
+            <!-- Almacén -->
+            <td>
+              <div class="almacen-cell">
+                <span class="alm-code">{{ m.almacen_codigo || 'ALM-01' }}</span>
+                <span class="alm-name">{{ m.almacen_nombre }}</span>
+              </div>
             </td>
 
             <!-- Usuario Responsable -->

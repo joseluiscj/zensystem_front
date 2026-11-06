@@ -2,11 +2,12 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../material/material.module';
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AperturaCajaService } from '../../../services/apertura-caja.service';
+import { CierreConfirmacionDialogComponent } from './cierre-confirmacion-dialog/cierre-confirmacion-dialog.component';
 
 @Component({
   selector: 'app-cierre-dialog',
@@ -50,6 +51,7 @@ export class CierreDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { idCajaDetalle: number, cajaNombre?: string, aMonto?: number },
     private dialogRef: MatDialogRef<CierreDialogComponent>,
     private aperturaService: AperturaCajaService,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
@@ -193,7 +195,6 @@ export class CierreDialogComponent implements OnInit {
       return;
     }
 
-    this.isButtonDisabled = true;
     const payload = {
       idCajaDetalle: this.data.idCajaDetalle,
       cMonto: Number(conteo.toFixed(2)),
@@ -205,26 +206,42 @@ export class CierreDialogComponent implements OnInit {
       montoTransferirTarjeta: Number(montoTarTrans.toFixed(2))
     };
 
-    this.aperturaService.cerrar(payload).subscribe({
-      next: (res) => {
-        this.isButtonDisabled = false;
-        if (res.code === 200) {
-          this.snackBar.open(res.message || '¡Caja cerrada correctamente!', 'Correcto', {
-            duration: 4500,
-            panelClass: 'custom-snackbar'
-          });
-          this.dialogRef.close('success');
-        } else {
-          this.snackBar.open(res.message || 'Error al cerrar caja', 'Error', {
-            duration: 5000,
-            panelClass: 'custom-snackbar'
-          });
-        }
-      },
-      error: (err) => {
-        this.isButtonDisabled = false;
-        const msg = err?.error?.message || 'Error al cerrar caja';
-        this.snackBar.open(msg, 'Error', { duration: 5000, panelClass: 'custom-snackbar' });
+    const nombreCajaDestinoEf = this.cajasDestino.find(c => c.id === this.idCajaDestinoEfectivo)?.nombre || 'Caja Mayor / Principal';
+    const nombreCajaDestinoTar = this.cajasDestino.find(c => c.id === this.idCajaDestinoTarjeta)?.nombre || 'Caja Mayor / Principal';
+
+    const datosConfirmacion = {
+      cajaNombre: this.data.cajaNombre || this.resumen?.detalle?.cajaNombre || 'Caja',
+      usuarioNombre: this.resumen?.detalle?.usuarioNombre || 'Usuario',
+      conteoReal: conteo,
+      saldoEsperado: Number(this.resumen?.saldoEsperadoEfectivo || 0),
+      diferencia: this.diferencia,
+      esCuadreExacto: this.esCuadreExacto,
+      esSobrante: this.esSobrante,
+      esFaltante: this.esFaltante,
+
+      transferirEfectivo: payload.transferirEfectivo,
+      montoTransferirEfectivo: montoEfTrans,
+      cajaDestinoEfectivoNombre: nombreCajaDestinoEf,
+      saldoRemanenteEfectivo: Math.max(0, Math.round((conteo - (payload.transferirEfectivo ? montoEfTrans : 0)) * 100) / 100),
+
+      transferirTarjeta: payload.transferirTarjeta,
+      montoTransferirTarjeta: montoTarTrans,
+      cajaDestinoTarjetaNombre: nombreCajaDestinoTar,
+
+      payload
+    };
+
+    const confirmRef = this.dialog.open(CierreConfirmacionDialogComponent, {
+      width: '560px',
+      maxWidth: '96vw',
+      disableClose: true,
+      panelClass: 'modal-dialog-center',
+      data: datosConfirmacion
+    });
+
+    confirmRef.afterClosed().subscribe((res) => {
+      if (res === 'success') {
+        this.dialogRef.close('success');
       }
     });
   }
