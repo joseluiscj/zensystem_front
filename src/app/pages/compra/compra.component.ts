@@ -97,8 +97,15 @@ export class CompraComponent implements OnInit {
     });
   }
 
+  private formatFechaLocal(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   aplicarFiltroHoy(): void {
-    const hoy = new Date().toISOString().substring(0, 10);
+    const hoy = this.formatFechaLocal(new Date());
     this.filtros.fechaInicio = hoy;
     this.filtros.fechaFin = hoy;
     this.cargarCompras();
@@ -106,8 +113,8 @@ export class CompraComponent implements OnInit {
 
   aplicarFiltroEsteMes(): void {
     const now = new Date();
-    const primerDia = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().substring(0, 10);
-    const hoy = now.toISOString().substring(0, 10);
+    const primerDia = this.formatFechaLocal(new Date(now.getFullYear(), now.getMonth(), 1));
+    const hoy = this.formatFechaLocal(now);
     this.filtros.fechaInicio = primerDia;
     this.filtros.fechaFin = hoy;
     this.cargarCompras();

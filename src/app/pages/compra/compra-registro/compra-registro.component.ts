@@ -84,8 +84,15 @@ export class CompraRegistroComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {}
 
+  private formatFechaLocal(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   ngOnInit(): void {
-    const hoy = new Date().toISOString().substring(0, 10);
+    const hoy = this.formatFechaLocal(new Date());
 
     this.compraForm = this.fb.group({
       proveedorNombre: ['', [Validators.required, Validators.maxLength(255)]],
