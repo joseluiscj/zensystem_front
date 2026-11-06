@@ -1,24 +1,38 @@
-<div class="side-drawer-container">
-  <!-- Cabecera del Panel Lateral -->
+<div class="side-drawer-container" [class.fullscreen-dialog]="esPantallaCompleta">
+  <!-- Cabecera -->
   <div class="drawer-header">
     <div class="drawer-header-main">
       <div class="drawer-icon-circle">
         <mat-icon>receipt_long</mat-icon>
       </div>
       <div class="drawer-header-text">
-        <h3 class="drawer-title">Movimientos de Caja</h3>
+        <h3 class="drawer-title">Movimientos y Detalle de Caja</h3>
         <div class="drawer-subtitle-row">
           <span class="drawer-caja-name">{{ data.cajaNombre }}</span>
           <span class="shift-badge" [class.shift-open]="data.state === 1" [class.shift-closed]="data.state !== 1">
             <span class="shift-dot"></span>
             {{ data.state === 1 ? 'Turno Abierto' : 'Turno Cerrado' }}
           </span>
+          <span class="shift-id-tag">Turno #{{ data.idCajaDetalle }}</span>
         </div>
       </div>
     </div>
-    <button type="button" class="btn-drawer-close" (click)="close()" matTooltip="Cerrar panel">
-      <mat-icon>close</mat-icon>
-    </button>
+
+    <!-- Controles de cabecera: Pantalla Completa y Cerrar -->
+    <div class="drawer-header-actions">
+      <button 
+        type="button" 
+        class="btn-header-fullscreen" 
+        (click)="togglePantallaCompleta()" 
+        [matTooltip]="esPantallaCompleta ? 'Salir de Pantalla Completa' : 'Ver en Pantalla Completa'">
+        <mat-icon>{{ esPantallaCompleta ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
+        <span class="btn-fs-text">{{ esPantallaCompleta ? 'Restaurar' : 'Pantalla Completa' }}</span>
+      </button>
+
+      <button type="button" class="btn-drawer-close" (click)="close()" matTooltip="Cerrar ventana">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
   </div>
 
   <mat-divider></mat-divider>
@@ -31,186 +45,208 @@
       <!-- Total Ingresos -->
       <div class="kpi-mini-card kpi-ingresos">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Ingresos (+)</span>
-          <mat-icon class="kpi-mini-icon">south_west</mat-icon>
+          <span class="kpi-mini-label">Ingresos Totales (+)</span>
+          <mat-icon class="kpi-mini-icon text-success">south_west</mat-icon>
         </div>
-        <div class="kpi-mini-val text-success">+$/{{ totalIngresos | number:'1.2-2' }}</div>
-        <div class="kpi-mini-sub">{{ conteoIngresos }} registro(s)</div>
+        <div class="kpi-mini-val text-success font-monospace">+$/ {{ totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-sub">{{ conteoIngresos }} transacción(es)</div>
       </div>
 
       <!-- Total Egresos -->
       <div class="kpi-mini-card kpi-egresos">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Egresos (-)</span>
-          <mat-icon class="kpi-mini-icon">north_east</mat-icon>
+          <span class="kpi-mini-label">Egresos Totales (-)</span>
+          <mat-icon class="kpi-mini-icon text-danger">north_east</mat-icon>
         </div>
-        <div class="kpi-mini-val text-danger">-$/{{ totalEgresos | number:'1.2-2' }}</div>
-        <div class="kpi-mini-sub">{{ conteoEgresos }} registro(s)</div>
+        <div class="kpi-mini-val text-danger font-monospace">-$/ {{ totalEgresos | number:'1.2-2' }}</div>
+        <div class="kpi-mini-sub">{{ conteoEgresos }} transacción(es)</div>
       </div>
 
       <!-- Balance Neto -->
-      <div class="kpi-mini-card kpi-balance">
+      <!-- <div class="kpi-mini-card kpi-balance">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Balance Neto</span>
+          <span class="kpi-mini-label">Balance Neto en Turno</span>
           <mat-icon class="kpi-mini-icon">account_balance_wallet</mat-icon>
         </div>
-        <div class="kpi-mini-val" [ngClass]="{'text-success': balanceNeto >= 0, 'text-danger': balanceNeto < 0}">
-          $/{{ balanceNeto | number:'1.2-2' }}
+        <div class="kpi-mini-val font-monospace" [ngClass]="{'text-success': balanceNeto >= 0, 'text-danger': balanceNeto < 0}">
+          $/ {{ balanceNeto | number:'1.2-2' }}
         </div>
-        <div class="kpi-mini-sub">En este turno</div>
+        <div class="kpi-mini-sub">Ingresos menos Egresos</div>
+      </div> -->
+
+      <!-- Total Movimientos -->
+      <!-- <div class="kpi-mini-card kpi-total">
+        <div class="kpi-mini-top">
+          <span class="kpi-mini-label">Total Registros</span>
+          <mat-icon class="kpi-mini-icon">list_alt</mat-icon>
+        </div>
+        <div class="kpi-mini-val font-monospace text-primary">{{ movimientos.length }}</div>
+        <div class="kpi-mini-sub">En esta sesión</div>
+      </div> -->
+    </div>
+
+    <!-- 2. BARRA DE HERRAMIENTAS: BÚSQUEDA, FILTROS Y ACCIONES -->
+    <div class="toolbar-section">
+      <!-- Buscador -->
+      <div class="search-input-box">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar por motivo, comprobante, beneficiario, usuario o monto..." 
+          class="search-input-field"
+        />
+        <button *ngIf="searchTerm" type="button" class="btn-clear-search" (click)="searchTerm = ''" matTooltip="Limpiar búsqueda">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Filtros por tipo y botones -->
+      <div class="toolbar-actions-group">
+        <!-- Filtros Chips -->
+        <div class="filter-chips-group">
+          <button 
+            type="button" 
+            class="filter-chip-btn" 
+            [class.chip-active]="filtroTipo === 'TODOS'"
+            (click)="filtroTipo = 'TODOS'">
+            Todos ({{ movimientos.length }})
+          </button>
+          <button 
+            type="button" 
+            class="filter-chip-btn chip-in" 
+            [class.chip-active]="filtroTipo === 'I'"
+            (click)="filtroTipo = 'I'">
+            +{{ conteoIngresos }}
+          </button>
+          <button 
+            type="button" 
+            class="filter-chip-btn chip-out" 
+            [class.chip-active]="filtroTipo === 'E'"
+            (click)="filtroTipo = 'E'">
+            -{{ conteoEgresos }}
+          </button>
+        </div>
+
+        <!-- Botón Expandir / Colapsar Todos -->
+        <button 
+          type="button" 
+          class="btn-toolbar-tool" 
+          (click)="toggleExpandirTodos()" 
+          [matTooltip]="expandirTodos ? 'Colapsar detalles de todas las tarjetas' : 'Ver motivo y detalle completo de todas las tarjetas'">
+          <mat-icon>{{ expandirTodos ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+          <span>{{ expandirTodos ? 'Colapsar' : 'Expandir Todos' }}</span>
+        </button>
+
+        <!-- Botón Nuevo Movimiento Manual (si turno abierto) -->
+        <button 
+          *ngIf="data.state === 1"
+          type="button" 
+          class="btn-toolbar-add" 
+          [class.btn-toolbar-active]="mostrarNuevoMovimiento"
+          (click)="toggleNuevoMovimiento()">
+          <mat-icon>{{ mostrarNuevoMovimiento ? 'close' : 'add' }}</mat-icon>
+          <span>{{ mostrarNuevoMovimiento ? 'Cerrar Registro' : 'Nuevo Movimiento' }}</span>
+        </button>
       </div>
     </div>
 
-    <!-- 2. BOTÓN DE ACCIÓN PARA NUEVO MOVIMIENTO -->
-    <!-- <div class="action-toggle-wrapper" *ngIf="data.state === 1">
-      <button 
-        type="button" 
-        class="btn-toggle-movement" 
-        [class.btn-toggle-active]="mostrarNuevoMovimiento"
-        (click)="toggleNuevoMovimiento()">
-        <mat-icon>{{ mostrarNuevoMovimiento ? 'expand_less' : 'add_circle' }}</mat-icon>
-        <span>{{ mostrarNuevoMovimiento ? 'Ocultar Formulario' : '+ Registrar Movimiento Manual' }}</span>
-      </button>
-    </div> -->
-
-    <!-- 3. FORMULARIO VERTICAL DE NUEVO MOVIMIENTO (adaptado al drawer lateral) -->
+    <!-- 3. FORMULARIO DE NUEVO MOVIMIENTO MANUAL -->
     <div class="movement-form-card" *ngIf="mostrarNuevoMovimiento && data.state === 1">
       <div class="form-card-header">
-        <span class="form-card-title">Registrar Movimiento Manual</span>
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-primary">edit_note</mat-icon>
+          <span class="form-card-title">Registrar Movimiento Manual de Caja</span>
+        </div>
         <button type="button" class="btn-card-close" (click)="toggleNuevoMovimiento()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <form [formGroup]="movimientoForm">
-        <!-- Selector Tipo (Segmented Switch) -->
-        <div class="form-group-custom mb-3">
-          <label class="form-label-custom">Tipo de Movimiento</label>
-          <div class="segmented-type-toggle">
-            <button 
-              type="button" 
-              class="btn-segment segment-ingreso"
-              [class.active]="movimientoForm.controls['tipo'].value === 'I'"
-              (click)="setTipoMovimiento('I')">
-              <mat-icon>add_circle_outline</mat-icon>
-              <span>Ingreso (+)</span>
-            </button>
-            <button 
-              type="button" 
-              class="btn-segment segment-egreso"
-              [class.active]="movimientoForm.controls['tipo'].value === 'E'"
-              (click)="setTipoMovimiento('E')">
-              <mat-icon>remove_circle_outline</mat-icon>
-              <span>Egreso / Gasto (-)</span>
-            </button>
+      <form [formGroup]="movimientoForm" class="p-3">
+        <div class="row g-3">
+          <!-- Tipo -->
+          <div class="col-md-4 col-12">
+            <label class="form-label-custom">Tipo de Movimiento</label>
+            <div class="segmented-type-toggle">
+              <button 
+                type="button" 
+                class="btn-segment segment-ingreso"
+                [class.active]="movimientoForm.controls['tipo'].value === 'I'"
+                (click)="setTipoMovimiento('I')">
+                <mat-icon>add_circle_outline</mat-icon>
+                <span>Ingreso (+)</span>
+              </button>
+              <button 
+                type="button" 
+                class="btn-segment segment-egreso"
+                [class.active]="movimientoForm.controls['tipo'].value === 'E'"
+                (click)="setTipoMovimiento('E')">
+                <mat-icon>remove_circle_outline</mat-icon>
+                <span>Egreso (-)</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- Fila: Monto y Método de Pago -->
-        <div class="row g-2 mb-2">
-          <div class="col-6">
+          <!-- Monto -->
+          <div class="col-md-4 col-sm-6 col-12">
             <label class="form-label-custom">Monto ($/)</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <input 
                 matInput 
                 type="text" 
                 inputmode="decimal" 
-                placeholder="0.00" 
-                formControlName="monto"
+                formControlName="monto" 
                 (blur)="formatearMonto()"
+                placeholder="0.00"
                 class="text-end font-monospace"
-                required>
+              />
               <span matPrefix class="currency-prefix">$/&nbsp;</span>
             </mat-form-field>
           </div>
-          <div class="col-6">
+
+          <!-- Medio de Pago -->
+          <div class="col-md-4 col-sm-6 col-12">
             <label class="form-label-custom">Medio de Pago</label>
             <mat-form-field appearance="outline" class="w-100 drawer-field">
               <mat-select formControlName="metodoPago">
-                <mat-option value="EF">Efectivo</mat-option>
-                <mat-option value="TA">Tarjeta</mat-option>
-                <mat-option value="TR">Transferencia</mat-option>
+                <mat-option value="EF">💵 Efectivo</mat-option>
+                <mat-option value="TA">💳 Tarjeta (POS)</mat-option>
+                <mat-option value="TR">📱 Transferencia / Yape / Plin</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
-        </div>
 
-        <!-- Descripción / Motivo -->
-        <div class="form-group-custom mb-2">
-          <label class="form-label-custom">Descripción / Motivo</label>
-          <mat-form-field appearance="outline" class="w-100 drawer-field">
-            <input 
-              matInput 
-              placeholder="Ej. Aporte sencillo, Pago de insumos..." 
-              formControlName="descripcion"
-              required>
-          </mat-form-field>
-
-          <!-- Sugerencias rápidas -->
-          <div class="quick-chips-wrapper">
-            <span class="chips-label">Sugerencias:</span>
-            <div class="chips-list" *ngIf="movimientoForm.controls['tipo'].value === 'I'">
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Aporte de sencillo')">Sencillo</button>
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Ingreso extraordinario')">Extraordinario</button>
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Ajuste de caja')">Ajuste (+)</button>
-            </div>
-            <div class="chips-list" *ngIf="movimientoForm.controls['tipo'].value === 'E'">
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de insumos urgentes')">Insumos</button>
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Pago de delivery')">Delivery</button>
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Retiro de efectivo')">Retiro</button>
-              <button type="button" class="quick-chip" (click)="setDescripcionRapida('Gasto de limpieza')">Limpieza</button>
-            </div>
+          <!-- Descripción / Motivo -->
+          <div class="col-12">
+            <label class="form-label-custom">Motivo / Descripción del Movimiento</label>
+            <mat-form-field appearance="outline" class="w-100 drawer-field">
+              <textarea 
+                matInput 
+                rows="2" 
+                formControlName="descripcion" 
+                placeholder="Especifique el motivo detallado del movimiento..."
+              ></textarea>
+            </mat-form-field>
           </div>
-        </div>
 
-        <!-- Botón Guardar -->
-        <div class="form-submit-row mt-3">
-          <button 
-            type="button" 
-            class="btn-save-movement" 
-            (click)="guardarMovimiento()" 
-            [disabled]="isSaving || movimientoForm.invalid">
-            <mat-icon *ngIf="!isSaving">save</mat-icon>
-            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
-            <span>{{ isSaving ? 'Guardando...' : 'Guardar Movimiento' }}</span>
-          </button>
+          <!-- Botón Guardar -->
+          <div class="col-12 d-flex justify-content-end">
+            <button 
+              type="button" 
+              class="btn-save-movement" 
+              (click)="guardarMovimiento()" 
+              [disabled]="isSaving || movimientoForm.invalid">
+              <mat-icon *ngIf="!isSaving">save</mat-icon>
+              <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+              <span>{{ isSaving ? 'Guardando...' : 'Guardar Movimiento' }}</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>
 
-    <!-- 4. HISTORIAL DE MOVIMIENTOS & FILTROS -->
-    <div class="history-section-header">
-      <div class="history-title-box">
-        <mat-icon class="history-icon">history</mat-icon>
-        <span class="history-title">Historial</span>
-      </div>
-
-      <!-- Filtro tipo pestaña$/chips -->
-      <div class="filter-chips-group">
-        <button 
-          type="button" 
-          class="filter-chip-btn" 
-          [class.chip-active]="filtroTipo === 'TODOS'"
-          (click)="filtroTipo = 'TODOS'">
-          Todos ({{ movimientos.length }})
-        </button>
-        <button 
-          type="button" 
-          class="filter-chip-btn chip-in" 
-          [class.chip-active]="filtroTipo === 'I'"
-          (click)="filtroTipo = 'I'">
-          +{{ conteoIngresos }}
-        </button>
-        <button 
-          type="button" 
-          class="filter-chip-btn chip-out" 
-          [class.chip-active]="filtroTipo === 'E'"
-          (click)="filtroTipo = 'E'">
-          -{{ conteoEgresos }}
-        </button>
-      </div>
-    </div>
-
+    <!-- 4. HISTORIAL DE MOVIMIENTOS -->
     <!-- Loader de Carga -->
     <div *ngIf="cargando" class="loading-state">
       <mat-progress-bar mode="indeterminate" class="drawer-progress"></mat-progress-bar>
@@ -222,46 +258,143 @@
       <div class="empty-icon-circle">
         <mat-icon>receipt</mat-icon>
       </div>
-      <h5 class="empty-title">Sin movimientos</h5>
+      <h5 class="empty-title">Sin movimientos encontrados</h5>
       <p class="empty-sub">
-        {{ filtroTipo === 'TODOS' ? 'No se han registrado movimientos en este turno aún.' : 'No hay movimientos con el filtro seleccionado.' }}
+        {{ searchTerm ? 'No hay registros que coincidan con "' + searchTerm + '".' : (filtroTipo === 'TODOS' ? 'No se han registrado movimientos en este turno aún.' : 'No hay movimientos con el filtro seleccionado.') }}
       </p>
+      <button *ngIf="searchTerm" type="button" class="btn-clear-search-empty" (click)="searchTerm = ''">
+        Limpiar Filtro de Búsqueda
+      </button>
     </div>
 
-    <!-- Lista de Cards de Movimientos -->
+    <!-- LISTA DE TARJETAS DE MOVIMIENTO CON VISUALIZACIÓN COMPLETA -->
     <div class="movements-container" *ngIf="!cargando && movimientosFiltrados.length > 0">
       <div 
         class="movement-row-card" 
         *ngFor="let m of movimientosFiltrados"
         [class.movement-row-in]="m.tipo === 'I'"
-        [class.movement-row-out]="m.tipo === 'E'">
-        
-        <!-- Icono de tipo -->
-        <div class="movement-icon-box" [ngClass]="{'icon-in': m.tipo === 'I', 'icon-out': m.tipo === 'E'}">
-          <mat-icon>{{ m.tipo === 'I' ? 'south_west' : 'north_east' }}</mat-icon>
-        </div>
+        [class.movement-row-out]="m.tipo === 'E'"
+        [class.card-is-expanded]="m.expandido"
+        (click)="toggleDetalle(m)">
 
-        <!-- Información Central -->
-        <div class="movement-main-info">
-          <div class="movement-desc-text" [title]="m.descripcion">{{ m.descripcion }}</div>
-          <div class="movement-meta-row">
-            <span class="meta-pill-method">
-              {{ m.metodoPago === 'EF' ? 'Efectivo' : (m.metodoPago === 'TA' ? 'Tarjeta' : 'Transf.') }}
-            </span>
-            <span class="meta-dot">&bull;</span>
-            <span class="meta-time">{{ m.created_at | date:'shortTime' }}</span>
-            <span class="meta-dot" *ngIf="m.usuarioNombre">&bull;</span>
-            <span class="meta-user" *ngIf="m.usuarioNombre">{{ m.usuarioNombre }}</span>
+        <!-- Cabecera de la Tarjeta -->
+        <div class="card-main-header">
+          <div class="header-left-col">
+            <!-- Icono Tipo -->
+            <div class="movement-icon-box" [ngClass]="{'icon-in': m.tipo === 'I', 'icon-out': m.tipo === 'E'}">
+              <mat-icon>{{ m.tipo === 'I' ? 'south_west' : 'north_east' }}</mat-icon>
+            </div>
+
+            <!-- Metadatos de Cabecera -->
+            <div class="header-meta-group">
+              <div class="meta-badges-row">
+                <!-- Badge Tipo -->
+                <span class="meta-badge-type" [ngClass]="{'badge-in': m.tipo === 'I', 'badge-out': m.tipo === 'E'}">
+                  {{ m.tipo === 'I' ? 'INGRESO (+)' : 'EGRESO (-)' }}
+                </span>
+
+                <!-- Método de Pago -->
+                <span class="meta-badge-method">
+                  {{ m.metodoPago === 'EF' ? '💵 Efectivo' : (m.metodoPago === 'TA' ? '💳 Tarjeta' : '📱 Transferencia') }}
+                </span>
+
+                <!-- Categoría si existe -->
+                <span *ngIf="m.categoria" class="meta-badge-cat">
+                  {{ m.categoria }}
+                </span>
+
+                <!-- Comprobante si existe -->
+                <span *ngIf="m.nroComprobante || m.tipoComprobante" class="meta-badge-doc">
+                  <mat-icon>receipt</mat-icon>
+                  {{ m.tipoComprobante }} {{ m.nroComprobante }}
+                </span>
+              </div>
+
+              <!-- Motivo / Descripción Principal (Completamente visible) -->
+              <div class="movement-desc-box">
+                <span class="desc-text" [class.desc-full]="m.expandido">
+                  {{ m.descripcion }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monto y Flecha de Expansión -->
+          <div class="header-right-col">
+            <div class="amount-stack">
+              <span class="amount-val font-monospace" [ngClass]="{'amount-in': m.tipo === 'I', 'amount-out': m.tipo === 'E'}">
+                {{ m.tipo === 'I' ? '+' : '-' }}$/ {{ m.monto | number:'1.2-2' }}
+              </span>
+              <span class="amount-timestamp">{{ m.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+
+            <button type="button" class="btn-toggle-expand" matTooltip="Clic para ver detalle completo">
+              <mat-icon>{{ m.expandido ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+            </button>
           </div>
         </div>
 
-        <!-- Monto a la derecha -->
-        <div class="movement-right-amount">
-          <span class="amount-text" [ngClass]="{'amount-in': m.tipo === 'I', 'amount-out': m.tipo === 'E'}">
-            {{ m.tipo === 'I' ? '+' : '-' }}$/ {{ m.monto | number:'1.2-2' }}
-          </span>
-          <span class="amount-date-sub">{{ m.created_at | date:'dd/MM' }}</span>
+        <!-- PANEL DE DETALLE EXPANDIDO (Al hacer clic en la tarjeta) -->
+        <div class="card-expanded-panel" *ngIf="m.expandido" (click)="$event.stopPropagation()">
+          <mat-divider class="mb-3"></mat-divider>
+
+          <!-- Texto completo del motivo en bloque destacado -->
+          <!-- <div class="full-motivo-callout">
+            <div class="motivo-callout-header">
+              <mat-icon>format_quote</mat-icon>
+              <span>Texto Completo del Motivo / Descripción:</span>
+            </div>
+            <p class="motivo-callout-body">{{ m.descripcion }}</p>
+          </div> -->
+
+          <!-- Ficha de Datos Complementarios -->
+          <div class="expanded-grid-details mt-2">
+            <!-- Beneficiario / Destino -->
+            <div class="detail-cell" *ngIf="m.beneficiario">
+              <span class="detail-label">Beneficiario / Destino:</span>
+              <strong class="detail-value text-primary">
+                <mat-icon class="mini-icon">business</mat-icon>
+                {{ m.beneficiario }}
+              </strong>
+            </div>
+
+            <!-- Categoría -->
+            <div class="detail-cell" *ngIf="m.categoria">
+              <span class="detail-label">Categoría de Movimiento:</span>
+              <span class="detail-value">{{ m.categoria }}</span>
+            </div>
+
+            <!-- Comprobante -->
+            <div class="detail-cell" *ngIf="m.tipoComprobante || m.nroComprobante">
+              <span class="detail-label">Documento / Comprobante:</span>
+              <span class="detail-value font-monospace">
+                {{ m.tipoComprobante || 'Comprobante' }}: {{ m.nroComprobante || 'S/N' }}
+              </span>
+            </div>
+
+            <!-- Origen -->
+            <div class="detail-cell" *ngIf="m.origen">
+              <span class="detail-label">Origen de la Operación:</span>
+              <span class="detail-value font-bold text-uppercase">{{ m.origen }}</span>
+            </div>
+
+            <!-- Cajero / Usuario -->
+            <div class="detail-cell">
+              <span class="detail-label">Registrado por:</span>
+              <span class="detail-value text-dark">
+                <mat-icon class="mini-icon">person</mat-icon>
+                {{ m.usuarioNombre || 'Sistema' }}
+              </span>
+            </div>
+
+            <!-- Fecha y Hora exacta -->
+            <div class="detail-cell">
+              <span class="detail-label">Fecha y Hora Exacta:</span>
+              <span class="detail-value font-monospace">{{ m.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -269,13 +402,19 @@
 
   <mat-divider></mat-divider>
 
-  <!-- Pie del Drawer Lateral -->
+  <!-- Pie del Diálogo -->
   <div class="drawer-footer">
     <div class="footer-summary-left">
-      <span class="footer-count">{{ movimientos.length }} movimiento(s)</span>
+      <span class="footer-count">
+        Mostrando {{ movimientosFiltrados.length }} de {{ movimientos.length }} movimiento(s)
+      </span>
+      <span class="footer-hint" *ngIf="movimientosFiltrados.length > 0">
+        • Haga clic sobre cualquier fila para expandir o contraer su información completa
+      </span>
     </div>
     <div class="footer-actions-right">
       <button type="button" class="btn-drawer-close-action" (click)="close()">
+        <mat-icon>close</mat-icon>
         Cerrar
       </button>
     </div>

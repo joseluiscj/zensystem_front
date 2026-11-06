@@ -167,15 +167,16 @@ export class AperturaCajaComponent implements OnInit {
 
   openMovimientosDialog(item: CajaDetalle): void {
     this.dialog.open(MovimientoDialogComponent, {
-      width: '600px',
+      width: '1150px',
+      maxWidth: '96vw',
+      maxHeight: '94vh',
       disableClose: false,
       data: {
         idCajaDetalle: item.id || item.idCajaDetalle,
         cajaNombre: item.cajaNombre || (item as any).caja,
         state: item.state
       },
-      // panelClass: 'modal-dialog-responsive'
-      panelClass: 'modal-dialog-right',
+      panelClass: 'modal-dialog-movimientos-large',
     });
   }
 

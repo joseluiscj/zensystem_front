@@ -33,6 +33,9 @@ export class MovimientoDialogComponent implements OnInit {
   movimientoForm: UntypedFormGroup;
   isSaving: boolean = false;
   filtroTipo: 'TODOS' | 'I' | 'E' = 'TODOS';
+  searchTerm: string = '';
+  esPantallaCompleta: boolean = false;
+  expandirTodos: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { idCajaDetalle: number, cajaNombre: string, state: number },
@@ -81,13 +84,47 @@ export class MovimientoDialogComponent implements OnInit {
   }
 
   get movimientosFiltrados(): CajaMovimiento[] {
+    let list = this.movimientos;
     if (this.filtroTipo === 'I') {
-      return this.movimientos.filter(m => m.tipo === 'I');
+      list = list.filter(m => m.tipo === 'I');
+    } else if (this.filtroTipo === 'E') {
+      list = list.filter(m => m.tipo === 'E');
     }
-    if (this.filtroTipo === 'E') {
-      return this.movimientos.filter(m => m.tipo === 'E');
+
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const q = this.searchTerm.toLowerCase().trim();
+      list = list.filter(m => 
+        (m.descripcion && m.descripcion.toLowerCase().includes(q)) ||
+        (m.categoria && m.categoria.toLowerCase().includes(q)) ||
+        (m.beneficiario && m.beneficiario.toLowerCase().includes(q)) ||
+        (m.tipoComprobante && m.tipoComprobante.toLowerCase().includes(q)) ||
+        (m.nroComprobante && m.nroComprobante.toLowerCase().includes(q)) ||
+        (m.usuarioNombre && m.usuarioNombre.toLowerCase().includes(q)) ||
+        (m.monto && String(m.monto).includes(q))
+      );
     }
-    return this.movimientos;
+
+    return list;
+  }
+
+  togglePantallaCompleta(): void {
+    this.esPantallaCompleta = !this.esPantallaCompleta;
+    if (this.esPantallaCompleta) {
+      this.dialogRef.updateSize('100vw', '100vh');
+      this.dialogRef.addPanelClass('modal-dialog-fullscreen');
+    } else {
+      this.dialogRef.updateSize('1150px', '94vh');
+      this.dialogRef.removePanelClass('modal-dialog-fullscreen');
+    }
+  }
+
+  toggleDetalle(m: CajaMovimiento): void {
+    m.expandido = !m.expandido;
+  }
+
+  toggleExpandirTodos(): void {
+    this.expandirTodos = !this.expandirTodos;
+    this.movimientos.forEach(m => m.expandido = this.expandirTodos);
   }
 
   setTipoMovimiento(tipo: 'I' | 'E'): void {
