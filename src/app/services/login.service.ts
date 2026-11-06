@@ -16,8 +16,8 @@ interface ILoginRequest {
 export class LoginService {
   private url: string = `${environment.HOST}/login`;
   
-  /** Tiempo máximo de inactividad permitido: 15 minutos (en milisegundos) */
-  readonly INACTIVITY_LIMIT_MS: number = 15 * 60 * 1000;
+  /** Tiempo máximo de inactividad permitido: 10 horas continuas (en milisegundos) */
+  readonly INACTIVITY_LIMIT_MS: number = 10 * 60 * 60 * 1000;
   private readonly LAST_ACTIVITY_KEY: string = 'zensystem_last_activity';
 
   private lastActivityTime: number = Date.now();
@@ -51,7 +51,7 @@ export class LoginService {
   }
 
   /**
-   * Almacena el token y activa el monitoreo de inactividad (15 minutos).
+   * Almacena el token y activa el monitoreo de inactividad (10 horas).
    */
   setToken(token: string): void {
     if (typeof sessionStorage !== 'undefined') {
@@ -72,7 +72,7 @@ export class LoginService {
   }
 
   /**
-   * Registra actividad del usuario (resetea el contador de inactividad de 15 minutos).
+   * Registra actividad del usuario (resetea el contador de inactividad de 10 horas).
    */
   recordActivity(): void {
     const now = Date.now();
@@ -186,10 +186,10 @@ export class LoginService {
       if (this.jwtHelper.isTokenExpired(token)) {
         this.logout(true, 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.', 'Salió del sistema (Sesión expirada)', true);
       } else {
-        // Verificar si antes de recargar ya habían transcurrido 15 minutos de inactividad
+        // Verificar si antes de recargar ya habían transcurrido 10 horas de inactividad
         const lastAct = this.getLastActivityTime();
         if (Date.now() - lastAct >= this.INACTIVITY_LIMIT_MS) {
-          this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 15 min)', true);
+          this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad prolongada (10 horas sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 10 horas)', true);
           return;
         }
         // Si el usuario recargó la página mientras está activo, refrescar actividad y arrancar monitor
@@ -206,11 +206,11 @@ export class LoginService {
     this.stopInactivityMonitor();
     this.attachActivityListeners();
 
-    // Verificación periódica cada 10 segundos fuera de NgZone para óptimo rendimiento
+    // Verificación periódica cada 30 segundos fuera de NgZone para óptimo rendimiento
     this.ngZone.runOutsideAngular(() => {
       this.checkInterval = setInterval(() => {
         this.checkInactivity();
-      }, 10000);
+      }, 30000);
     });
   }
 
@@ -226,7 +226,7 @@ export class LoginService {
   }
 
   /**
-   * Evalúa si han transcurrido 15 minutos continuos sin uso del sistema.
+   * Evalúa si han transcurrido 10 horas continuas sin uso del sistema.
    */
   private checkInactivity(): void {
     const token = this.getToken();
@@ -238,10 +238,10 @@ export class LoginService {
     const lastAct = this.getLastActivityTime();
     const idleMs = Date.now() - lastAct;
 
-    // Solo se cierra la sesión si han pasado 15 minutos continuos sin ninguna interacción
+    // Solo se cierra la sesión si han pasado 10 horas continuas sin ninguna interacción
     if (idleMs >= this.INACTIVITY_LIMIT_MS) {
       this.ngZone.run(() => {
-        this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad (15 minutos sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 15 min)', true);
+        this.logout(true, 'Su sesión se ha cerrado automáticamente por inactividad prolongada (10 horas sin uso). Por favor, inicie sesión nuevamente.', 'Salió del sistema (Inactividad 10 horas)', true);
       });
       return;
     }
