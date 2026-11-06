@@ -610,6 +610,34 @@
   color: #64748b;
 }
 
+/* COLUMNA DE ACCIONES STICKY (VISIBLE EN PANTALLAS CHICAS) */
+.th-acciones,
+.td-acciones {
+  position: sticky;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.caja-table thead .th-acciones {
+  background-color: #f8fafc;
+  z-index: 5;
+}
+
+.mov-row:hover .td-acciones {
+  background-color: #f8fafc;
+}
+
+.row-gasto:hover .td-acciones {
+  background-color: #fff1f2;
+}
+
+.row-ingreso:hover .td-acciones {
+  background-color: #f0fdf4;
+}
+
 /* ACCIONES */
 .action-buttons-group {
   display: flex;

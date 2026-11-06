@@ -485,6 +485,51 @@
   background-color: #f1f5f9 !important;
 }
 
+/* Columna de Acciones Sticky a la Derecha */
+.custom-product-table th.mat-column-actions,
+.custom-product-table td.mat-column-actions,
+.custom-product-table th.th-acciones,
+.custom-product-table td.td-acciones {
+  position: sticky;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.custom-product-table th.mat-column-actions,
+.custom-product-table th.th-acciones {
+  background-color: #144c85 !important;
+  color: #ffffff !important;
+  z-index: 5;
+}
+
+.custom-product-table tr.even-row td.mat-column-actions,
+.custom-product-table tr.even-row td.td-acciones {
+  background-color: #ffffff;
+}
+
+.custom-product-table tr.odd-row td.mat-column-actions,
+.custom-product-table tr.odd-row td.td-acciones {
+  background-color: #f8fafc;
+}
+
+.custom-product-table tr.mat-mdc-row:hover td.mat-column-actions,
+.custom-product-table tr.mat-mdc-row:hover td.td-acciones {
+  background-color: #f1f5f9 !important;
+}
+
+:host-context(body.dark-mode) .custom-product-table td.mat-column-actions,
+:host-context(body.dark-mode) .custom-product-table td.td-acciones {
+  background-color: #0b1329;
+}
+
+:host-context(body.dark-mode) .custom-product-table tr.mat-mdc-row:hover td.mat-column-actions,
+:host-context(body.dark-mode) .custom-product-table tr.mat-mdc-row:hover td.td-acciones {
+  background-color: #11254a !important;
+}
+
 /* Badges específicos */
 .badge-sku {
   font-family: monospace;

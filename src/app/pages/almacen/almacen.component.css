@@ -697,6 +697,42 @@
   border-radius: 6px;
 }
 
+/* COLUMNA DE ACCIONES STICKY (VISIBLE EN PANTALLAS CHICAS) */
+.th-acciones,
+.td-acciones {
+  position: sticky;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.inventory-table thead .th-acciones {
+  background-color: #f8fafc;
+  z-index: 5;
+}
+
+.inv-row:hover .td-acciones {
+  background-color: #f8fafc;
+}
+
+.inv-row.row-agotado .td-acciones {
+  background-color: #fff1f2;
+}
+
+.inv-row.row-agotado:hover .td-acciones {
+  background-color: #ffe4e6;
+}
+
+.inv-row.row-bajo .td-acciones {
+  background-color: #fffbeb;
+}
+
+.inv-row.row-bajo:hover .td-acciones {
+  background-color: #fef3c7;
+}
+
 /* BOTONES DE ACCIÓN */
 .actions-group {
   display: inline-flex;

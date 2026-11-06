@@ -82,14 +82,14 @@
         <mat-form-field appearance="outline" class="w-100 drawer-field">
           <mat-select formControlName="idCaja" placeholder="Seleccione una caja">
             <mat-option *ngFor="let c of cajas" [value]="c.id">
-              <strong>{{ c.nombre }}</strong> &bull; Saldo: S/ {{ c.saldo | number:'1.2-2' }}
+              <strong>{{ c.nombre }}</strong> &bull; Saldo: $/ {{ c.saldo | number:'1.2-2' }}
             </mat-option>
           </mat-select>
           <mat-icon matPrefix class="field-icon-prefix">point_of_sale</mat-icon>
         </mat-form-field>
       </div>
 
-      <!-- 3. FECHA DE OPERACIÓN Y MONTO (S/) -->
+      <!-- 3. FECHA DE OPERACIÓN Y MONTO ($/) -->
       <div class="row g-2" style="margin-bottom: -25px;">
         <!-- Fecha -->
         <div class="col-6">
@@ -106,7 +106,7 @@
 
         <!-- Monto -->
         <div class="col-6">
-          <label class="form-label-custom">Importe / Monto (S/) *</label>
+          <label class="form-label-custom">Importe / Monto ($/) *</label>
           <mat-form-field appearance="outline" class="w-100 drawer-field">
             <input 
               matInput 
@@ -116,7 +116,7 @@
               formControlName="monto" 
               placeholder="0.00"
               required>
-            <span matPrefix class="currency-prefix">S/&nbsp;</span>
+            <span matPrefix class="currency-prefix">$/&nbsp;</span>
           </mat-form-field>
         </div>
       </div>
@@ -241,7 +241,7 @@
         <div class="impact-calc-grid">
           <div class="calc-col">
             <span class="calc-label">Saldo Actual</span>
-            <strong class="calc-num font-monospace">S/ {{ saldoActual | number:'1.2-2' }}</strong>
+            <strong class="calc-num font-monospace">$/ {{ saldoActual | number:'1.2-2' }}</strong>
           </div>
 
           <div class="calc-op">
@@ -252,7 +252,7 @@
           <div class="calc-col">
             <span class="calc-label">Monto</span>
             <strong class="calc-num font-monospace" [ngClass]="tipoActual === 'I' ? 'text-success' : 'text-danger'">
-              S/ {{ montoIngresado | number:'1.2-2' }}
+              $/ {{ montoIngresado | number:'1.2-2' }}
             </strong>
           </div>
 
@@ -263,7 +263,7 @@
           <div class="calc-col calc-result">
             <span class="calc-label">Saldo Final</span>
             <strong class="calc-num font-monospace result-val">
-              S/ {{ saldoResultante | number:'1.2-2' }}
+              $/ {{ saldoResultante | number:'1.2-2' }}
             </strong>
           </div>
         </div>

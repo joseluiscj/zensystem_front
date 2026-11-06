@@ -197,7 +197,7 @@
             <th>Pago / Caja</th>
             <th class="text-end" style="width: 120px;">Monto Total</th>
             <th class="text-center" style="width: 110px;">Estado</th>
-            <th class="text-center" style="width: 110px;">Acciones</th>
+            <th class="text-center th-acciones" style="width: 110px;">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -247,7 +247,7 @@
                 {{ c.estado }}
               </span>
             </td>
-            <td class="text-center">
+            <td class="text-center td-acciones">
               <div class="d-flex justify-content-center gap-1">
                 <button type="button" class="btn btn-sm btn-outline-primary p-1" (click)="verDetalle(c)" title="Ver detalle del comprobante">
                   <mat-icon class="sm-icon">visibility</mat-icon>

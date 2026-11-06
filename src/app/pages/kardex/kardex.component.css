@@ -777,3 +777,35 @@
   transform: translateY(-1px);
   box-shadow: 0 3px 6px -1px rgba(37, 99, 235, 0.2);
 }
+
+/* Columna de Acciones Sticky a la Derecha */
+.th-acciones,
+.td-acciones {
+  position: sticky;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.kardex-table thead .th-acciones {
+  background-color: #f8fafc;
+  z-index: 5;
+}
+
+.kardex-row:hover .td-acciones {
+  background-color: #f8fafc;
+}
+
+.kardex-row.row-entrada:hover .td-acciones {
+  background-color: #f0fdf4;
+}
+
+.kardex-row.row-salida:hover .td-acciones {
+  background-color: #fef2f2;
+}
+
+.kardex-row.row-ajuste:hover .td-acciones {
+  background-color: #fffbeb;
+}

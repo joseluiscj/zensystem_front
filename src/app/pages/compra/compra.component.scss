@@ -247,3 +247,31 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Columna de Acciones Sticky a la Derecha */
+.th-acciones,
+.td-acciones {
+  position: sticky;
+  right: 0;
+  background-color: #ffffff;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+thead .th-acciones {
+  background-color: #f8f9fa;
+  z-index: 5;
+}
+
+tr:hover .td-acciones {
+  background-color: #f8fafc;
+}
+
+tr.table-danger-subtle .td-acciones {
+  background-color: #f8d7da;
+}
+
+tr.table-danger-subtle:hover .td-acciones {
+  background-color: #f1b0b7;
+}

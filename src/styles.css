@@ -110,6 +110,23 @@ body {
 }
 
 /**/
+/* Utilidad Global: Columna de Opciones / Acciones Sticky a la Derecha */
+.table-responsive th.th-acciones,
+.table-responsive td.td-acciones,
+.table-responsive-container th.th-acciones,
+.table-responsive-container td.td-acciones {
+  position: sticky;
+  right: 0;
+  z-index: 4;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.table-responsive thead th.th-acciones,
+.table-responsive-container thead th.th-acciones {
+  z-index: 5;
+}
+
 .wrap-title-with-buttons {
     display: flex !important;
     flex-wrap: wrap !important;
