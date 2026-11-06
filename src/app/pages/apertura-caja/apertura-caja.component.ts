@@ -15,6 +15,7 @@ import { CajaDetalle } from '../../../model/cajaDetalle';
 import { AperturaDialogComponent } from './apertura-dialog/apertura-dialog.component';
 import { CierreDialogComponent } from './cierre-dialog/cierre-dialog.component';
 import { MovimientoDialogComponent } from './movimiento-dialog/movimiento-dialog.component';
+import { CierreArqueoDialogComponent } from '../movimiento-caja/cierre-arqueo-dialog/cierre-arqueo-dialog.component';
 
 @Component({
   selector: 'app-apertura-caja',
@@ -161,6 +162,17 @@ export class AperturaCajaComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'success') {
         this.cargarDatos();
+      }
+    });
+  }
+
+  openReporteCierreDialog(item: CajaDetalle): void {
+    this.dialog.open(CierreArqueoDialogComponent, {
+      width: '820px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: {
+        idCajaDetalle: item.id || item.idCajaDetalle
       }
     });
   }

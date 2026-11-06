@@ -171,6 +171,14 @@
                       <mat-icon style="color: #f59e0b !important;">lock_clock</mat-icon> Cerrar
                     </button>
 
+                    <button *ngIf="row.state !== 1" 
+                            mat-raised-button 
+                            (click)="openReporteCierreDialog(row)" 
+                            class="small-buttonc btn-reporte-cierre" 
+                            matTooltip="Ver acta de cierre y arqueo de caja">
+                      <mat-icon style="color: #0284c7 !important;">fact_check</mat-icon> Reporte
+                    </button>
+
                     <button mat-raised-button 
                             (click)="openMovimientosDialog(row)" 
                             class="small-buttonc btn-view-movements" 
@@ -224,6 +232,9 @@
         <mat-card-actions class="car_footer d-flex justify-content-end gap-2 p-2" style="border-radius: 0 0 8px 8px;">
           <button *ngIf="item.state === 1" mat-raised-button color="warn" (click)="openCerrarDialog(item)" style="font-size: 12px;">
             <mat-icon>lock_clock</mat-icon> Cerrar
+          </button>
+          <button *ngIf="item.state !== 1" mat-raised-button class="btn-reporte-cierre" (click)="openReporteCierreDialog(item)" style="font-size: 12px; background: #e0f2fe; color: #0369a1;">
+            <mat-icon>fact_check</mat-icon> Reporte Cierre
           </button>
           <button mat-raised-button color="primary" (click)="openMovimientosDialog(item)" style="font-size: 12px;">
             <mat-icon>receipt_long</mat-icon> Movimientos

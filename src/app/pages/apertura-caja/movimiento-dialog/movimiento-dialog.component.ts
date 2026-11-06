@@ -59,15 +59,25 @@ export class MovimientoDialogComponent implements OnInit {
     });
   }
 
+  esMovimientoCierre(m: CajaMovimiento): boolean {
+    const origen = (m.origen || '').toUpperCase();
+    if (origen === 'CIERRE') return true;
+    const nro = (m.nroComprobante || '').toUpperCase();
+    if (nro.includes('TRANSF-CIERRE')) return true;
+    const desc = (m.descripcion || '').toLowerCase();
+    if (desc.includes('por cierre') || (desc.includes('transferencia') && desc.includes('cierre'))) return true;
+    return false;
+  }
+
   get totalIngresos(): number {
     return this.movimientos
-      .filter(m => m.tipo === 'I')
+      .filter(m => m.tipo === 'I' && !this.esMovimientoCierre(m))
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
   }
 
   get totalEgresos(): number {
     return this.movimientos
-      .filter(m => m.tipo === 'E')
+      .filter(m => m.tipo === 'E' && !this.esMovimientoCierre(m))
       .reduce((sum, m) => sum + Number(m.monto || 0), 0);
   }
 
@@ -76,11 +86,21 @@ export class MovimientoDialogComponent implements OnInit {
   }
 
   get conteoIngresos(): number {
-    return this.movimientos.filter(m => m.tipo === 'I').length;
+    return this.movimientos.filter(m => m.tipo === 'I' && !this.esMovimientoCierre(m)).length;
   }
 
   get conteoEgresos(): number {
-    return this.movimientos.filter(m => m.tipo === 'E').length;
+    return this.movimientos.filter(m => m.tipo === 'E' && !this.esMovimientoCierre(m)).length;
+  }
+
+  get totalTransferidoCierre(): number {
+    return this.movimientos
+      .filter(m => this.esMovimientoCierre(m))
+      .reduce((sum, m) => sum + Number(m.monto || 0), 0);
+  }
+
+  get conteoTransferenciasCierre(): number {
+    return this.movimientos.filter(m => this.esMovimientoCierre(m)).length;
   }
 
   get movimientosFiltrados(): CajaMovimiento[] {

@@ -42,46 +42,46 @@
 
     <!-- 1. RESUMEN EJECUTIVO / KPIS DEL TURNO -->
     <div class="kpi-mini-grid">
-      <!-- Total Ingresos -->
+      <!-- Total Ingresos Operativos -->
       <div class="kpi-mini-card kpi-ingresos">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Ingresos Totales (+)</span>
+          <span class="kpi-mini-label">Ingresos en Turno (+)</span>
           <mat-icon class="kpi-mini-icon text-success">south_west</mat-icon>
         </div>
         <div class="kpi-mini-val text-success font-monospace">+$/ {{ totalIngresos | number:'1.2-2' }}</div>
-        <div class="kpi-mini-sub">{{ conteoIngresos }} transacción(es)</div>
+        <div class="kpi-mini-sub">{{ conteoIngresos }} transacción(es) (operativo)</div>
       </div>
 
-      <!-- Total Egresos -->
+      <!-- Total Egresos / Gastos (sin cierre) -->
       <div class="kpi-mini-card kpi-egresos">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Egresos Totales (-)</span>
+          <span class="kpi-mini-label">Egresos / Gastos (-)</span>
           <mat-icon class="kpi-mini-icon text-danger">north_east</mat-icon>
         </div>
         <div class="kpi-mini-val text-danger font-monospace">-$/ {{ totalEgresos | number:'1.2-2' }}</div>
-        <div class="kpi-mini-sub">{{ conteoEgresos }} transacción(es)</div>
+        <div class="kpi-mini-sub">{{ conteoEgresos }} gasto(s) (sin cierre)</div>
       </div>
+
+      <!-- Liquidación al Cierre (si existen transferencias de cierre) -->
+      <!-- <div class="kpi-mini-card kpi-cierre" *ngIf="conteoTransferenciasCierre > 0">
+        <div class="kpi-mini-top">
+          <span class="kpi-mini-label">Liquidación al Cierre</span>
+          <mat-icon class="kpi-mini-icon text-primary">swap_horiz</mat-icon>
+        </div>
+        <div class="kpi-mini-val text-primary font-monospace">$/ {{ totalTransferidoCierre | number:'1.2-2' }}</div>
+        <div class="kpi-mini-sub">{{ conteoTransferenciasCierre }} transferencia(s) a cajas mayores</div>
+      </div> -->
 
       <!-- Balance Neto -->
       <!-- <div class="kpi-mini-card kpi-balance">
         <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Balance Neto en Turno</span>
+          <span class="kpi-mini-label">Balance Neto Turno</span>
           <mat-icon class="kpi-mini-icon">account_balance_wallet</mat-icon>
         </div>
         <div class="kpi-mini-val font-monospace" [ngClass]="{'text-success': balanceNeto >= 0, 'text-danger': balanceNeto < 0}">
           $/ {{ balanceNeto | number:'1.2-2' }}
         </div>
-        <div class="kpi-mini-sub">Ingresos menos Egresos</div>
-      </div> -->
-
-      <!-- Total Movimientos -->
-      <!-- <div class="kpi-mini-card kpi-total">
-        <div class="kpi-mini-top">
-          <span class="kpi-mini-label">Total Registros</span>
-          <mat-icon class="kpi-mini-icon">list_alt</mat-icon>
-        </div>
-        <div class="kpi-mini-val font-monospace text-primary">{{ movimientos.length }}</div>
-        <div class="kpi-mini-sub">En esta sesión</div>
+        <div class="kpi-mini-sub">Ingresos menos Egresos operativos</div>
       </div> -->
     </div>
 
@@ -139,7 +139,7 @@
         </button>
 
         <!-- Botón Nuevo Movimiento Manual (si turno abierto) -->
-        <button 
+        <!-- <button 
           *ngIf="data.state === 1"
           type="button" 
           class="btn-toolbar-add" 
@@ -147,7 +147,7 @@
           (click)="toggleNuevoMovimiento()">
           <mat-icon>{{ mostrarNuevoMovimiento ? 'close' : 'add' }}</mat-icon>
           <span>{{ mostrarNuevoMovimiento ? 'Cerrar Registro' : 'Nuevo Movimiento' }}</span>
-        </button>
+        </button> -->
       </div>
     </div>
 
