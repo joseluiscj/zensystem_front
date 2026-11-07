@@ -16,7 +16,7 @@ import { CierreArqueoDialogComponent } from './cierre-arqueo-dialog/cierre-arque
   standalone: true,
   imports: [
     CommonModule,
-    MaterialModule,
+    MaterialModule, 
     MatProgressBarModule,
     FormsModule,
     DecimalPipe,

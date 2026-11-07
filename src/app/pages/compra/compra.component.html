@@ -219,9 +219,9 @@
             <th style="width: 130px;">Fecha / Hora</th>
             <th>Proveedor</th>
             <th>Comprobante</th>
-            <th>Almacén</th>
             <th>Pago / Caja</th>
             <th class="text-end" style="width: 120px;">Monto Total</th>
+            <th>Almacén</th>
             <th class="text-center" style="width: 110px;">Estado</th>
             <th class="text-center th-acciones" style="width: 110px;">Acciones</th>
           </tr>
@@ -246,12 +246,6 @@
               <div class="small text-muted" *ngIf="c.nroComprobante">{{ c.nroComprobante }}</div>
             </td>
             <td>
-              <div class="d-flex align-items-center gap-1">
-                <mat-icon class="sm-icon text-secondary">warehouse</mat-icon>
-                <span>{{ c.almacenNombre }}</span>
-              </div>
-            </td>
-            <td>
               <div>
                 <span class="badge bg-light text-secondary border">
                   {{ c.metodoPago === 'EF' ? 'Efectivo' : (c.metodoPago === 'TA' ? 'Tarjeta' : (c.metodoPago === 'TR' ? 'Transferencia' : (c.metodoPago === 'CR' ? 'Crédito' : 'Sin Pago'))) }}
@@ -267,6 +261,12 @@
                 $/ {{ c.montoTotal | number:'1.2-2' }}
               </span>
               <div class="small text-muted">{{ c.totalItems }} prod. ({{ c.totalUnidades }} un.)</div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1">
+                <mat-icon class="sm-icon text-secondary">warehouse</mat-icon>
+                <span>{{ c.almacenNombre }}</span>
+              </div>
             </td>
             <td class="text-center">
               <span class="badge" [ngClass]="c.estado === 'REGISTRADO' ? 'bg-success' : 'bg-danger'">

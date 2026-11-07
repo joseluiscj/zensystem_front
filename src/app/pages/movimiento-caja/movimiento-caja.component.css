@@ -859,3 +859,48 @@
   font-weight: 700;
   color: #334155;
 }
+
+.btn-apply-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #103A64;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.btn-apply-filter:hover {
+  background: #0a233c;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+.btn-apply-filter-limpiar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #fff;
+  color: #103A64;
+  border: 1px solid #103A64;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+.filter-actions-col {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

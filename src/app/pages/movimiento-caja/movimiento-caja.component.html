@@ -116,9 +116,10 @@
 
   <!-- BARRA DE FILTROS -->
   <div class="caja-filters-card mb-4">
-    <div class="filters-grid">
+    <!-- <div class="filters-grid"> -->
+    <div class="row">
       <!-- Búsqueda rápida -->
-      <div class="filter-item filter-search">
+      <div class="  col-md-5">
         <label class="filter-label">Buscar Concepto / Beneficiario / Doc:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <input matInput [(ngModel)]="filtros.search" (keyup.enter)="cargarMovimientos()" placeholder="Ej: Luz, Agua, Factura, Carlos...">
@@ -130,7 +131,7 @@
       </div>
 
       <!-- Tipo de Movimiento -->
-      <div class="filter-item">
+      <div class="col-md-4">
         <label class="filter-label">Tipo Movimiento:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <mat-select [(ngModel)]="filtros.tipo" (selectionChange)="cargarMovimientos()">
@@ -142,7 +143,7 @@
       </div>
 
       <!-- Caja -->
-      <div class="filter-item">
+      <div class="col-md-3">
         <label class="filter-label">Caja:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <mat-select [(ngModel)]="filtros.idCaja" (selectionChange)="cargarMovimientos()">
@@ -155,7 +156,7 @@
       </div>
 
       <!-- Medio de Pago -->
-      <div class="filter-item">
+      <div class="col-md-3">
         <label class="filter-label">Medio de Pago:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <mat-select [(ngModel)]="filtros.metodoPago" (selectionChange)="cargarMovimientos()">
@@ -170,7 +171,7 @@
       </div>
 
       <!-- Fecha Desde -->
-      <div class="filter-item">
+      <div class="col-md-3">
         <label class="filter-label">Desde:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()">
@@ -178,7 +179,7 @@
       </div>
 
       <!-- Fecha Hasta -->
-      <div class="filter-item">
+      <div class="col-md-3">
         <label class="filter-label">Hasta:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
           <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()">
@@ -186,20 +187,32 @@
       </div>
 
       <!-- Botones de Acción Filtros -->
-      <div class="filter-actions-inline">
-        <button type="button" class="btn-filter-today" [class.btn-today-active]="esFiltroHoy" (click)="aplicarFiltroHoy()" matTooltip="Filtrar movimientos de hoy">
+      <!-- <div class="filter-actions-inline"> -->
+      <div class="col-md-2 filter-actions-col">
+        <!-- <button type="button" class="btn-filter-today" [class.btn-today-active]="esFiltroHoy" (click)="aplicarFiltroHoy()" matTooltip="Filtrar movimientos de hoy">
           <mat-icon>today</mat-icon>
           <span>Hoy</span>
-        </button>
+        </button> -->
 
-        <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
+        <!-- <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
           <mat-icon>tune</mat-icon>
           <span>Filtrar</span>
         </button>
 
         <button type="button" class="btn-action-reset" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
           <mat-icon>refresh</mat-icon>
+        </button> -->
+ 
+        <button type="button" class="btn-apply-filter" (click)="cargarMovimientos()">
+          <mat-icon>filter_alt</mat-icon> Buscar
         </button>
+        <button type="button" class="btn-apply-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+            Limpiar
+        </button>
+
+
+
+
       </div>
     </div>
   </div>
@@ -219,8 +232,8 @@
             <th>Medio Pago</th>
             <th>Concepto / Categoría</th>
             <th>Descripción / Glosa</th>
-            <th>Beneficiario / Proveedor</th>
             <th>Comprobante</th>
+            <th>Beneficiario / Proveedor</th>
             <th>Usuario</th>
             <th class="text-center th-acciones">Acciones</th>
           </tr>
@@ -291,6 +304,15 @@
               </div>
             </td>
 
+            <!-- Comprobante -->
+            <td>
+              <div class="doc-cell" *ngIf="m.tipoComprobante && m.tipoComprobante !== 'Sin Comprobante'">
+                <span class="doc-type">{{ m.tipoComprobante }}</span>
+                <span class="doc-nro" *ngIf="m.nroComprobante">{{ m.nroComprobante }}</span>
+              </div>
+              <span *ngIf="!m.tipoComprobante || m.tipoComprobante === 'Sin Comprobante'" class="text-muted small">Sin comprobante</span>
+            </td>
+            
             <!-- Beneficiario -->
             <td>
               <div class="beneficiario-cell" *ngIf="m.beneficiario">
@@ -300,18 +322,9 @@
               <span *ngIf="!m.beneficiario" class="text-muted small">-</span>
             </td>
 
-            <!-- Comprobante -->
-            <td>
-              <div class="doc-cell" *ngIf="m.tipoComprobante && m.tipoComprobante !== 'Sin Comprobante'">
-                <span class="doc-type">{{ m.tipoComprobante }}</span>
-                <span class="doc-nro" *ngIf="m.nroComprobante">{{ m.nroComprobante }}</span>
-              </div>
-              <span *ngIf="!m.tipoComprobante || m.tipoComprobante === 'Sin Comprobante'" class="text-muted small">Sin comprobante</span>
-            </td>
-
             <!-- Usuario -->
             <td>
-              <span class="user-pill">
+              <span class="user-pill" style="font-size: 8px;line-height: 0;">
                 {{ m.usuario_nombre }}
               </span>
             </td>
