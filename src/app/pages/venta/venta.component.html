@@ -128,14 +128,14 @@
       <div class="filter-quick-bar">
         <!-- Chips de Acceso Rápido -->
         <div class="quick-chips-group">
-          <button 
+          <!-- <button 
             type="button" 
             class="chip-btn" 
             [class.chip-active]="filtros.state === 'todos' && !esFiltroHoy" 
             (click)="filtrarTodos()">
             <mat-icon class="chip-icon">list_alt</mat-icon>
             <span>Todas</span>
-          </button>
+          </button> -->
 
           <button 
             type="button" 
@@ -190,9 +190,9 @@
             <mat-icon class="toggle-arrow">{{ mostrarFiltrosAvanzados ? 'expand_less' : 'expand_more' }}</mat-icon>
           </button>
 
-          <button type="button" class="btn-reset-quick" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+          <!-- <button type="button" class="btn-reset-quick" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
             <mat-icon>restart_alt</mat-icon>
-          </button>
+          </button> -->
         </div>
       </div>
 
@@ -239,7 +239,7 @@
           </div>
 
           <!-- Mesa -->
-          <div class="filter-field" *ngIf="mesasCatalogo.length > 0">
+          <!-- <div class="filter-field" *ngIf="mesasCatalogo.length > 0">
             <label class="field-label">
               <mat-icon>table_restaurant</mat-icon> Mesa
             </label>
@@ -247,12 +247,15 @@
               <option value="todos">Todas las Mesas</option>
               <option *ngFor="let m of mesasCatalogo" [value]="m.id || m.idMesa">{{ m.nombre || m.f_nombre }}</option>
             </select>
-          </div>
+          </div> -->
 
           <!-- Botón Aplicar en panel avanzado -->
           <div class="filter-actions-col">
             <button type="button" class="btn-apply-filter" (click)="aplicarFiltros()">
-              <mat-icon>filter_alt</mat-icon> Aplicar
+              <mat-icon>filter_alt</mat-icon> Buscar
+            </button>
+            <button type="button" class="btn-apply-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+                Limpiar
             </button>
           </div>
         </div>

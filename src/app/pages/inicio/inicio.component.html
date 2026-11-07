@@ -14,8 +14,8 @@
           </span>
         </div>
         <p class="hero-subtitle">
-          <mat-icon class="subtitle-icon">calendar_today</mat-icon>
-          <span>{{ fechaActual | date:'fullDate':'':'es-ES' | titlecase }}</span>
+          <mat-icon class="subtitle-icon" style="color: #ffffffe3;">calendar_today</mat-icon>
+          <span style="color: #ffffffe3;">{{ fechaActual | date:'fullDate':'':'es-ES' | titlecase }}</span>
           <span class="subtitle-divider">&bull;</span>
           <!-- <mat-icon class="subtitle-icon">storefront</mat-icon> -->
           <!-- <span>Panel de Control & Ventas  </span> -->
@@ -41,7 +41,7 @@
   </header>
 
   <!-- BARRA DE FILTROS POR FECHA -->
-  <section class="dashboard-filter-card">
+  <section class="dashboard-filter-card d-none">
     <div class="filter-card-header">
       <div class="filter-header-title">
         <mat-icon class="filter-icon">filter_alt</mat-icon>

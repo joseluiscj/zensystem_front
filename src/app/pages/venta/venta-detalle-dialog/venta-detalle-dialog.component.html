@@ -139,15 +139,15 @@
   <!-- Botones de Acción -->
   <div class="ticket-modal-actions">
     <!-- Botón Cobrar y Liberar si está pendiente (solo modo editable) -->
-    <button *ngIf="!soloLectura && pedido?.f_state !== 1" type="button" class="btn-action-cobrar" (click)="cobrar()" matTooltip="Cobrar comanda y liberar mesa">
+    <!-- <button *ngIf="!soloLectura && pedido?.f_state !== 1" type="button" class="btn-action-cobrar" (click)="cobrar()" matTooltip="Cobrar comanda y liberar mesa">
       <mat-icon>point_of_sale</mat-icon> Cobrar y Liberar Mesa
-    </button>
-    <button *ngIf="!soloLectura" mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
+    </button> -->
+    <!-- <button *ngIf="!soloLectura" mat-raised-button color="primary" class="btn-action-edit" (click)="editar()" matTooltip="Editar este pedido">
       <mat-icon>edit</mat-icon> Editar Comanda
-    </button>
-    <button mat-stroked-button class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir comprobante">
+    </button> -->
+    <!-- <button mat-stroked-button class="btn-action-print" (click)="imprimir()" matTooltip="Imprimir comprobante">
       <mat-icon>print</mat-icon> Imprimir
-    </button>
+    </button> -->
     <button mat-button class="btn-action-close" (click)="cerrar()">
       Cerrar
     </button>

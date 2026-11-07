@@ -983,7 +983,7 @@
 }
 
 .filter-icon {
-  color: #2563eb;
+  color: #103A64;
   font-size: 20px;
   width: 20px;
   height: 20px;
@@ -1104,12 +1104,12 @@
 }
 
 .btn-apply {
-  background: #2563eb;
+  background: #103A64;
   color: #ffffff;
 }
 
 .btn-apply:hover {
-  background: #1d4ed8;
+  background: #0b3259;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
 }
 

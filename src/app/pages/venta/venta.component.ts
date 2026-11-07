@@ -61,7 +61,7 @@ export class VentaComponent implements OnInit {
   };
 
   esFiltroHoy: boolean = false;
-  mostrarFiltrosAvanzados: boolean = false;
+  mostrarFiltrosAvanzados: boolean = true;
 
   // Catálogo de mesas para el selector de filtros
   mesasCatalogo: any[] = [];
@@ -125,7 +125,8 @@ export class VentaComponent implements OnInit {
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
     this.filtrarHoy();
-    this.cargarMesasCatalogo();
+    this.cargarVentas();
+    // this.cargarMesasCatalogo();
   }
 
   obtenerFechaHoy(): string {
