@@ -967,3 +967,22 @@ body.dark-mode .box-sin-caja {
 body.dark-mode .sin-caja-label {
     color: #fda4af !important;
 }
+
+/* ESTILOS GLOBALES DE INPUTS TIPO FECHA CON CALENDARIO */
+input[type="date"] {
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: #e2e8f0;
+  transform: scale(1.1);
+}

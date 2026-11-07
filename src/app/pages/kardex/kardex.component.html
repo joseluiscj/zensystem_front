@@ -175,7 +175,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Desde:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()">
+          <input matInput type="date" #kardexDesdeInput [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()" (click)="kardexDesdeInput.showPicker()">
         </mat-form-field>
       </div>
 
@@ -183,7 +183,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Hasta:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()">
+          <input matInput type="date" #kardexHastaInput [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()" (click)="kardexHastaInput.showPicker()">
         </mat-form-field>
       </div>
 

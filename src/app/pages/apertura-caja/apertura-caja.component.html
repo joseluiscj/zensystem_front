@@ -58,14 +58,14 @@
       <div class="col-md-2">
         <mat-form-field appearance="fill" class="custom-input w-100">
           <mat-label class="labeltext">Fecha Desde:</mat-label>
-          <input matInput type="date" formControlName="fechaDesde">
+          <input matInput type="date" #cajaDesdeInput formControlName="fechaDesde" (click)="cajaDesdeInput.showPicker()">
         </mat-form-field>
       </div>
 
       <div class="col-md-2">
         <mat-form-field appearance="fill" class="custom-input w-100">
           <mat-label class="labeltext">Fecha Hasta:</mat-label>
-          <input matInput type="date" formControlName="fechaHasta">
+          <input matInput type="date" #cajaHastaInput formControlName="fechaHasta" (click)="cajaHastaInput.showPicker()">
         </mat-form-field>
       </div>
 

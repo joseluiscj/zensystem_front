@@ -174,7 +174,7 @@
       <div class="col-md-3">
         <label class="filter-label">Desde:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()">
+          <input matInput type="date" #movDesdeInput [(ngModel)]="filtros.fechaInicio" (change)="onFechaChange(); cargarMovimientos()" (click)="movDesdeInput.showPicker()">
         </mat-form-field>
       </div>
 
@@ -182,7 +182,7 @@
       <div class="col-md-3">
         <label class="filter-label">Hasta:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()">
+          <input matInput type="date" #movHastaInput [(ngModel)]="filtros.fechaFin" (change)="onFechaChange(); cargarMovimientos()" (click)="movHastaInput.showPicker()">
         </mat-form-field>
       </div>
 

@@ -169,7 +169,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Desde:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
+          <input matInput type="date" #compraDesdeInput [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()" (click)="compraDesdeInput.showPicker()">
         </mat-form-field>
       </div>
 
@@ -177,7 +177,7 @@
       <div class="filter-item filter-date">
         <label class="filter-label">Hasta:</label>
         <mat-form-field appearance="outline" class="w-100 filter-field">
-          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
+          <input matInput type="date" #compraHastaInput [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()" (click)="compraHastaInput.showPicker()">
         </mat-form-field>
       </div>
 
