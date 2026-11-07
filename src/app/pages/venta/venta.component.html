@@ -122,142 +122,95 @@
       </div> -->
     </div>
 
-    <!-- BARRA DE FILTROS OPTIMIZADA Y COMPACTA (APTA PARA LAPTOPS) -->
-    <div class="ventas-filter-card mb-3">
-      <!-- Fila de Acceso Rápido (Compacta) -->
-      <div class="filter-quick-bar">
-        <!-- Chips de Acceso Rápido -->
-        <div class="quick-chips-group">
-          <!-- <button 
-            type="button" 
-            class="chip-btn" 
-            [class.chip-active]="filtros.state === 'todos' && !esFiltroHoy" 
-            (click)="filtrarTodos()">
-            <mat-icon class="chip-icon">list_alt</mat-icon>
-            <span>Todas</span>
-          </button> -->
+    <!-- BARRA DE FILTROS & BÚSQUEDA (Estilo unificado con Almacén) -->
+    <div class="ventas-filters-card mb-4">
+      <div class="filters-row">
+        <!-- Búsqueda rápida por cliente o # orden -->
+        <div class="filter-item filter-search">
+          <label class="filter-label">Buscar Venta / Cliente / Orden:</label>
+          <mat-form-field appearance="outline" class="w-100 filter-field">
+            <input matInput [(ngModel)]="filtros.search" (keyup.enter)="aplicarFiltros()" placeholder="Cliente, DNI/RUC, # orden...">
+            <mat-icon matPrefix class="search-icon">search</mat-icon>
+            <button *ngIf="filtros.search" matSuffix mat-icon-button (click)="filtros.search = ''; aplicarFiltros()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
 
-          <button 
-            type="button" 
-            class="chip-btn chip-pendientes" 
-            [class.chip-active]="filtros.state === '0'" 
-            [class.chip-has-pendientes]="(resumen.totalPendientes || 0) > 0" 
-            (click)="filtrarPendientes()"
-            matTooltip="Ver solo ventas y comandas pendientes de cobro">
+        <!-- Filtro por Estado Cobranza -->
+        <div class="filter-item">
+          <label class="filter-label">Estado Cobranza:</label>
+          <mat-form-field appearance="outline" class="w-100 filter-field">
+            <mat-select [(ngModel)]="filtros.state" (selectionChange)="aplicarFiltros()">
+              <mat-option value="todos">Todos los estados</mat-option>
+              <mat-option value="1">Cobrado / Atendido</mat-option>
+              <mat-option value="0">Pendiente por Cobrar</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Filtro por Medio de Pago -->
+        <div class="filter-item">
+          <label class="filter-label">Medio de Pago:</label>
+          <mat-form-field appearance="outline" class="w-100 filter-field">
+            <mat-select [(ngModel)]="filtros.pagoCon" (selectionChange)="aplicarFiltros()">
+              <mat-option value="todos">Todos los medios</mat-option>
+              <mat-option value="EF">Efectivo en Caja</mat-option>
+              <mat-option value="TA">Tarjeta Débito/Crédito</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Filtro Desde -->
+        <div class="filter-item filter-date">
+          <label class="filter-label">Desde:</label>
+          <mat-form-field appearance="outline" class="w-100 filter-field">
+            <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="aplicarFiltros()">
+          </mat-form-field>
+        </div>
+
+        <!-- Filtro Hasta -->
+        <div class="filter-item filter-date">
+          <label class="filter-label">Hasta:</label>
+          <mat-form-field appearance="outline" class="w-100 filter-field">
+            <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="aplicarFiltros()">
+          </mat-form-field>
+        </div>
+
+        <!-- Botones de Acción Inline -->
+        <div class="filter-actions-inline">
+          <!-- Chip Por Cobrar -->
+          <button type="button" 
+                  class="chip-btn chip-pendientes" 
+                  [class.chip-active]="filtros.state === '0'" 
+                  [class.chip-has-pendientes]="(resumen.totalPendientes || 0) > 0" 
+                  (click)="filtrarPendientes()"
+                  matTooltip="Ver solo ventas pendientes de cobro">
             <mat-icon class="chip-icon">hourglass_top</mat-icon>
             <span>Por Cobrar</span>
             <span class="chip-badge" *ngIf="(resumen.totalPendientes || 0) > 0">{{ resumen.totalPendientes }}</span>
           </button>
 
-          <button 
-            type="button" 
-            class="chip-btn" 
-            [class.chip-active]="esFiltroHoy && filtros.state === 'todos'" 
-            (click)="filtrarHoy()"
-            matTooltip="Ver ventas de hoy">
-            <mat-icon class="chip-icon">today</mat-icon>
+          <!-- Botón Hoy -->
+          <button type="button" 
+                  class="btn-filter-quick"
+                  [class.btn-filter-quick-active]="esFiltroHoy && filtros.state === 'todos'" 
+                  (click)="filtrarHoy()"
+                  matTooltip="Ver ventas de hoy">
+            <mat-icon>today</mat-icon>
             <span>Hoy</span>
           </button>
-        </div>
 
-        <!-- Buscador Rápido -->
-        <div class="quick-search-wrapper">
-          <mat-icon class="search-lead-icon">search</mat-icon>
-          <input 
-            type="text" 
-            class="quick-search-input" 
-            [(ngModel)]="filtros.search" 
-            (keyup.enter)="aplicarFiltros()" 
-            placeholder="Buscar por cliente o # orden..." />
-          <button type="button" class="btn-clear-quick" *ngIf="filtros.search" (click)="filtros.search = ''; aplicarFiltros()">
-            <mat-icon>close</mat-icon>
-          </button>
-          <button type="button" class="btn-quick-go" (click)="aplicarFiltros()" matTooltip="Buscar">
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-
-        <!-- Botones de Utilidad -->
-        <div class="quick-actions-tools">
-          <button 
-            type="button" 
-            class="btn-toggle-filters" 
-            [class.btn-filters-open]="mostrarFiltrosAvanzados" 
-            (click)="toggleFiltrosAvanzados()" 
-            matTooltip="Filtros avanzados (Fechas, Mesas, Pago)">
-            <mat-icon>tune</mat-icon>
-            <span class="d-none d-md-inline">Filtros</span>
-            <mat-icon class="toggle-arrow">{{ mostrarFiltrosAvanzados ? 'expand_less' : 'expand_more' }}</mat-icon>
+          <!-- Botón Filtrar -->
+          <button type="button" class="btn-action-filter" (click)="aplicarFiltros()" matTooltip="Aplicar filtros">
+            <mat-icon>search</mat-icon>
+            <span>Buscar</span>
           </button>
 
-          <!-- <button type="button" class="btn-reset-quick" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
-            <mat-icon>restart_alt</mat-icon>
-          </button> -->
-        </div>
-      </div>
-
-      <!-- Sección Desplegable de Filtros Avanzados -->
-      <div class="filter-advanced-panel mt-3 pt-3" *ngIf="mostrarFiltrosAvanzados">
-        <div class="filter-grid-layout">
-          <!-- Rango de Fechas -->
-          <div class="filter-field">
-            <label class="field-label">
-              <mat-icon>calendar_today</mat-icon> Desde
-            </label>
-            <input type="date" class="form-input" [(ngModel)]="filtros.fechaInicio" (change)="aplicarFiltros()" />
-          </div>
-
-          <div class="filter-field">
-            <label class="field-label">
-              <mat-icon>event</mat-icon> Hasta
-            </label>
-            <input type="date" class="form-input" [(ngModel)]="filtros.fechaFin" (change)="aplicarFiltros()" />
-          </div>
-
-          <!-- Estado de la Venta -->
-          <div class="filter-field">
-            <label class="field-label">
-              <mat-icon>flag</mat-icon> Estado Cobranza
-            </label>
-            <select class="form-select" [(ngModel)]="filtros.state" (change)="aplicarFiltros()">
-              <option value="todos">Todos los Estados</option>
-              <option value="1">Cobrado / Atendido</option>
-              <option value="0">Pendiente por Cobrar</option>
-            </select>
-          </div>
-
-          <!-- Método de Pago -->
-          <div class="filter-field">
-            <label class="field-label">
-              <mat-icon>payments</mat-icon> Medio de Pago
-            </label>
-            <select class="form-select" [(ngModel)]="filtros.pagoCon" (change)="aplicarFiltros()">
-              <option value="todos">Todos los Medios</option>
-              <option value="EF">💵 Efectivo en Caja</option>
-              <option value="TA">💳 Tarjeta Débito/Crédito</option>
-            </select>
-          </div>
-
-          <!-- Mesa -->
-          <!-- <div class="filter-field" *ngIf="mesasCatalogo.length > 0">
-            <label class="field-label">
-              <mat-icon>table_restaurant</mat-icon> Mesa
-            </label>
-            <select class="form-select" [(ngModel)]="filtros.idMesa" (change)="aplicarFiltros()">
-              <option value="todos">Todas las Mesas</option>
-              <option *ngFor="let m of mesasCatalogo" [value]="m.id || m.idMesa">{{ m.nombre || m.f_nombre }}</option>
-            </select>
-          </div> -->
- 
-          <!-- Botón Aplicar en panel avanzado -->
-          <div class="filter-actions-col">
-            <button type="button" class="btn-apply-filter" (click)="aplicarFiltros()">
-              <mat-icon>filter_alt</mat-icon> Buscar
-            </button>
-            <button type="button" class="btn-apply-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
-                Limpiar
-            </button>
-          </div>
+          <!-- Botón Limpiar -->
+          <button type="button" class="btn-action-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer">
+            <span>Limpiar</span>
+          </button>
         </div>
       </div>
     </div>

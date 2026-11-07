@@ -193,15 +193,28 @@
           <mat-icon>today</mat-icon>
           <span>Hoy</span>
         </button>
-
+<!-- 
         <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
-          <mat-icon>tune</mat-icon>
-          <span>Filtrar</span>
+          <mat-icon>search</mat-icon>
+          <span>Buscar</span>
         </button>
 
         <button type="button" class="btn-action-reset" (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
           <mat-icon>refresh</mat-icon>
-        </button>
+        </button> -->
+
+          <!-- Botón Filtrar -->
+          <button type="button" class="btn-action-filter" (click)="cargarMovimientos()" matTooltip="Aplicar filtros">
+            <mat-icon>search</mat-icon>
+            <span>Buscar</span>
+          </button>
+
+          <!-- Botón Limpiar -->
+          <button type="button" class="btn-action-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer">
+            <span>Limpiar</span>
+          </button>
+
+
       </div>
     </div>
   </div>

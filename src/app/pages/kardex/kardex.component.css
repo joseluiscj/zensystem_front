@@ -809,3 +809,49 @@
 .kardex-row.row-ajuste:hover .td-acciones {
   background-color: #fffbeb;
 }
+
+.btn-action-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #103A64;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-action-filter:hover {
+  background: #0a233c;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.btn-action-filter-limpiar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #fff;
+  color: #103A64;
+  border: 1px solid #103A64;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-action-filter-limpiar:hover {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
