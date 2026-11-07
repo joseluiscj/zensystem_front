@@ -112,72 +112,98 @@
     </div> -->
   </div>
 
-  <!-- BARRA DE FILTROS -->
-  <div class="card p-3 mb-4 shadow-sm border filter-card">
-    <div class="row g-2 align-items-end">
+  <!-- BARRA DE FILTROS & BÚSQUEDA -->
+  <div class="compras-filters-card mb-4">
+    <div class="filters-row">
       
-      <!-- Almacén -->
-      <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold mb-1">Almacén</label>
-        <select class="form-select form-select-sm" [(ngModel)]="filtros.idAlmacen" (change)="cargarCompras()">
-          <option value="todos">Todos los almacenes</option>
-          <option *ngFor="let a of almacenes" [value]="a.idAlmacen">{{ a.nombre }}</option>
-        </select>
-      </div>
-
-      <!-- Método de Pago -->
-      <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold mb-1">Método de Pago</label>
-        <select class="form-select form-select-sm" [(ngModel)]="filtros.metodoPago" (change)="cargarCompras()">
-          <option value="todos">Todos los pagos</option>
-          <option value="EF">Efectivo</option>
-          <option value="TA">Tarjeta</option>
-          <option value="TR">Transferencia</option>
-          <option value="CR">Crédito</option>
-        </select>
-      </div>
-
-      <!-- Estado -->
-      <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold mb-1">Estado</label>
-        <select class="form-select form-select-sm" [(ngModel)]="filtros.estado" (change)="cargarCompras()">
-          <option value="todos">Todos</option>
-          <option value="REGISTRADO">Activas</option>
-          <option value="ANULADO">Anuladas</option>
-        </select>
-      </div>
-      
-      <!-- Rango de Fechas -->
-      <div class="col-12 col-md-4">
-        <label class="form-label small fw-bold mb-1">Rango de Fechas</label>
-        <div class="d-flex gap-1">
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
-          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
-        </div>
-      </div>
-
-      <!-- Accesos Rápidos de Fecha -->
-      <div class="col-auto ">
-        <label class="form-label small fw-bold mb-1 d-none d-md-block">&nbsp;</label>
-        <div class="d-flex gap-1">
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroHoy()">Hoy</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEsteMes()">Este Mes</button>
-        </div>
-      </div>
-
-      <!-- Buscador -->
-      <div class="col-12 col-md-3">
-        <label class="form-label small fw-bold mb-1">Buscar</label>
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control" [(ngModel)]="filtros.search" (keyup.enter)="cargarCompras()" placeholder="Código, proveedor, comprobante...">
-          <button class="btn btn-primary" type="button" (click)="cargarCompras()">
-            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">search</mat-icon> Buscar
+      <!-- Búsqueda rápida por código, proveedor o comprobante -->
+      <div class="filter-item filter-search">
+        <label class="filter-label">Buscar Compra / Proveedor / Doc:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput [(ngModel)]="filtros.search" (keyup.enter)="cargarCompras()" placeholder="Código, proveedor, comprobante...">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <button *ngIf="filtros.search" matSuffix mat-icon-button (click)="filtros.search = ''; cargarCompras()">
+            <mat-icon>close</mat-icon>
           </button>
-          <button class="btn btn-outline-secondary" type="button" (click)="limpiarFiltros()" title="Limpiar filtros">
-            <mat-icon style="font-size: 16px; width: 16px; height: 16px;">clear</mat-icon> Limpiar
-          </button>
-        </div>
+        </mat-form-field>
       </div>
+
+      <!-- Filtro por Almacén -->
+      <div class="filter-item">
+        <label class="filter-label">Filtrar por Almacén:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idAlmacen" (selectionChange)="cargarCompras()">
+            <mat-option value="todos">-- Todos los almacenes --</mat-option>
+            <mat-option *ngFor="let a of almacenes" [value]="a.idAlmacen">{{ a.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro por Método de Pago -->
+      <div class="filter-item">
+        <label class="filter-label">Método de Pago:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.metodoPago" (selectionChange)="cargarCompras()">
+            <mat-option value="todos">Todos los pagos</mat-option>
+            <mat-option value="EF">Efectivo</mat-option>
+            <mat-option value="TA">Tarjeta</mat-option>
+            <mat-option value="TR">Transferencia</mat-option>
+            <mat-option value="CR">Crédito</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro por Estado -->
+      <div class="filter-item">
+        <label class="filter-label">Estado:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.estado" (selectionChange)="cargarCompras()">
+            <mat-option value="todos">Todos los estados</mat-option>
+            <mat-option value="REGISTRADO">Activas</mat-option>
+            <mat-option value="ANULADO">Anuladas</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Rango de Fechas: Desde -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Desde:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaInicio" (change)="cargarCompras()">
+        </mat-form-field>
+      </div>
+
+      <!-- Rango de Fechas: Hasta -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Hasta:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date" [(ngModel)]="filtros.fechaFin" (change)="cargarCompras()">
+        </mat-form-field>
+      </div>
+
+      <!-- Accesos Rápidos & Botones Filtrar / Limpiar -->
+      <div class="filter-actions-inline">
+        <button type="button" class="btn-filter-quick" (click)="aplicarFiltroHoy()" matTooltip="Filtrar compras de hoy">
+          <mat-icon>today</mat-icon>
+          <span>Hoy</span>
+        </button>
+
+        <button type="button" class="btn-filter-quick" (click)="aplicarFiltroEsteMes()" matTooltip="Filtrar compras de este mes">
+          <mat-icon>calendar_month</mat-icon>
+          <span>Este Mes</span>
+        </button>
+
+        <button type="button" class="btn-action-filter" (click)="cargarCompras()" matTooltip="Aplicar filtros">
+          <mat-icon>tune</mat-icon>
+          <span>Filtrar</span>
+        </button>
+
+        <button type="button" class="btn-action-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer">
+          <mat-icon>tune</mat-icon>
+          <span>Limpiar</span>
+        </button>
+      </div>
+
     </div>
   </div>
 

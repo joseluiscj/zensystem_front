@@ -275,3 +275,156 @@ tr.table-danger-subtle .td-acciones {
 tr.table-danger-subtle:hover .td-acciones {
   background-color: #f1b0b7;
 }
+
+/* ============================================================
+   FILTROS (Estilo idéntico a Almacén)
+   ============================================================ */
+.compras-filters-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.filters-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  flex: 1;
+  min-width: 170px;
+
+  &.filter-search {
+    flex: 2;
+    min-width: 240px;
+  }
+
+  &.filter-date {
+    min-width: 145px;
+    flex: 0.9;
+  }
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.filter-field {
+  width: 100%;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+}
+
+.search-icon {
+  color: #94a3b8;
+  margin-right: 6px;
+}
+
+.filter-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.btn-filter-quick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 12px;
+  height: 38px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+  }
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #94a3b8;
+  }
+}
+
+.btn-action-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #103A64;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #0a233c;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  }
+}
+
+.btn-action-filter-limpiar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 8px;
+  background: #fff;
+  color: #103A64;
+  border: 1px solid #103A64;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  }
+}
