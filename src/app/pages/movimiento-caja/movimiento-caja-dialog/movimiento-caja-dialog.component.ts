@@ -176,6 +176,26 @@ export class MovimientoCajaDialogComponent implements OnInit {
     return Number(this.movimientoForm?.get('monto')?.value || 0);
   }
 
+  get saldoDisponibleParaGasto(): number {
+    let base = this.saldoActual;
+    if (this.esEdicion && this.movimientoOriginal && Number(this.movimientoForm?.get('idCaja')?.value) === this.movimientoOriginal.idCaja) {
+      const montoAntiguo = Number(this.movimientoOriginal.monto || 0);
+      if (this.movimientoOriginal.tipo === 'E') {
+        base += montoAntiguo;
+      } else {
+        base -= montoAntiguo;
+      }
+    }
+    return base;
+  }
+
+  get esGastoMayorAlSaldo(): boolean {
+    if (this.tipoActual !== 'E') return false;
+    const monto = this.montoIngresado;
+    if (monto <= 0) return false;
+    return monto > this.saldoDisponibleParaGasto;
+  }
+
   get saldoResultante(): number {
     const monto = this.montoIngresado;
     let base = this.saldoActual;
@@ -201,6 +221,18 @@ export class MovimientoCajaDialogComponent implements OnInit {
     if (this.movimientoForm.invalid) {
       this.movimientoForm.markAllAsTouched();
       this.snackBar.open('Complete los campos requeridos correctamente.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    if (this.esGastoMayorAlSaldo) {
+      const saldoStr = this.saldoDisponibleParaGasto.toFixed(2);
+      const montoStr = this.montoIngresado.toFixed(2);
+      const nombreCaja = this.cajaSeleccionada?.nombre || 'la caja seleccionada';
+      this.snackBar.open(
+        `No es posible registrar el gasto: El monto ($/ ${montoStr}) supera el saldo disponible en ${nombreCaja} ($/ ${saldoStr}).`,
+        'Cerrar',
+        { duration: 5000, panelClass: 'custom-snackbar' }
+      );
       return;
     }
 

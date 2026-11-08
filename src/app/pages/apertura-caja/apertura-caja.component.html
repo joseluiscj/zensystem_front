@@ -127,6 +127,10 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Monto Inicial </th>
                 <td mat-cell *matCellDef="let row">
                   <span class="badge-monto">$/ {{ row.aMonto | number:'1.2-2' }}</span>
+                  <div *ngIf="row.cajaOrigenNombre" class="text-muted mt-1" style="font-size: 11px;" [matTooltip]="'Transferido desde ' + row.cajaOrigenNombre">
+                    <mat-icon style="font-size: 13px; width: 13px; height: 13px; vertical-align: middle; color: #0284c7;">subdirectory_arrow_right</mat-icon>
+                    De: <span class="fw-medium text-dark">{{ row.cajaOrigenNombre }}</span>
+                  </div>
                 </td>
               </ng-container>
 

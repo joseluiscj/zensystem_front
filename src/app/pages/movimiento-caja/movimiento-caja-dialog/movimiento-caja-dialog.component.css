@@ -486,3 +486,73 @@
   line-height: 1.4;
   color: #334155;
 }
+
+/* =====================================================
+   ALERTA DE SALDO INSUFICIENTE (VALIDACIÓN DE GASTO)
+   ===================================================== */
+.insufficient-balance-alert {
+  background-color: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-left: 4px solid #e11d48;
+  border-radius: 8px;
+  padding: 10px 12px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.alert-icon-error {
+  color: #e11d48;
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+}
+
+.alert-content-block {
+  flex: 1;
+}
+
+.alert-content-block strong {
+  font-size: 0.82rem;
+  color: #9f1239;
+  margin-bottom: 2px;
+}
+
+.alert-text-detail {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #4c0519;
+  display: block;
+}
+
+.field-error-saldo .mat-mdc-text-field-wrapper {
+  background-color: #fff1f2 !important;
+}
+
+.result-negativo .result-val {
+  color: #dc2626 !important;
+}
+
+.badge-excede-saldo {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #dc2626;
+  background-color: #fee2e2;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 3px;
+  text-align: center;
+  border: 1px solid #fca5a5;
+}
+
+.btn-blocked-balance {
+  background-color: #94a3b8 !important;
+  color: #ffffff !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,606 @@
+<div class="reportes-wrapper">
+
+  <!-- CABECERA HERO BANNER -->
+  <header class="reportes-hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-box">
+        <mat-icon>analytics</mat-icon>
+      </div>
+      <div>
+        <h2 class="hero-title">Centro de Reportes & Analítica</h2>
+        <p class="hero-subtitle">
+          <mat-icon class="sub-icon">insights</mat-icon>
+          <span>Visibilidad integral de flujo de dinero, rentabilidad y rotación de productos</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="btn-hero-secondary" (click)="cargarReporte()" matTooltip="Actualizar datos">
+        <mat-icon [class.spin-icon]="cargando">refresh</mat-icon>
+        <span class="d-none d-sm-inline">Actualizar</span>
+      </button>
+
+      <button type="button" class="btn-hero-export" (click)="exportarCSV()" matTooltip="Descargar en formato Excel / CSV">
+        <mat-icon>file_download</mat-icon>
+        <span>Exportar Excel</span>
+      </button>
+
+      <!-- <button type="button" class="btn-hero-print" (click)="imprimir()" matTooltip="Imprimir reporte actual">
+        <mat-icon>print</mat-icon>
+        <span class="d-none d-sm-inline">Imprimir</span>
+      </button> -->
+    </div>
+  </header>
+
+  <!-- SELECTOR DE PESTAÑAS (DINERO VS PRODUCTOS) -->
+  <div class="reportes-nav-tabs mb-3">
+    <button type="button"
+            class="tab-btn"
+            [class.tab-active]="tabActivo === 'dinero'"
+            (click)="cambiarTab('dinero')">
+      <mat-icon>payments</mat-icon>
+      <span>Reporte de Dinero & Finanzas</span>
+    </button>
+
+    <button type="button"
+            class="tab-btn"
+            [class.tab-active]="tabActivo === 'productos'"
+            (click)="cambiarTab('productos')">
+      <mat-icon>inventory_2</mat-icon>
+      <span>Reporte de Productos & Inventario</span>
+    </button>
+  </div>
+
+  <!-- BARRA DE FILTROS UNIFICADA -->
+  <div class="reportes-filters-card mb-4">
+    <div class="filters-row">
+
+      <!-- Filtro Rango: Desde -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Desde:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date"
+                 #fechaDesdeInput
+                 [(ngModel)]="filtros.fechaInicio"
+                 (change)="cargarReporte()"
+                 (click)="fechaDesdeInput.showPicker()">
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro Rango: Hasta -->
+      <div class="filter-item filter-date">
+        <label class="filter-label">Hasta:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <input matInput type="date"
+                 #fechaHastaInput
+                 [(ngModel)]="filtros.fechaFin"
+                 (change)="cargarReporte()"
+                 (click)="fechaHastaInput.showPicker()">
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro Específico Dinero: Caja -->
+      <div class="filter-item" *ngIf="tabActivo === 'dinero'">
+        <label class="filter-label">Filtrar por Caja:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idCaja" (selectionChange)="cargarReporte()">
+            <mat-option value="todos">-- Todas las cajas --</mat-option>
+            <mat-option *ngFor="let c of dataDinero?.catalogos?.cajas" [value]="c.idCaja">
+              {{ c.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Filtro Específico Productos: Categoría -->
+      <div class="filter-item" *ngIf="tabActivo === 'productos'">
+        <label class="filter-label">Filtrar por Categoría:</label>
+        <mat-form-field appearance="outline" class="w-100 filter-field">
+          <mat-select [(ngModel)]="filtros.idCategoria" (selectionChange)="cargarReporte()">
+            <mat-option value="todos">-- Todas las categorías --</mat-option>
+            <mat-option *ngFor="let cat of dataProductos?.catalogos?.categorias" [value]="cat.id">
+              {{ cat.f_nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Acciones de Filtrado -->
+      <div class="filter-actions-inline">
+        <button type="button" class="btn-filter-quick" [class.btn-filter-quick-active]="esFiltroHoy" (click)="aplicarFiltroHoy()" matTooltip="Filtrar por hoy">
+          <mat-icon>today</mat-icon>
+          <span>Hoy</span>
+        </button>
+
+        <button type="button" class="btn-filter-quick" [class.btn-filter-quick-active]="esFiltroMes" (click)="aplicarFiltroEsteMes()" matTooltip="Filtrar por el mes en curso">
+          <mat-icon>calendar_month</mat-icon>
+          <span>Este Mes</span>
+        </button>
+
+        <button type="button" class="btn-action-filter" (click)="cargarReporte()" matTooltip="Aplicar filtros">
+          <mat-icon>search</mat-icon>
+          <span>Buscar</span>
+        </button>
+
+        <button type="button" class="btn-action-filter-limpiar" (click)="limpiarFiltros()" matTooltip="Restablecer">
+          <span>Limpiar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div *ngIf="cargando" class="reportes-loader mb-4">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div class="loader-text">Generando métricas y análisis de datos...</div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SECCIÓN 1: REPORTE DE DINERO & FINANZAS                   -->
+  <!-- ======================================================== -->
+  <div *ngIf="tabActivo === 'dinero' && !cargando && dataDinero">
+
+    <!-- KPI CARDS FINANCIEROS -->
+    <div class="row g-3 mb-4">
+      <!-- 1. Total Ingresos -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-ingresos">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Total Ingresos Operativos</span>
+            <div class="kpi-icon-circle bg-emerald">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-emerald">S/ {{ dataDinero.kpis.totalIngresos | number:'1.2-2' }}</div>
+          <div class="kpi-card-footer d-flex flex-column gap-1">
+            <span class="kpi-badge badge-emerald">
+              <mat-icon>point_of_sale</mat-icon> {{ dataDinero.kpis.cantidadVentas }} ventas (S/ {{ dataDinero.kpis.totalVentas | number:'1.2-2' }})
+            </span>
+            <span class="kpi-badge badge-blue" *ngIf="dataDinero.kpis.otrosIngresos > 0">
+              <mat-icon>add_circle_outline</mat-icon> Otros Ingresos Caja: S/ {{ dataDinero.kpis.otrosIngresos | number:'1.2-2' }}
+            </span>
+            <span class="kpi-badge badge-amber" *ngIf="(dataDinero.kpis.totalAperturas || 0) > 0" title="Fondos asignados como saldo inicial para cambio en turnos de caja">
+              <mat-icon>savings</mat-icon> Fondo Aperturas: S/ {{ (dataDinero.kpis.totalAperturas || 0) | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Total Egresos -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-egresos">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Total Egresos Operativos</span>
+            <div class="kpi-icon-circle bg-rose">
+              <mat-icon>trending_down</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-rose">S/ {{ dataDinero.kpis.totalEgresos | number:'1.2-2' }}</div>
+          <div class="kpi-card-footer d-flex flex-column gap-1">
+            <span class="kpi-badge badge-rose">
+              <mat-icon>shopping_cart</mat-icon> {{ dataDinero.kpis.cantidadCompras }} compras (S/ {{ dataDinero.kpis.totalCompras | number:'1.2-2' }})
+            </span>
+            <span class="kpi-badge badge-rose" *ngIf="dataDinero.kpis.otrosEgresos > 0">
+              <mat-icon>remove_circle_outline</mat-icon> Gastos Manuales Caja: S/ {{ dataDinero.kpis.otrosEgresos | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Balance Neto -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-balance">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Balance Neto</span>
+            <div class="kpi-icon-circle" [ngClass]="dataDinero.kpis.balanceNeto >= 0 ? 'bg-primary-blue' : 'bg-rose'">
+              <mat-icon>{{ dataDinero.kpis.balanceNeto >= 0 ? 'account_balance' : 'warning' }}</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value" [ngClass]="dataDinero.kpis.balanceNeto >= 0 ? 'text-blue' : 'text-rose'">
+            S/ {{ dataDinero.kpis.balanceNeto | number:'1.2-2' }}
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge" [ngClass]="dataDinero.kpis.balanceNeto >= 0 ? 'badge-blue' : 'badge-rose'">
+              <mat-icon>{{ dataDinero.kpis.balanceNeto >= 0 ? 'check_circle' : 'remove_circle' }}</mat-icon>
+              {{ dataDinero.kpis.balanceNeto >= 0 ? 'Superávit en período' : 'Déficit en período' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Efectivo Neto Físico -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-efectivo">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Efectivo Físico Neto</span>
+            <div class="kpi-icon-circle bg-amber">
+              <mat-icon>attach_money</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-amber">
+            S/ {{ dataDinero.metodosPago.consolidado.efectivoTotal | number:'1.2-2' }}
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-amber">
+              <mat-icon>credit_card</mat-icon> Tarjetas: S/ {{ dataDinero.metodosPago.consolidado.tarjetaTotal | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETAS DE DESGLOSE DE MEDIOS DE PAGO Y FLUJO DIARIO -->
+    <div class="row g-3 mb-4">
+      <!-- Desglose de Medios de Pago -->
+      <div class="col-12 col-lg-5">
+        <div class="report-section-card h-100">
+          <div class="section-card-header">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-primary-blue">pie_chart</mat-icon>
+              <h5 class="section-title m-0">Medios de Pago en Ventas</h5>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <div class="payment-method-item mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold text-dark"><mat-icon class="align-middle fs-6">payments</mat-icon> Efectivo en Caja</span>
+                <span class="fw-bold text-emerald">S/ {{ dataDinero.metodosPago.ventas.efectivo | number:'1.2-2' }}</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-success"
+                     [style.width.%]="dataDinero.kpis.totalVentas > 0 ? (dataDinero.metodosPago.ventas.efectivo / dataDinero.kpis.totalVentas) * 100 : 0"></div>
+              </div>
+            </div>
+
+            <div class="payment-method-item mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold text-dark"><mat-icon class="align-middle fs-6">credit_card</mat-icon> Tarjetas Débito / Crédito</span>
+                <span class="fw-bold text-primary">S/ {{ dataDinero.metodosPago.ventas.tarjeta | number:'1.2-2' }}</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-primary"
+                     [style.width.%]="dataDinero.kpis.totalVentas > 0 ? (dataDinero.metodosPago.ventas.tarjeta / dataDinero.kpis.totalVentas) * 100 : 0"></div>
+              </div>
+            </div>
+
+            <div class="payment-method-item" *ngIf="dataDinero.metodosPago.ventas.otros > 0">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold text-dark"><mat-icon class="align-middle fs-6">account_balance</mat-icon> Otros Medios</span>
+                <span class="fw-bold text-secondary">S/ {{ dataDinero.metodosPago.ventas.otros | number:'1.2-2' }}</span>
+              </div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-secondary"
+                     [style.width.%]="dataDinero.kpis.totalVentas > 0 ? (dataDinero.metodosPago.ventas.otros / dataDinero.kpis.totalVentas) * 100 : 0"></div>
+              </div>
+            </div>
+
+            <div class="summary-breakdown-box mt-4">
+              <div class="row text-center">
+                <div class="col-6 border-end">
+                  <div class="text-muted small">Ingresos Caja Extra</div>
+                  <div class="fw-bold text-emerald">S/ {{ dataDinero.kpis.otrosIngresos | number:'1.2-2' }}</div>
+                </div>
+                <div class="col-6">
+                  <div class="text-muted small">Gastos Caja Extra</div>
+                  <div class="fw-bold text-rose">S/ {{ dataDinero.kpis.otrosEgresos | number:'1.2-2' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flujo de Dinero Cronológico Diario -->
+      <div class="col-12 col-lg-7">
+        <div class="report-section-card h-100">
+          <div class="section-card-header">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-primary-blue">calendar_view_day</mat-icon>
+              <h5 class="section-title m-0">Evolución Cronológica Diaria</h5>
+            </div>
+          </div>
+          <div class="section-card-body p-0">
+            <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th>Fecha</th>
+                    <th class="text-end">Ventas (+)</th>
+                    <th class="text-end">Compras (-)</th>
+                    <th class="text-end">Otros Ing.</th>
+                    <th class="text-end">Otros Egr.</th>
+                    <th class="text-end">Neto Día</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let dia of dataDinero.flujoDiario">
+                    <td class="fw-bold text-dark">{{ dia.fecha_dia | date:'dd/MM/yyyy' }}</td>
+                    <td class="text-end text-emerald fw-semibold">S/ {{ dia.ventas | number:'1.2-2' }}</td>
+                    <td class="text-end text-rose fw-semibold">S/ {{ dia.compras | number:'1.2-2' }}</td>
+                    <td class="text-end text-muted">S/ {{ dia.otros_ingresos | number:'1.2-2' }}</td>
+                    <td class="text-end text-muted">S/ {{ dia.otros_egresos | number:'1.2-2' }}</td>
+                    <td class="text-end fw-bold" [ngClass]="+dia.neto_dia >= 0 ? 'text-emerald' : 'text-rose'">
+                      S/ {{ dia.neto_dia | number:'1.2-2' }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="dataDinero.flujoDiario.length === 0">
+                    <td colspan="6" class="text-center text-muted py-3">No hay movimientos en el rango de fechas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA DE DETALLE DE TRANSACCIONES -->
+    <div class="report-section-card mb-4">
+      <div class="section-card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-primary-blue">receipt_long</mat-icon>
+          <h5 class="section-title m-0">Últimas Transacciones Monetarias del Período</h5>
+        </div>
+        <span class="badge bg-secondary">{{ dataDinero.transacciones.length }} transacciones</span>
+      </div>
+      <div class="section-card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha</th>
+                <th>Flujo</th>
+                <th>Concepto</th>
+                <th>Comprobante</th>
+                <th>Entidad (Cliente/Prov.)</th>
+                <th>Caja</th>
+                <th>Medio</th>
+                <th class="text-end">Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of dataDinero.transacciones">
+                <td class="small">{{ t.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="t.flujo === 'INGRESO' ? 'bg-success' : 'bg-danger'">
+                    {{ t.flujo }}
+                  </span>
+                </td>
+                <td class="fw-semibold text-dark">{{ t.concepto }}</td>
+                <td class="text-muted">{{ t.documento }}</td>
+                <td>{{ t.entidad }}</td>
+                <td><span class="badge bg-light text-dark border">{{ t.caja_nombre }}</span></td>
+                <td><span class="badge bg-info-subtle text-info border">{{ t.metodo_pago || 'EF' }}</span></td>
+                <td class="text-end fw-bold" [ngClass]="t.flujo === 'INGRESO' ? 'text-emerald' : 'text-rose'">
+                  {{ t.flujo === 'INGRESO' ? '+' : '-' }} S/ {{ t.monto | number:'1.2-2' }}
+                </td>
+              </tr>
+              <tr *ngIf="dataDinero.transacciones.length === 0">
+                <td colspan="8" class="text-center text-muted py-4">No hay transacciones monetarias registradas en este período.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SECCIÓN 2: REPORTE DE PRODUCTOS & INVENTARIO              -->
+  <!-- ======================================================== -->
+  <div *ngIf="tabActivo === 'productos' && !cargando && dataProductos">
+
+    <!-- KPI CARDS PRODUCTOS -->
+    <div class="row g-3 mb-4">
+      <!-- 1. Total Unidades Vendidas -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-unidades">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Unidades Vendidas</span>
+            <div class="kpi-icon-circle bg-emerald">
+              <mat-icon>production_quantity_limits</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-emerald">{{ dataProductos.kpis.totalUnidadesVendidas }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-emerald">
+              <mat-icon>sell</mat-icon> Recaudado: S/ {{ dataProductos.kpis.totalRecaudado | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Producto Estrella -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-estrella">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Producto Estrella</span>
+            <div class="kpi-icon-circle bg-amber">
+              <mat-icon>star</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-amber fs-5 text-truncate" [matTooltip]="dataProductos.kpis.productoMasVendido">
+            {{ dataProductos.kpis.productoMasVendido }}
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-amber">
+              <mat-icon>local_fire_department</mat-icon> {{ dataProductos.kpis.unidadesMasVendido }} unidades
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Valorización de Stock -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-valorizacion">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Valorización de Stock</span>
+            <div class="kpi-icon-circle bg-primary-blue">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-blue">S/ {{ dataProductos.kpis.valorCostoInventario | number:'1.2-2' }}</div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-blue">
+              <mat-icon>storefront</mat-icon> P. Venta: S/ {{ dataProductos.kpis.valorVentaInventario | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Alertas de Inventario -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-alertas">
+          <div class="kpi-card-header">
+            <span class="kpi-card-title">Alertas de Stock</span>
+            <div class="kpi-icon-circle bg-rose">
+              <mat-icon>inventory</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card-value text-rose">
+            {{ dataProductos.kpis.productosBajoStock + dataProductos.kpis.productosAgotados }}
+          </div>
+          <div class="kpi-card-footer">
+            <span class="kpi-badge badge-rose">
+              <mat-icon>warning</mat-icon> {{ dataProductos.kpis.productosAgotados }} agotados &bull; {{ dataProductos.kpis.productosBajoStock }} bajos
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RANKING DE PRODUCTOS Y VENTAS POR CATEGORÍA -->
+    <div class="row g-3 mb-4">
+      <!-- Ranking de Productos Más Vendidos -->
+      <div class="col-12 col-lg-8">
+        <div class="report-section-card h-100">
+          <div class="section-card-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-primary-blue">leaderboard</mat-icon>
+              <h5 class="section-title m-0">Ranking de Productos Más Vendidos</h5>
+            </div>
+            <span class="badge bg-secondary">{{ dataProductos.ranking.length }} productos con ventas</span>
+          </div>
+          <div class="section-card-body p-0">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-center">Unidades</th>
+                    <th class="text-end">P. Venta</th>
+                    <th class="text-end">Total Recaudado</th>
+                    <th style="min-width: 140px;">% Participación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of dataProductos.ranking; let i = index">
+                    <td class="fw-bold text-muted">{{ i + 1 }}</td>
+                    <td>
+                      <div class="fw-semibold text-dark">{{ p.nombre }}</div>
+                      <small class="text-muted">{{ p.codigo }}</small>
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ p.categoria }}</span></td>
+                    <td class="text-center fw-bold">{{ p.total_unidades }}</td>
+                    <td class="text-end">S/ {{ p.precio | number:'1.2-2' }}</td>
+                    <td class="text-end fw-bold text-emerald">S/ {{ p.total_recaudado | number:'1.2-2' }}</td>
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height: 6px;">
+                          <div class="progress-bar bg-success" [style.width.%]="p.porcentaje_participacion"></div>
+                        </div>
+                        <span class="small fw-semibold text-muted">{{ p.porcentaje_participacion }}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="dataProductos.ranking.length === 0">
+                    <td colspan="7" class="text-center text-muted py-4">No se registraron ventas de productos en este período.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ventas por Categoría -->
+      <div class="col-12 col-lg-4">
+        <div class="report-section-card h-100">
+          <div class="section-card-header">
+            <div class="d-flex align-items-center gap-2">
+              <mat-icon class="text-primary-blue">pie_chart</mat-icon>
+              <h5 class="section-title m-0">Ventas por Categoría</h5>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <div *ngFor="let cat of dataProductos.ventasPorCategoria" class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-bold text-dark">{{ cat.categoria }}</span>
+                <span class="fw-bold text-emerald">S/ {{ cat.total_recaudado | number:'1.2-2' }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height: 8px;">
+                  <div class="progress-bar bg-primary" [style.width.%]="cat.porcentaje"></div>
+                </div>
+                <small class="text-muted fw-semibold">{{ cat.total_unidades }} uds ({{ cat.porcentaje }}%)</small>
+              </div>
+            </div>
+            <div *ngIf="dataProductos.ventasPorCategoria.length === 0" class="text-muted text-center py-4">
+              Sin datos de categorías en el período.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTOS CON STOCK CRÍTICO / AGOTADOS -->
+    <div class="report-section-card mb-4" *ngIf="dataProductos.productosCriticos.length > 0">
+      <div class="section-card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-danger">warning</mat-icon>
+          <h5 class="section-title m-0 text-danger">Atención Requerida: Productos con Stock Bajo o Agotados</h5>
+        </div>
+        <span class="badge bg-danger">{{ dataProductos.productosCriticos.length }} productos</span>
+      </div>
+      <div class="section-card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th class="text-center">Stock Actual</th>
+                <th class="text-center">Stock Mínimo</th>
+                <th class="text-end">Costo Unit.</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let pc of dataProductos.productosCriticos">
+                <td class="text-muted">{{ pc.codigo }}</td>
+                <td class="fw-bold text-dark">{{ pc.nombre }}</td>
+                <td><span class="badge bg-light text-dark border">{{ pc.categoria }}</span></td>
+                <td class="text-center fw-bold" [ngClass]="pc.stock <= 0 ? 'text-danger' : 'text-warning'">
+                  {{ pc.stock | number:'1.0-2' }}
+                </td>
+                <td class="text-center text-muted">{{ pc.stockMinimo | number:'1.0-2' }}</td>
+                <td class="text-end">S/ {{ pc.costo | number:'1.2-2' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="pc.nivel_alerta === 'AGOTADO' ? 'bg-danger' : 'bg-warning text-dark'">
+                    {{ pc.nivel_alerta }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

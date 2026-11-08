@@ -15,6 +15,7 @@ import { MovimientoCajaComponent } from "./movimiento-caja/movimiento-caja.compo
 import { PosComponent } from "./pos/pos.component";
 import { UsuarioComponent } from "./usuario/usuario.component";
 import { CompraComponent } from "./compra/compra.component";
+import { ReportesComponent } from "./reportes/reportes.component";
 
 export const pagesRoutes: Routes = [
     {path: 'inicio', component:InicioComponent, canActivate: [certGuard]},
@@ -32,5 +33,6 @@ export const pagesRoutes: Routes = [
     {path: 'apertura', component:AperturaCajaComponent, canActivate: [certGuard]},
     {path: 'movimiento-caja', component:MovimientoCajaComponent, canActivate: [certGuard]},
     {path: 'usuario', component:UsuarioComponent, canActivate: [certGuard]},
+    {path: 'reportes', component:ReportesComponent, canActivate: [certGuard]},
     {path: 'not-404', component:Not404Component}
 ];

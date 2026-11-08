@@ -35,7 +35,7 @@
     <div *ngIf="!cargandoResumen && resumen" class="cierre-content-flow">
       
       <!-- 1. Tarjeta de Datos del Turno -->
-      <div class="shift-info-card">
+      <div class="shift-info-card d-none">
         <div class="row g-2">
           <div class="col-6">
             <span class="info-label">Cajero en Turno</span>
@@ -65,7 +65,12 @@
 
         <div class="breakdown-list">
           <div class="breakdown-row">
-            <span class="row-label">Monto Inicial (Apertura)</span>
+            <span class="row-label">
+              Monto Inicial (Apertura)
+              <small *ngIf="resumen.detalle?.cajaOrigenNombre" class="text-muted d-block" style="font-size: 11px;">
+                (Fondo recibido de: <strong>{{ resumen.detalle.cajaOrigenNombre }}</strong>)
+              </small>
+            </span>
             <span class="row-val font-monospace">$/ {{ resumen.aMonto | number:'1.2-2' }}</span>
           </div>
 
@@ -218,6 +223,13 @@
                   <span matPrefix class="currency-prefix">$/&nbsp;</span>
                   <mat-icon matSuffix style="color: #10b981;">payments</mat-icon>
                 </mat-form-field>
+              </div>
+
+              <div class="col-12 mt-1">
+                <div style="font-size: 0.8rem; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 10px; border-radius: 6px; color: #166534; display: flex; align-items: center; gap: 6px;">
+                  <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: #16a34a;">info</mat-icon>
+                  <span>💡 <strong>Transferencia total:</strong> Se transferirá la totalidad del efectivo a la Caja Principal. Esta caja quedará en $/ 0.00 al cierre.</span>
+                </div>
               </div>
             </div>
 

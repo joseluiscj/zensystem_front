@@ -107,7 +107,7 @@
         <!-- Monto -->
         <div class="col-6">
           <label class="form-label-custom">Importe / Monto ($/) *</label>
-          <mat-form-field appearance="outline" class="w-100 drawer-field">
+          <mat-form-field appearance="outline" class="w-100 drawer-field" [class.field-error-saldo]="esGastoMayorAlSaldo">
             <input 
               matInput 
               type="number" 
@@ -118,6 +118,21 @@
               required>
             <span matPrefix class="currency-prefix">$/&nbsp;</span>
           </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Alerta cuando el gasto solicitado supera el saldo de la caja -->
+      <div class="insufficient-balance-alert mb-3" *ngIf="esGastoMayorAlSaldo">
+        <div class="d-flex align-items-start gap-2">
+          <mat-icon class="alert-icon-error">cancel</mat-icon>
+          <div class="alert-content-block">
+            <strong class="d-block text-danger">Saldo insuficiente para registrar este gasto</strong>
+            <span class="alert-text-detail">
+              El importe del gasto (<strong>$/ {{ montoIngresado | number:'1.2-2' }}</strong>) supera el saldo disponible actual en 
+              <strong>{{ cajaSeleccionada?.nombre || 'la caja seleccionada' }}</strong> (<strong>$/ {{ saldoDisponibleParaGasto | number:'1.2-2' }}</strong>).
+              No se puede procesar un gasto que deje la caja con saldo negativo.
+            </span>
+          </div>
         </div>
       </div>
 
@@ -261,11 +276,12 @@
             <mat-icon>drag_handle</mat-icon>
           </div>
 
-          <div class="calc-col calc-result">
+          <div class="calc-col calc-result" [class.result-negativo]="saldoResultante < 0">
             <span class="calc-label">Saldo Final</span>
-            <strong class="calc-num font-monospace result-val">
+            <strong class="calc-num font-monospace result-val" [ngClass]="saldoResultante < 0 ? 'text-danger font-weight-bold' : ''">
               $/ {{ saldoResultante | number:'1.2-2' }}
             </strong>
+            <span *ngIf="esGastoMayorAlSaldo" class="badge-excede-saldo">Excede saldo</span>
           </div>
         </div>
       </div>
@@ -282,11 +298,14 @@
       <button 
         type="submit" 
         class="btn-drawer-submit" 
-        [disabled]="cargando || movimientoForm.invalid">
-        <mat-icon *ngIf="!cargando">check_circle</mat-icon>
+        [disabled]="cargando || movimientoForm.invalid || esGastoMayorAlSaldo"
+        [class.btn-blocked-balance]="esGastoMayorAlSaldo"
+        [matTooltip]="esGastoMayorAlSaldo ? 'El gasto supera el saldo disponible de la caja' : ''">
+        <mat-icon *ngIf="!cargando && !esGastoMayorAlSaldo">check_circle</mat-icon>
+        <mat-icon *ngIf="!cargando && esGastoMayorAlSaldo">block</mat-icon>
         <i class="fas fa-spinner fa-spin" *ngIf="cargando"></i>
         <span>
-          {{ cargando ? 'Guardando...' : (esEdicion ? (tipoActual === 'I' ? 'Actualizar Ingreso' : 'Actualizar Gasto') : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto')) }}
+          {{ cargando ? 'Guardando...' : (esGastoMayorAlSaldo ? 'Saldo Insuficiente' : (esEdicion ? (tipoActual === 'I' ? 'Actualizar Ingreso' : 'Actualizar Gasto') : (tipoActual === 'I' ? 'Registrar Ingreso' : 'Registrar Gasto'))) }}
         </span>
       </button>
     </div>

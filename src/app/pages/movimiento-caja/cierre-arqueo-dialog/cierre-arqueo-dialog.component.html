@@ -101,7 +101,12 @@
             <span class="row-num">1</span>
             <div>
               <span class="concept-name">Fondo Inicial de Apertura</span>
-              <span class="concept-sub">Monto con el que se abrió la caja</span>
+              <span class="concept-sub">
+                Monto con el que se abrió la caja
+                <span *ngIf="detalle?.cajaOrigenNombre" class="text-primary fw-semibold">
+                  (Transferido desde {{ detalle?.cajaOrigenNombre }})
+                </span>
+              </span>
             </div>
           </div>
           <div class="cuadre-amount font-mono">$ {{ resumen.aMonto | number:'1.2-2' }}</div>
@@ -256,7 +261,7 @@
                 <span class="badge bg-light text-secondary border font-mono small">{{ t.nroComprobante }}</span>
               </td>
               <td class="text-end font-mono fw-bold" [ngClass]="t.tipo === 'E' ? 'text-danger' : 'text-success'">
-                {{ t.tipo === 'E' ? '-' : '+' }}$ {{ t.monto | number:'1.2-2' }}
+                {{ t.tipo === 'E' ? '-' : '+' }}${{ t.monto | number:'1.2-2' }}
               </td>
             </tr>
           </tbody>

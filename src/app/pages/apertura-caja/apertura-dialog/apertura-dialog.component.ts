@@ -26,6 +26,8 @@ export class AperturaDialogComponent implements OnInit {
   basicForm: UntypedFormGroup;
   isButtonDisabled: boolean = false;
   cajasDisponibles: any[] = [];
+  cajasOrigen: any[] = [];
+  cajaOrigenSeleccionada: any = null;
   usuariosDisponibles: any[] = [];
   cargandoCajas: boolean = true;
   usuarioActualId: number | null = null;
@@ -47,6 +49,7 @@ export class AperturaDialogComponent implements OnInit {
       idCaja: new UntypedFormControl('', [Validators.required]),
       idUsuario: new UntypedFormControl('', [Validators.required]),
       aMonto: new UntypedFormControl('0.00', [Validators.required, Validators.min(0)]),
+      idCajaOrigen: new UntypedFormControl(null),
     });
   }
 
@@ -57,6 +60,7 @@ export class AperturaDialogComponent implements OnInit {
         this.cargandoCajas = false;
         if (res.code === 200) {
           this.cajasDisponibles = res.data || [];
+          this.cajasOrigen = res.cajasOrigen || [];
           this.usuariosDisponibles = res.usuarios || [];
           this.usuarioActualId = res.usuarioActual || null;
 
@@ -76,6 +80,8 @@ export class AperturaDialogComponent implements OnInit {
               this.basicForm.controls['idUsuario'].setValue(this.usuariosDisponibles[0].id);
             }
           }
+
+          this.actualizarCajaOrigenDefault();
         }
       },
       error: () => {
@@ -85,11 +91,57 @@ export class AperturaDialogComponent implements OnInit {
     });
   }
 
+  getCajasOrigenFiltradas(): any[] {
+    const idCajaDestino = this.basicForm?.controls['idCaja']?.value;
+    return this.cajasOrigen.filter(c => c.id !== idCajaDestino);
+  }
+
+  actualizarCajaOrigenDefault(): void {
+    const filtradas = this.getCajasOrigenFiltradas();
+    if (filtradas.length === 0) {
+      this.basicForm.controls['idCajaOrigen'].setValue(null);
+      this.cajaOrigenSeleccionada = null;
+      return;
+    }
+
+    const idCajaDestino = this.basicForm?.controls['idCaja']?.value;
+    const cajaDestino = this.cajasDisponibles.find(c => c.id === idCajaDestino);
+    const saldoRemanente = parseFloat(cajaDestino?.saldo || 0);
+
+    // Si la caja ya tiene saldo remanente positivo del cierre anterior,
+    // por defecto no debe transferir de caja principal (es saldo propio que ya quedó en la gaveta)
+    if (saldoRemanente > 0) {
+      this.basicForm.controls['idCajaOrigen'].setValue(null);
+      this.cajaOrigenSeleccionada = null;
+    } else {
+      // Si la caja quedó en 0 (liquidada totalmente al cierre), se sugiere transferir el fondo desde Caja Principal
+      const principal = filtradas.find(c => c.principal == 1) || filtradas[0];
+      this.basicForm.controls['idCajaOrigen'].setValue(principal ? principal.id : null);
+      this.cajaOrigenSeleccionada = principal || null;
+    }
+  }
+
   onCajaSelected(idCaja: number) {
     const seleccionada = this.cajasDisponibles.find(c => c.id === idCaja);
     if (seleccionada && seleccionada.saldo !== undefined && seleccionada.saldo !== null) {
-      this.basicForm.controls['aMonto'].setValue(parseFloat(seleccionada.saldo || 0).toFixed(2));
+      const saldo = parseFloat(seleccionada.saldo || 0);
+      this.basicForm.controls['aMonto'].setValue(saldo > 0 ? saldo.toFixed(2) : '0.00');
     }
+    this.actualizarCajaOrigenDefault();
+  }
+
+  onCajaOrigenSelected(id: any): void {
+    if (id) {
+      this.cajaOrigenSeleccionada = this.cajasOrigen.find(c => c.id === id) || null;
+    } else {
+      this.cajaOrigenSeleccionada = null;
+    }
+  }
+
+  get montoInicialNumerico(): number {
+    const raw = this.basicForm?.controls['aMonto']?.value;
+    const val = parseFloat(String(raw !== null && raw !== undefined ? raw : 0).replace(',', '.'));
+    return isNaN(val) || val < 0 ? 0 : val;
   }
 
   formatearAMonto(): void {
@@ -105,11 +157,14 @@ export class AperturaDialogComponent implements OnInit {
     }
 
     const aMontoVal = parseFloat(String(this.basicForm.controls['aMonto'].value || 0).replace(',', '.'));
+    const idCajaOrigenVal = this.montoInicialNumerico > 0 ? (this.basicForm.controls['idCajaOrigen'].value || null) : null;
+
     this.isButtonDisabled = true;
     const payload = {
       idCaja: this.basicForm.controls['idCaja'].value,
       idUsuario: this.basicForm.controls['idUsuario'].value,
-      aMonto: Math.round((isNaN(aMontoVal) || aMontoVal < 0 ? 0 : aMontoVal) * 100) / 100
+      aMonto: Math.round((isNaN(aMontoVal) || aMontoVal < 0 ? 0 : aMontoVal) * 100) / 100,
+      idCajaOrigen: idCajaOrigenVal
     };
 
     this.aperturaService.aperturar(payload).subscribe({

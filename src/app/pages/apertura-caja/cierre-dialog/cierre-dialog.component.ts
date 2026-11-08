@@ -79,22 +79,27 @@ export class CierreDialogComponent implements OnInit {
 
           const saldoEsperado = Number(this.resumen.saldoEsperadoEfectivo || 0);
           this.basicForm.controls['cMonto'].setValue(saldoEsperado.toFixed(2));
-          this.calcularDiferencia();
 
-          // Configurar transferencias
+          // Configurar transferencias: Por defecto transferir todo a la Caja Principal
           this.idCajaDestinoEfectivo = this.resumen.idCajaDestinoEfectivo || null;
           this.idCajaDestinoTarjeta = this.resumen.idCajaDestinoTarjeta || null;
 
           if (!this.esCajaPrincipal && this.cajasDestino.length > 0) {
-            // Por defecto activar transferencia si hay caja destino configurada
-            if (this.idCajaDestinoEfectivo) {
-              this.transferirEfectivo = true;
+            if (!this.idCajaDestinoEfectivo) {
+              const principalEf = this.cajasDestino.find(c => c.principal == 1) || this.cajasDestino[0];
+              this.idCajaDestinoEfectivo = principalEf ? principalEf.id : null;
             }
-            if (this.idCajaDestinoTarjeta && Number(this.resumen.totalTarjeta || 0) > 0) {
+            if (!this.idCajaDestinoTarjeta) {
+              const principalTar = this.cajasDestino.find(c => c.principal == 1 && c.id !== this.idCajaDestinoEfectivo) || this.cajasDestino[0];
+              this.idCajaDestinoTarjeta = principalTar ? principalTar.id : null;
+            }
+            this.transferirEfectivo = true;
+            if (Number(this.resumen.totalTarjeta || 0) > 0) {
               this.transferirTarjeta = true;
             }
           }
 
+          this.calcularDiferencia();
           this.montoTransferirEfectivo = Math.max(0, saldoEsperado).toFixed(2);
           this.montoTransferirTarjeta = Math.max(0, Number(this.resumen.totalTarjeta || 0)).toFixed(2);
         } else {
@@ -115,8 +120,8 @@ export class CierreDialogComponent implements OnInit {
     const validConteo = isNaN(conteoReal) ? 0 : conteoReal;
     this.diferencia = Math.round((validConteo - saldoEsperado) * 100) / 100;
 
-    // Actualizar monto sugerido a transferir si coincide con el conteo o si estaba sincronizado
-    if (this.transferirEfectivo && (!this.montoTransferirEfectivo || parseFloat(String(this.montoTransferirEfectivo)) === saldoEsperado)) {
+    // Al cerrar, transferir por defecto el 100% del efectivo contado para dejar la caja en 0.00
+    if (this.transferirEfectivo) {
       this.montoTransferirEfectivo = Math.max(0, validConteo).toFixed(2);
     }
   }

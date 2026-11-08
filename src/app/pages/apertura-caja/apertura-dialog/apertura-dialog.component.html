@@ -72,6 +72,67 @@
             </mat-error>
           </mat-form-field>
         </div>
+
+        <!-- Selector de Caja de Origen (de dónde sale el dinero) -->
+        <div class="col-12 mb-3" *ngIf="montoInicialNumerico > 0">
+          <mat-form-field appearance="outline" class="w-100" style="margin-bottom: -15px;">
+            <mat-label>Transferir Fondo Inicial desde (Caja Origen):</mat-label>
+            <mat-select formControlName="idCajaOrigen" (valueChange)="onCajaOrigenSelected($event)">
+              <mat-option [value]="null">
+                <em>-- Sin transferencia externa (Saldo propio / Ya en caja) --</em>
+              </mat-option>
+              <mat-option *ngFor="let co of getCajasOrigenFiltradas()" [value]="co.id">
+                <span class="fw-bold">{{ co.nombre }}</span>
+                <span class="text-muted ms-2">(Disponible: S/ {{ (co.saldo || 0) | number:'1.2-2' }})</span>
+                <span *ngIf="co.principal == 1" class="badge bg-primary ms-1" style="font-size: 10px;">Principal</span>
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>account_balance</mat-icon>
+            <mat-hint>Caja de donde se retirará el efectivo para habilitar el turno.</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Tarjeta Informativa de la Transferencia de Apertura -->
+        <div class="col-12 mb-3" *ngIf="montoInicialNumerico > 0 && cajaOrigenSeleccionada">
+          <div class="transfer-preview-box" [ngClass]="montoInicialNumerico > (cajaOrigenSeleccionada.saldo || 0) ? 'transfer-warning' : 'transfer-info'">
+            <div class="d-flex align-items-start gap-2">
+              <mat-icon class="transfer-preview-icon">
+                {{ montoInicialNumerico > (cajaOrigenSeleccionada.saldo || 0) ? 'warning' : 'swap_horiz' }}
+              </mat-icon>
+              <div class="transfer-preview-text">
+                <div class="transfer-preview-title">
+                  Transferencia Automática de Fondo Inicial
+                </div>
+                <div style="font-size: 12px; line-height: 1.4;">
+                  Se registrará un <strong>Egreso</strong> de <strong>S/ {{ montoInicialNumerico | number:'1.2-2' }}</strong> en 
+                  <strong>{{ cajaOrigenSeleccionada.nombre }}</strong> (Saldo actual: S/ {{ (cajaOrigenSeleccionada.saldo || 0) | number:'1.2-2' }}),
+                  y el <strong>Primer Movimiento de Ingreso</strong> en esta caja.
+                </div>
+                <div *ngIf="montoInicialNumerico > (cajaOrigenSeleccionada.saldo || 0)" class="text-danger mt-1 fw-bold" style="font-size: 11.5px;">
+                  ⚠️ Atención: El monto supera el saldo disponible actual en {{ cajaOrigenSeleccionada.nombre }}.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta Informativa cuando NO hay transferencia externa (Saldo propio / Remanente en gaveta) -->
+        <div class="col-12 mb-3" *ngIf="montoInicialNumerico > 0 && !basicForm.controls['idCajaOrigen'].value">
+          <div class="transfer-preview-box transfer-self">
+            <div class="d-flex align-items-start gap-2">
+              <mat-icon class="transfer-preview-icon" style="color: #0284c7;">savings</mat-icon>
+              <div class="transfer-preview-text">
+                <div class="transfer-preview-title" style="color: #0369a1;">
+                  Fondo Propio en Gaveta (Sin Transferencia Externa)
+                </div>
+                <div style="font-size: 12px; line-height: 1.4; color: #334155;">
+                  El turno iniciará con <strong>S/ {{ montoInicialNumerico | number:'1.2-2' }}</strong> como efectivo físico que ya se encuentra en la gaveta (remanente dejado al cierre anterior).
+                  <strong class="d-block text-primary mt-1">✓ No se descontará dinero de Caja Principal ni se registrará como ingreso nuevo (el dinero ya pertenecía a la caja).</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   </mat-dialog-content>

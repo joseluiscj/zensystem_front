@@ -2,6 +2,8 @@ export interface CajaDetalle {
     id?: number;
     idCajaDetalle?: number;
     idCaja: number;
+    idCajaOrigen?: number;
+    cajaOrigenNombre?: string;
     caja?: string;
     cajaNombre?: string;
     moneda?: string;
