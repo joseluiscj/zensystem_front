@@ -6,8 +6,8 @@
         <mat-icon>point_of_sale</mat-icon>
       </div>
       <div>
-        <h3 class="modal-title">Cobrar y Liberar Mesa</h3>
-        <p class="modal-subtitle">Orden #{{ idPedido }} &bull; {{ mesaNombre }}</p>
+        <h3 class="modal-title">Cobro de Mesa &amp; Comanda</h3>
+        <p class="modal-subtitle">Comanda #{{ idPedido }} &bull; {{ mesaNombre }} &bull; {{ nombreClienteGeneral }}</p>
       </div>
     </div>
     <button mat-icon-button class="btn-close-modal" (click)="cerrar()" matTooltip="Cerrar ventana">
@@ -18,7 +18,7 @@
   <!-- Loader si está consultando -->
   <div *ngIf="cargando" class="cobro-loader">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p class="loader-label">Verificando estado de cajas...</p>
+    <p class="loader-label">Cargando productos y estado de la comanda...</p>
   </div>
 
   <!-- Contenido Principal -->
@@ -33,7 +33,7 @@
         <div class="alert-text">
           <h4 class="alert-heading">Cobro Bloqueado: Sin caja abierta</h4>
           <p class="alert-desc">
-            No es posible registrar el cobro ni liberar la mesa porque no existe ninguna caja aperturada con turno activo en el sistema.
+            No es posible registrar cobros porque no existe ninguna caja aperturada con turno activo en el sistema.
           </p>
         </div>
       </div>
@@ -43,7 +43,7 @@
       </button>
     </div>
 
-    <!-- 2. RESUMEN DE LA COMANDA Y MONTO TOTAL -->
+    <!-- 2. RESUMEN FINANCIERO DE LA MESA Y PROGRESO DE PAGOS -->
     <div class="order-summary-card mb-3">
       <div class="summary-meta-row">
         <div class="meta-item">
@@ -53,33 +53,272 @@
           </span>
         </div>
         <div class="meta-item">
-          <span class="meta-lbl">Cliente:</span>
-          <span class="meta-val fw-bold">{{ nombreCliente }}</span>
+          <span class="meta-lbl">Cliente Base:</span>
+          <span class="meta-val fw-bold">{{ nombreClienteGeneral }}</span>
         </div>
       </div>
 
-      <div *ngIf="resumenProductos" class="summary-products-preview mt-2">
-        <span class="preview-lbl">Consumo:</span>
-        <span class="preview-text">{{ resumenProductos }}</span>
+      <!-- Tarjeta de Saldos (Total, Pagado, Pendiente) -->
+      <div class="saldos-grid-card mt-3">
+        <div class="saldo-box total">
+          <span class="saldo-lbl">TOTAL COMANDA</span>
+          <span class="saldo-val">$/ {{ montoTotal | number:'1.2-2' }}</span>
+        </div>
+        <div class="saldo-box pagado">
+          <span class="saldo-lbl">YA PAGADO</span>
+          <span class="saldo-val">$/ {{ montoPagado | number:'1.2-2' }}</span>
+        </div>
+        <div class="saldo-box pendiente">
+          <span class="saldo-lbl">SALDO PENDIENTE</span>
+          <span class="saldo-val">$/ {{ saldoPendiente | number:'1.2-2' }}</span>
+        </div>
       </div>
 
-      <!-- Banner de Total a Cobrar -->
-      <div class="cobro-total-banner mt-3">
-        <div class="total-caption-wrap">
-          <span class="total-tag">TOTAL A LIQUIDAR</span>
-          <span class="total-curr">PEN (S/)</span>
+      <!-- Barra de progreso -->
+      <div class="progress-bar-wrap mt-2">
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="porcentajePagado"></div>
         </div>
-        <div class="total-amount-display">
-          S/ {{ montoTotal | number:'1.2-2' }}
+        <div class="progress-labels">
+          <span>{{ porcentajePagado }}% saldado</span>
+          <span *ngIf="saldoPendiente > 0">Falta liquidar $/ {{ saldoPendiente | number:'1.2-2' }}</span>
+          <span *ngIf="saldoPendiente <= 0" class="text-success fw-bold">¡100% Pagado!</span>
         </div>
       </div>
+
+      <!-- Historial de Pagos Previos (Accordion / Toggle) -->
+      <div *ngIf="historialPagos && historialPagos.length > 0" class="mt-2">
+        <button type="button" class="btn-toggle-historial" (click)="mostrarHistorial = !mostrarHistorial">
+          <mat-icon>{{ mostrarHistorial ? 'expand_less' : 'expand_more' }}</mat-icon>
+          <span>Ver pagos anteriores de esta mesa ({{ historialPagos.length }})</span>
+        </button>
+
+        <div *ngIf="mostrarHistorial" class="historial-pagos-list mt-2">
+          <div *ngFor="let p of historialPagos" class="pago-hist-item">
+            <div class="pago-hist-info">
+              <div class="pago-hist-header">
+                <span class="badge-pago-num">Pago #{{ p.idPedidoPago }}</span>
+                <span class="badge-metodo" [class.badge-ta]="p.metodoPago === 'TA'">
+                  {{ p.metodoPago === 'TA' ? 'Tarjeta' : 'Efectivo' }}
+                </span>
+                <span class="pago-hist-date">{{ p.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="pago-hist-desc">
+                <strong>{{ p.nombreCliente || 'Comensal' }}:</strong> {{ p.descripcion }}
+              </div>
+            </div>
+            <div class="pago-hist-actions">
+              <span class="pago-hist-monto">$/{{ p.monto | number:'1.2-2' }}</span>
+              <!-- <button type="button" class="btn-print-mini" (click)="imprimirComprobanteAbono(p)" matTooltip="Imprimir ticket de este pago">
+                <mat-icon>print</mat-icon>
+              </button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- 3. CONFIGURACIÓN DEL COBRO (SOLO SI HAY CAJA APERTURADA) -->
+    <!-- 3. SELECTOR DE MODALIDAD DE PAGO -->
     <div *ngIf="hayCajaAperturada" class="payment-setup-section">
 
-      <!-- Caja y Cajero -->
+      <label class="form-label-cobro">¿Cómo desean pagar los comensales?</label>
+      <div class="modo-cobro-tabs mb-3">
+        <button 
+          type="button" 
+          class="btn-modo-tab" 
+          [class.active]="modoCobro === 'TOTAL'"
+          (click)="setModoCobro('TOTAL')">
+          <mat-icon>done_all</mat-icon>
+          <div class="tab-text">
+            <strong>Cuenta Completa</strong>
+            <small>Liquidar todo el saldo restante</small>
+          </div>
+        </button>
+
+        <button 
+          type="button" 
+          class="btn-modo-tab" 
+          [class.active]="modoCobro === 'ITEMS'"
+          (click)="setModoCobro('ITEMS')">
+          <mat-icon>fastfood</mat-icon>
+          <div class="tab-text">
+            <strong>Por Platos / Ítems</strong>
+            <small>Cada comensal paga lo que consumió</small>
+          </div>
+        </button>
+
+        <button 
+          type="button" 
+          class="btn-modo-tab" 
+          [class.active]="modoCobro === 'MONTO'"
+          (click)="setModoCobro('MONTO')">
+          <mat-icon>pie_chart</mat-icon>
+          <div class="tab-text">
+            <strong>Dividir Cuenta</strong>
+            <small>Partes iguales o monto libre</small>
+          </div>
+        </button>
+      </div>
+
+      <!-- A. PANEL CUANDO SE ELIGE: POR ÍTEMS / PLATOS -->
+      <div *ngIf="modoCobro === 'ITEMS'" class="items-selection-panel mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="section-subheading">
+            <mat-icon class="sub-icon">checklist</mat-icon>
+            Selecciona los productos que paga esta persona:
+          </span>
+          <div class="quick-select-links">
+            <button type="button" class="btn-link-action" (click)="seleccionarTodosItems()">Todos</button>
+            <span class="sep">&bull;</span>
+            <button type="button" class="btn-link-action" (click)="deseleccionarTodosItems()">Ninguno</button>
+          </div>
+        </div>
+
+        <div class="items-cards-container">
+          <div 
+            *ngFor="let it of detalleProductos" 
+            class="item-dish-card" 
+            [class.item-selected]="it.cantidadCobrar > 0"
+            [class.item-fully-paid]="it.cantidadPendiente === 0"
+            (click)="toggleItem(it)">
+            
+            <div class="item-left-col">
+              <mat-checkbox 
+                [checked]="it.cantidadCobrar > 0" 
+                [disabled]="it.cantidadPendiente === 0"
+                color="primary"
+                (click)="$event.stopPropagation()"
+                (change)="toggleItem(it)">
+              </mat-checkbox>
+              <div class="item-dish-info">
+                <span class="dish-name" [class.text-decoration-line-through]="it.cantidadPendiente === 0">
+                  {{ it.nombre }}
+                </span>
+                <div class="dish-badges">
+                  <span class="dish-unit-price">$/ {{ it.precio | number:'1.2-2' }} c/u</span>
+                  <span class="dish-badge-total">Total: {{ it.cantidadTotal }}</span>
+                  <span *ngIf="it.cantidadPagada > 0" class="dish-badge-paid">Ya Pagados: {{ it.cantidadPagada }}</span>
+                  <span class="dish-badge-pending" [class.zero]="it.cantidadPendiente === 0">
+                    Por Pagar: {{ it.cantidadPendiente }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="item-right-col" (click)="$event.stopPropagation()">
+              <!-- Si ya está 100% pagado -->
+              <span *ngIf="it.cantidadPendiente === 0" class="badge-saldado">
+                <mat-icon>check</mat-icon> Saldado
+              </span>
+
+              <!-- Controles de cantidad a cobrar para este comensal -->
+              <div *ngIf="it.cantidadPendiente > 0" class="qty-stepper-wrap">
+                <button 
+                  type="button" 
+                  class="btn-stepper" 
+                  [disabled]="it.cantidadCobrar <= 0"
+                  (click)="decrementarCantidad(it, $event)">
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <span class="qty-display">{{ it.cantidadCobrar }}</span>
+                <button 
+                  type="button" 
+                  class="btn-stepper" 
+                  [disabled]="it.cantidadCobrar >= it.cantidadPendiente"
+                  (click)="incrementarCantidad(it, $event)">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+
+              <div *ngIf="it.cantidadCobrar > 0" class="item-subtotal-tag">
+                $/ {{ (it.cantidadCobrar * it.precio) | number:'1.2-2' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="itemsSeleccionadosCount === 0" class="hint-no-items alert alert-warning py-2 px-3 mt-2">
+          <mat-icon class="mini-icon">info</mat-icon>
+          <span>Selecciona al menos 1 plato o bebida para calcular el cobro de este comensal.</span>
+        </div>
+      </div>
+
+      <!-- B. PANEL CUANDO SE ELIGE: DIVIDIR EN PARTES IGUALES / MONTO LIBRE -->
+      <div *ngIf="modoCobro === 'MONTO'" class="split-amount-panel mb-3">
+        <label class="form-label-cobro">Dividir en partes iguales:</label>
+        <div class="equal-split-btns mb-3">
+          <button type="button" class="btn-split-chip" (click)="dividirEnPartes(2)">
+            Entre 2 ($/ {{ (saldoPendiente / 2) | number:'1.2-2' }} c/u)
+          </button>
+          <button type="button" class="btn-split-chip" (click)="dividirEnPartes(3)">
+            Entre 3 ($/ {{ (saldoPendiente / 3) | number:'1.2-2' }} c/u)
+          </button>
+          <button type="button" class="btn-split-chip" (click)="dividirEnPartes(4)">
+            Entre 4 ($/ {{ (saldoPendiente / 4) | number:'1.2-2' }} c/u)
+          </button>
+          <button type="button" class="btn-split-chip" (click)="dividirEnPartes(5)">
+            Entre 5 ($/ {{ (saldoPendiente / 5) | number:'1.2-2' }} c/u)
+          </button>
+        </div>
+
+        <label class="form-label-cobro">O ingresa el monto exacto a cobrar a esta persona:</label>
+        <div class="input-cobro-group mb-2">
+          <span class="input-prefix">$/</span>
+          <input 
+            type="number" 
+            step="0.50" 
+            min="0.10"
+            [max]="saldoPendiente"
+            class="form-control form-cobro-control text-end fw-bold fs-5"
+            [(ngModel)]="montoACobrar"
+            (input)="onMontoManualChange()"
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      <!-- BANNER DESTACADO DEL MONTO A COBRAR EN ESTE PAGO -->
+      <div class="charge-summary-box mb-3" [class.charge-complete]="esPagoCompleto" [class.charge-partial]="!esPagoCompleto">
+        <div class="charge-header">
+          <div class="charge-title-wrap">
+            <mat-icon>{{ esPagoCompleto ? 'verified' : 'payments' }}</mat-icon>
+            <span class="charge-title">{{ esPagoCompleto ? 'LIQUIDACIÓN TOTAL DE LA MESA' : 'PAGO PARCIAL DE ESTE COMENSAL' }}</span>
+          </div>
+          <span class="badge-status-outcome" [class.liberara]="esPagoCompleto">
+            {{ esPagoCompleto ? '✓ Liberará la Mesa' : 'Mesa seguirá ocupada' }}
+          </span>
+        </div>
+        
+        <div class="charge-amount-row">
+          <span class="charge-amount-lbl">Monto a cobrar en esta operación:</span>
+          <span class="charge-amount-val">$/ {{ montoACobrar | number:'1.2-2' }}</span>
+        </div>
+
+        <div *ngIf="!esPagoCompleto && montoACobrar > 0" class="charge-remaining-note">
+          Restará un saldo pendiente de <strong>$/ {{ (saldoPendiente - montoACobrar) | number:'1.2-2' }}</strong> por pagar en la comanda.
+        </div>
+      </div>
+
+      <!-- DATOS DE ESTE COMENSAL (NOMBRE O NOTA OPCIONAL) -->
       <div class="row g-2 mb-3">
+        <div class="col-12 col-sm-6">
+          <label class="form-label-cobro d-flex justify-content-between">
+            <span>Nombre / Comensal</span>
+            <span class="badge-opcional">Opcional</span>
+          </label>
+          <div class="input-cobro-group">
+            <mat-icon class="input-icon">person</mat-icon>
+            <input 
+              type="text" 
+              class="form-control form-cobro-control" 
+              placeholder="Ej: Juan, Amigo de polo azul, Persona 1" 
+              [(ngModel)]="nombreClientePago"
+              maxlength="100"
+            />
+          </div>
+        </div>
+
         <div class="col-12 col-sm-6">
           <label class="form-label-cobro">Caja de Cobro *</label>
           <div class="input-cobro-group">
@@ -91,22 +330,10 @@
             </select>
           </div>
         </div>
-
-        <div class="col-12 col-sm-6">
-          <label class="form-label-cobro">Cajero Responsable</label>
-          <div class="input-cobro-group">
-            <mat-icon class="input-icon">badge</mat-icon>
-            <select class="form-select form-cobro-control" [(ngModel)]="idCajeroSeleccionado">
-              <option *ngFor="let u of cajeros" [value]="u.id">
-                {{ u.nombre }}
-              </option>
-            </select>
-          </div>
-        </div>
       </div>
 
-      <!-- Métodos de Pago -->
-      <label class="form-label-cobro">Método de Cobro</label>
+      <!-- MÉTODOS DE PAGO (EFECTIVO O TARJETA) -->
+      <label class="form-label-cobro">Medio de Pago</label>
       <div class="payment-tabs-row mb-3">
         <button 
           type="button" 
@@ -128,32 +355,35 @@
       </div>
 
       <!-- Panel de Efectivo y Vuelto -->
-      <div *ngIf="pagoCon === 'EF'" class="cash-calc-card">
-        <label class="form-label-cobro">Monto Recibido del Cliente (S/)</label>
+      <div *ngIf="pagoCon === 'EF'" class="cash-calc-card mb-3">
+        <label class="form-label-cobro">Monto Recibido del Comensal ($/)</label>
 
         <!-- Botones sugeridos rápidos -->
         <div class="quick-cash-row mb-2">
-          <button type="button" class="btn-cash-quick exact" (click)="setMontoSugerido(montoTotal)">
-            Exacto (S/ {{ montoTotal | number:'1.2-2' }})
+          <button type="button" class="btn-cash-quick exact" (click)="setMontoSugerido(montoACobrar)">
+            Exacto ($/ {{ montoACobrar | number:'1.2-2' }})
           </button>
-          <button *ngIf="montoTotal <= 20" type="button" class="btn-cash-quick" (click)="setMontoSugerido(20)">
-            S/ 20
+          <button *ngIf="montoACobrar <= 10" type="button" class="btn-cash-quick" (click)="setMontoSugerido(10)">
+            $/ 10
           </button>
-          <button *ngIf="montoTotal <= 50" type="button" class="btn-cash-quick" (click)="setMontoSugerido(50)">
-            S/ 50
+          <button *ngIf="montoACobrar <= 20" type="button" class="btn-cash-quick" (click)="setMontoSugerido(20)">
+            $/ 20
           </button>
-          <button *ngIf="montoTotal <= 100" type="button" class="btn-cash-quick" (click)="setMontoSugerido(100)">
-            S/ 100
+          <button *ngIf="montoACobrar <= 50" type="button" class="btn-cash-quick" (click)="setMontoSugerido(50)">
+            $/ 50
+          </button>
+          <button *ngIf="montoACobrar <= 100" type="button" class="btn-cash-quick" (click)="setMontoSugerido(100)">
+            $/ 100
           </button>
           <button type="button" class="btn-cash-quick" (click)="setMontoSugerido(200)">
-            S/ 200
+            $/ 200
           </button>
         </div>
 
         <div class="row g-2 align-items-center">
           <div class="col-6">
             <div class="input-cobro-group">
-              <span class="input-prefix">S/</span>
+              <span class="input-prefix">$/</span>
               <input 
                 type="number" 
                 step="0.10"
@@ -167,18 +397,18 @@
           </div>
 
           <div class="col-6">
-            <div class="change-display-pill" [class.change-positive]="vuelto > 0" [class.change-negative]="montoEfectivo !== null && montoEfectivo < montoTotal">
+            <div class="change-display-pill" [class.change-positive]="vuelto > 0" [class.change-negative]="montoEfectivo !== null && montoEfectivo < montoACobrar">
               <span class="change-lbl">Vuelto a entregar:</span>
               <span class="change-val">
-                S/ {{ (montoEfectivo !== null && montoEfectivo >= montoTotal ? vuelto : 0) | number:'1.2-2' }}
+                $/ {{ (montoEfectivo !== null && montoEfectivo >= montoACobrar ? vuelto : 0) | number:'1.2-2' }}
               </span>
             </div>
           </div>
         </div>
 
-        <div *ngIf="montoEfectivo !== null && montoEfectivo < montoTotal" class="cash-shortage-alert mt-2">
+        <div *ngIf="montoEfectivo !== null && montoEfectivo < montoACobrar" class="cash-shortage-alert mt-2">
           <mat-icon>warning</mat-icon>
-          <span>Faltan S/ {{ (montoTotal - montoEfectivo) | number:'1.2-2' }} para completar el total</span>
+          <span>Faltan $/ {{ (montoACobrar - montoEfectivo) | number:'1.2-2' }} para cubrir este cobro</span>
         </div>
       </div>
 
@@ -186,13 +416,13 @@
       <div *ngIf="pagoCon === 'TA'" class="card-checkout-panel mb-3">
         <div class="card-notice-pill mb-3">
           <mat-icon>credit_score</mat-icon>
-          <span>Procese la transacción bancaria en el terminal POS antes de confirmar la liberación de la mesa.</span>
+          <span>Pase la tarjeta por el terminal POS y registre la transacción.</span>
         </div>
 
         <div class="card-operation-box">
           <label class="form-label-cobro d-flex justify-content-between align-items-center mb-1">
             <span>
-              <mat-icon class="label-mini-icon">tag</mat-icon> Nro. de Operación / Referencia
+              <mat-icon class="label-mini-icon">tag</mat-icon> Nro. de Operación / Voucher POS
             </span>
             <span class="badge-opcional">Opcional</span>
           </label>
@@ -206,10 +436,24 @@
               maxlength="50"
             />
           </div>
-          <small class="hint-op-text">
-            Si ingresa el número de operación del voucher, quedará registrado para la conciliación de caja.
-          </small>
         </div>
+      </div>
+
+      <!-- Notificación del último abono registrado con botón de impresión directa -->
+      <div *ngIf="ultimoPagoExitoso" class="alert-pago-exitoso mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <mat-icon class="text-success">check_circle</mat-icon>
+          <div>
+            <strong>¡Abono registrado con éxito!</strong>
+            <div style="font-size: 11px;">
+              Monto: $/ {{ ultimoPagoExitoso.montoCobrado | number:'1.2-2' }} &bull; Saldo en mesa: $/ {{ ultimoPagoExitoso.saldoRestante | number:'1.2-2' }}
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-print-receipt" (click)="imprimirComprobanteAbono(ultimoPagoExitoso)">
+          <mat-icon>print</mat-icon>
+          <span>Imprimir Ticket Comensal</span>
+        </button>
       </div>
 
     </div>
@@ -219,20 +463,28 @@
   <!-- Barra de Acciones / Botones Inferiores -->
   <div class="cobro-modal-footer">
     <button type="button" class="btn-modal-cancel" (click)="cerrar()" [disabled]="procesando">
-      Cancelar
+      {{ ultimoPagoExitoso ? 'Listo / Cerrar ventana' : 'Cancelar' }}
     </button>
 
     <button 
       type="button" 
       class="btn-modal-confirm" 
+      [class.btn-confirm-total]="esPagoCompleto"
+      [class.btn-confirm-partial]="!esPagoCompleto"
       (click)="confirmarCobro()"
       [disabled]="!esValidoParaCobrar || procesando">
-      <mat-icon *ngIf="!procesando && hayCajaAperturada">check_circle</mat-icon>
-      <mat-icon *ngIf="!procesando && !hayCajaAperturada">lock</mat-icon>
+      
+      <mat-icon *ngIf="!procesando && esPagoCompleto">check_circle</mat-icon>
+      <mat-icon *ngIf="!procesando && !esPagoCompleto">payments</mat-icon>
       <mat-icon *ngIf="procesando" class="spin-icon">refresh</mat-icon>
-      <span *ngIf="!procesando && hayCajaAperturada">Cobrar y Liberar Mesa (S/ {{ montoTotal | number:'1.2-2' }})</span>
-      <span *ngIf="!procesando && !hayCajaAperturada">Aperturar Caja para Cobrar</span>
-      <span *ngIf="procesando">Procesando Cobro...</span>
+      
+      <span *ngIf="!procesando && esPagoCompleto">
+        Cobrar y Liberar Mesa ($/ {{ montoACobrar | number:'1.2-2' }})
+      </span>
+      <span *ngIf="!procesando && !esPagoCompleto">
+        Registrar Pago Parcial ($/ {{ montoACobrar | number:'1.2-2' }})
+      </span>
+      <span *ngIf="procesando">Procesando Pago...</span>
     </button>
   </div>
 </div>

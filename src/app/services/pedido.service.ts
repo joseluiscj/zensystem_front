@@ -26,6 +26,9 @@ export interface VentaItem {
   idCajero: number;
   cajero_nombre: string;
   montoTotal: string | number;
+  montoPagado?: string | number;
+  montoPendiente?: string | number;
+  pagos_count?: number;
   montoEfectivo: string | number;
   montoVuelto: string | number;
   state: number;
@@ -43,6 +46,7 @@ export interface PedidoCompletoResponse {
   code: number;
   data: any;
   detalle: any[];
+  pagos?: any[];
   cajas: any[];
   cajeros: any[];
   mesas: any[];

@@ -291,7 +291,7 @@ export class VentaComponent implements OnInit {
 
   abrirCobroMesa(v: VentaItem): void {
     const dialogRef = this.dialog.open(VentaCobroMesaDialogComponent, {
-      width: '540px',
+      width: '680px',
       maxWidth: '95vw',
       panelClass: 'modal-dialog-center',
       data: {
@@ -299,14 +299,14 @@ export class VentaComponent implements OnInit {
         idMesa: v.idMesa,
         mesa_nombre: v.mesa_nombre,
         nombreCliente: v.nombreCliente,
-        montoTotal: Number(v.montoTotal || 0),
+        montoTotal: Number(v.montoTotal || 0), montoPagado: Number(v.montoPagado || 0), montoPendiente: Number(v.montoPendiente !== undefined ? v.montoPendiente : (Number(v.montoTotal || 0) - Number(v.montoPagado || 0))),
         items_count: v.items_count,
         resumen_productos: v.resumen_productos
       }
     });
 
     dialogRef.afterClosed().subscribe((res) => {
-      if (res && res.cobrado) {
+      if (res && (res.cobrado || res.abono)) {
         this.cargarVentas();
       }
     });
@@ -615,7 +615,7 @@ export class VentaComponent implements OnInit {
     if (esVentaCobrada) {
       // Si ya fue cobrada, el sistema exige obligatoriamente justificación
       const dialogRef = this.dialog.open(VentaJustificacionDialogComponent, {
-        width: '540px',
+        width: '680px',
         maxWidth: '95vw',
         disableClose: true,
         panelClass: 'modal-dialog-center',

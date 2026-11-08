@@ -172,7 +172,7 @@
 
               <div class="amount-row">
                 <span class="amount-label">Cuenta:</span>
-                <span class="amount-value">${{ (mesa.montoTotal || 0) | number:'1.2-2' }}</span>
+                <span class="amount-value">${{ (mesa.montoTotal || 0) | number:'1.2-2' }}</span> <small *ngIf="mesa.montoPagado && +mesa.montoPagado > 0" class="text-warning fw-bold" style="font-size: 10.5px;">(Resta: ${{ ((mesa.montoTotal || 0) - (mesa.montoPagado || 0)) | number:'1.2-2' }})</small>
               </div>
             </div>
           </ng-container>

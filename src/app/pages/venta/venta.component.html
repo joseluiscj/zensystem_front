@@ -253,7 +253,7 @@
                   (click)="abrirCobroMesa(v)" 
                   matTooltip="Pagar / Cobrar comanda y liberar mesa">
                   <mat-icon class="icon-cobrar-btn">point_of_sale</mat-icon>
-                  <span class="txt-cobrar-btn">PAGAR</span>
+                  <span class="txt-cobrar-btn">{{ (v.montoPagado && +v.montoPagado > 0) ? 'ABONAR' : 'PAGAR' }}</span>
                 </button>
 
                 <!-- Si ya fue cobrado: Indicador de cobrado con acceso directo al ticket -->
@@ -313,7 +313,7 @@
               <td class="td-estado text-center">
                 <span class="status-pill" [class.pill-atendido]="v.state === 1" [class.pill-pendiente]="v.state !== 1">
                   <span class="pill-dot"></span>
-                  {{ v.state === 1 ? 'Cobrado' : 'Por Cobrar' }}
+                  {{ v.state === 1 ? 'Cobrado' : ((v.montoPagado && +v.montoPagado > 0) ? 'Parcial' : 'Por Cobrar') }}
                 </span>
               </td>
 

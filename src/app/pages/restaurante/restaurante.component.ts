@@ -17,6 +17,7 @@ export interface MesaItem {
   disponible: number;
   cliente: string;
   montoTotal: number;
+  montoPagado?: number;
   state: number;
   estadoServicio?: 'PENDIENTE' | 'SERVIDO' | string;
 }
