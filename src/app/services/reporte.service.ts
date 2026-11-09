@@ -25,6 +25,17 @@ export interface FlujoDiarioItem {
   neto_dia: number;
 }
 
+export interface FlujoMensualItem {
+  mes_anio: string;
+  ventas: number;
+  compras: number;
+  otros_ingresos: number;
+  otros_egresos: number;
+  total_ingresos: number;
+  total_egresos: number;
+  neto_mes: number;
+}
+
 export interface TransaccionMonetariaItem {
   fecha: string;
   concepto: string;
@@ -57,6 +68,7 @@ export interface ReporteDineroData {
     };
   };
   flujoDiario: FlujoDiarioItem[];
+  flujoMensual?: FlujoMensualItem[];
   transacciones: TransaccionMonetariaItem[];
   catalogos: {
     cajas: Array<{ idCaja: number; nombre: string }>;
