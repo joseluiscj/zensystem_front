@@ -360,9 +360,9 @@
                     <mat-icon>{{ v.esEditable ? 'edit' : 'lock' }}</mat-icon>
                   </button>
 
-                  <!-- Anular Pedido -->
-                  <button type="button" class="btn-action btn-delete" (click)="anularVenta(v.idPedido)" matTooltip="Anular orden">
-                    <mat-icon>delete_outline</mat-icon>
+                  <!-- Eliminar / Anular Venta -->
+                  <button type="button" class="btn-action" [ngClass]="v.esEliminable ? 'btn-delete' : 'btn-delete-disabled'" (click)="anularVenta(v)" [matTooltip]="v.esEliminable ? 'Eliminar / anular venta' : (v.motivoBloqueoEliminacion || 'No eliminable: la caja de esta venta ya fue cerrada')">
+                    <mat-icon>{{ v.esEliminable ? 'delete_outline' : 'lock' }}</mat-icon>
                   </button>
                 </div>
               </td>

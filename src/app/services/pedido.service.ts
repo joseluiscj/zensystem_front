@@ -35,6 +35,8 @@ export interface VentaItem {
   estadoServicio?: string;
   esEditable?: number | boolean;
   motivoBloqueo?: string;
+  esEliminable?: number | boolean;
+  motivoBloqueoEliminacion?: string;
   motivoActualizacion?: string;
   created_at: string;
   updated_at: string;

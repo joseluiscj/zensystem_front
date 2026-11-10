@@ -1256,7 +1256,8 @@
 /* ============================================================
    ESTILOS PARA BOTÓN EDITAR DESHABILITADO POR CAJA CERRADA
    ============================================================ */
-.btn-action.btn-edit-disabled {
+.btn-action.btn-edit-disabled,
+.btn-action.btn-delete-disabled {
   background: #f1f5f9 !important;
   color: #94a3b8 !important;
   border-color: #e2e8f0 !important;
@@ -1264,7 +1265,8 @@
   opacity: 0.65;
 }
 
-.btn-action.btn-edit-disabled:hover {
+.btn-action.btn-edit-disabled:hover,
+.btn-action.btn-delete-disabled:hover {
   background: #fee2e2 !important;
   color: #ef4444 !important;
   border-color: #fca5a5 !important;

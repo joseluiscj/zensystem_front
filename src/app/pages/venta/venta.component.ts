@@ -700,11 +700,28 @@ export class VentaComponent implements OnInit {
     });
   }
 
-  anularVenta(idPedido: number): void {
+  anularVenta(ventaOrId: any): void {
+    const venta = typeof ventaOrId === 'object' && ventaOrId !== null ? ventaOrId : null;
+    const idPedido = venta ? (venta.idPedido || venta.id) : ventaOrId;
+
+    if (venta && (venta.esEliminable === 0 || venta.esEliminable === false)) {
+      this.snackBar.open(
+        venta.motivoBloqueoEliminacion || 'No se puede eliminar la venta: la caja en la que se registró ya fue cerrada.',
+        'Entendido',
+        { duration: 4500 }
+      );
+      return;
+    }
+
+    const esCobrada = venta ? (Number(venta.state) === 1) : false;
+    const mensaje = esCobrada
+      ? `¿Está seguro de que desea anular y eliminar la Venta #${idPedido}? Esta acción devolverá los productos al stock del almacén y anulará el cobro en caja.`
+      : `¿Está seguro de que desea anular la comanda #${idPedido}? Esta acción no se puede deshacer.`;
+
     const dialogRef = this.dialog.open(AlertMsjComponent, {
-      width: '400px',
+      width: '420px',
       data: {
-        mensaje: `¿Está seguro de que desea anular la orden #${idPedido}? Esta acción no se puede deshacer.`
+        mensaje: mensaje
       }
     });
 
@@ -715,16 +732,17 @@ export class VentaComponent implements OnInit {
           next: (resp) => {
             this.cargando = false;
             if (resp && resp.code === 200) {
-              this.snackBar.open('Comanda anulada correctamente', 'Cerrar', { duration: 3500 });
+              this.snackBar.open(resp.message || 'Venta / Comanda anulada y eliminada correctamente', 'Cerrar', { duration: 4000 });
               this.cargarVentas();
             } else {
-              this.snackBar.open(resp.message || 'Error al anular comanda', 'Cerrar', { duration: 3500 });
+              this.snackBar.open(resp.message || 'Error al anular venta', 'Cerrar', { duration: 4000 });
             }
           },
           error: (err) => {
             this.cargando = false;
             console.error(err);
-            this.snackBar.open('No se pudo anular la comanda', 'Cerrar', { duration: 3500 });
+            const msg = err?.error?.message || 'No se pudo anular la venta / comanda';
+            this.snackBar.open(msg, 'Cerrar', { duration: 4500 });
           }
         });
       }
